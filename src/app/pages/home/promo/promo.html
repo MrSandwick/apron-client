@@ -1,0 +1,70 @@
+<section class="bg-[#1a1714] px-6 py-20" data-testid="home-promo">
+  <div
+    class="relative mx-auto w-full max-w-[1024px] overflow-hidden rounded-[32px] border border-brand-amber/15 bg-[linear-gradient(155deg,#1e1a16_0%,#2a2318_60%,#1a1200_100%)] p-8 sm:p-14"
+  >
+    <!-- Amber glow, top-right -->
+    <div
+      class="pointer-events-none absolute -top-24 -right-16 size-72 rounded-full"
+      style="
+        background: radial-gradient(
+          circle,
+          rgba(240, 165, 0, 0.18) 0%,
+          rgba(120, 83, 0, 0.09) 35%,
+          rgba(0, 0, 0, 0) 70%
+        );
+      "
+    ></div>
+
+    <!-- HOT DEAL badge, top-right -->
+    <div
+      class="absolute top-8 right-8 flex size-20 -rotate-6 flex-col items-center justify-center rounded-full bg-[#e8890a] text-center shadow-[0_10px_8px_rgba(0,0,0,0.1)] sm:right-14"
+    >
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="size-5 text-brand-cream">
+        <path
+          fill-rule="evenodd"
+          d="M12.963 2.286a.75.75 0 0 0-1.071-.136 9.742 9.742 0 0 0-3.539 6.176 7.547 7.547 0 0 1-1.705-1.715.75.75 0 0 0-1.152-.082A9 9 0 1 0 15.68 4.534a7.46 7.46 0 0 1-2.717-2.248Z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      <span class="font-display text-[10px] leading-[1.1] text-brand-bg">HOT<br />DEAL</span>
+    </div>
+
+    <!-- Limited-time badge -->
+    <div
+      class="inline-flex items-center gap-2 rounded-full border border-brand-amber/15 bg-[#2a2318] px-4 py-1.5"
+    >
+      <span class="size-2 rounded-full bg-brand-amber/50"></span>
+      <span class="font-sans text-[12px] font-bold uppercase tracking-[1.2px] text-brand-amber">
+        Limited Time
+      </span>
+    </div>
+
+    <h2 class="mt-6 font-display text-[40px] leading-tight text-brand-cream sm:text-[60px]">
+      Unlimited KBBQ Night
+    </h2>
+
+    <p class="mt-2 font-display text-[28px] text-brand-amber">$35 / person · Every Fri &amp; Sat</p>
+
+    <p class="mt-4 max-w-[576px] font-kr text-[18px] leading-[1.6] text-brand-cream/65">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
+      labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+      laboris.
+    </p>
+
+    <div class="mt-8 flex flex-wrap items-center gap-4">
+      <!-- Placeholder CTA: no destination wired yet -->
+      <button
+        type="button"
+        class="rounded-full bg-brand-amber px-9 py-3.5 font-display text-[17.6px] text-brand-bg transition-colors hover:bg-brand-amber/90"
+      >
+        Claim This Deal →
+      </button>
+      <a
+        routerLink="/menu"
+        class="rounded-full border border-brand-amber/15 px-9 py-3.5 font-sans text-[16px] text-brand-cream/70 transition-colors hover:border-brand-amber/40 hover:text-brand-cream"
+      >
+        See Full Menu
+      </a>
+    </div>
+  </div>
+</section>
