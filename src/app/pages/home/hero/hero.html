@@ -1,0 +1,80 @@
+<section class="relative overflow-hidden bg-brand-bg" data-testid="home-hero">
+  <!-- Warm radial glow behind the decorative art -->
+  <div
+    class="pointer-events-none absolute inset-0"
+    style="
+      background: radial-gradient(
+        120% 60% at 50% 50%,
+        #2a1a00 0%,
+        #22190a 22.5%,
+        #1a1714 45%,
+        #0e0c0b 100%
+      );
+    "
+  ></div>
+
+  <!-- Decorative blob (exported from Figma) -->
+  <img
+    src="images/hero-blob.png"
+    alt=""
+    aria-hidden="true"
+    class="pointer-events-none absolute inset-0 h-full w-full object-contain opacity-55"
+  />
+
+  <!-- Vignette darkening the edges -->
+  <div
+    class="pointer-events-none absolute inset-0"
+    style="
+      background: radial-gradient(
+        130% 65% at 50% 50%,
+        rgba(0, 0, 0, 0) 20%,
+        rgba(14, 12, 11, 0.55) 70%,
+        rgba(14, 12, 11, 0.9) 100%
+      );
+    "
+  ></div>
+
+  <!-- Centered content -->
+  <div
+    class="relative mx-auto flex min-h-[767px] max-w-[1400px] flex-col items-center justify-center px-6 text-center"
+  >
+    <p class="font-sans text-[12px] font-bold uppercase tracking-[4.2px] text-brand-amber/90">
+      Lorem · Ipsum · Dolor
+    </p>
+
+    <h1
+      class="mt-2 font-display text-[64px] leading-none text-brand-cream drop-shadow-[0_25px_25px_rgba(0,0,0,0.15)] sm:text-[88px] lg:text-[112px]"
+    >
+      Ahjoomah's Apron
+    </h1>
+
+    <p class="mt-2 font-display text-[32px] tracking-[6.4px] text-brand-amber/80">아주마스</p>
+
+    <p class="mt-6 max-w-[36rem] font-kr text-[19.2px] leading-[31.2px] text-brand-cream/70">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit
+    </p>
+
+    <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
+      <a
+        routerLink="/reserve"
+        class="rounded-full bg-brand-amber px-10 py-3 font-display text-[17.6px] text-brand-bg transition-colors hover:bg-brand-amber/90"
+      >
+        Reserve a Table
+      </a>
+      <a
+        routerLink="/menu"
+        class="rounded-full border border-brand-amber/15 px-10 py-3 font-sans text-[16px] text-brand-cream/80 transition-colors hover:border-brand-amber/40 hover:text-brand-cream"
+      >
+        View Menu →
+      </a>
+    </div>
+  </div>
+
+  <!-- Scroll hint -->
+  <div
+    class="pointer-events-none absolute bottom-6 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 opacity-40"
+  >
+    <span class="font-sans text-[12px] uppercase tracking-[1.2px] text-brand-cream/60">Scroll</span>
+    <span class="h-10 w-px bg-gradient-to-b from-brand-amber/60 to-transparent"></span>
+  </div>
+</section>
