@@ -1,3 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import 'tailwindcss';
+
+/*
+ * Brand design tokens. The Figma file defines no variables, so the design
+ * system lives here. Tailwind v4 exposes these as utilities, e.g.
+ * `bg-brand-bg`, `text-brand-cream`, `font-display`.
+ */
+@theme {
+  --color-brand-bg: #0e0c0b;
+  --color-brand-amber: #f0a500;
+  --color-brand-cream: #f5e6c8;
+
+  --font-display: 'Fredoka One', cursive;
+  --font-sans: 'Nunito', sans-serif;
+  --font-kr: 'Noto Sans KR', sans-serif;
+}
