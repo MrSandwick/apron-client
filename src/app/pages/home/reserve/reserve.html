@@ -1,0 +1,56 @@
+<section class="relative overflow-hidden bg-[#0a0806]" data-testid="home-reserve">
+  <!-- Decorative octagon, right side -->
+  <img
+    src="images/reserve-octagon.png"
+    alt=""
+    aria-hidden="true"
+    class="pointer-events-none absolute top-0 right-0 hidden h-full w-[700px] max-w-[55%] object-contain md:block"
+  />
+
+  <!-- Fade the art into the background toward the text -->
+  <div
+    class="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0a0806] from-[38%] via-[rgba(10,8,6,0.5)] via-[65%] to-transparent"
+  ></div>
+
+  <div class="relative mx-auto max-w-[1152px] px-6 py-24">
+    <div class="flex max-w-[576px] flex-col gap-8">
+      <div>
+        <p class="font-sans text-[12px] font-bold uppercase tracking-[3.6px] text-brand-amber">
+          Reservations
+        </p>
+        <h2 class="mt-2 font-display text-[40px] leading-[1.1] text-brand-cream sm:text-[52px]">
+          Book Your<br />Table Online
+        </h2>
+        <p class="mt-4 font-kr text-[18px] leading-[1.6] text-brand-cream/60">
+          Walk-ins welcome. Reservations guaranteed. Head to our dedicated booking page to choose
+          your date, time, and party size — takes less than two minutes.
+        </p>
+      </div>
+
+      <ul class="flex flex-col gap-3">
+        @for (feature of features; track feature) {
+          <li class="flex items-center gap-3">
+            <span class="size-1.5 shrink-0 rounded-full bg-brand-amber"></span>
+            <span class="font-kr text-[14px] text-brand-cream/70">{{ feature }}</span>
+          </li>
+        }
+      </ul>
+
+      <div class="flex flex-wrap items-center gap-4">
+        <a
+          routerLink="/reserve"
+          class="rounded-full bg-brand-amber px-10 py-4 font-display text-[17.6px] text-brand-bg transition-colors hover:bg-brand-amber/90"
+        >
+          Reserve a Table →
+        </a>
+        <!-- Placeholder: phone number not wired yet -->
+        <button
+          type="button"
+          class="rounded-full border border-brand-amber/15 px-10 py-4 font-sans text-[14px] text-brand-cream/70 transition-colors hover:border-brand-amber/40 hover:text-brand-cream"
+        >
+          Or call us directly
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
