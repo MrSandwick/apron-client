@@ -21,9 +21,10 @@ describe('HomeAbout', () => {
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
     const text = el.textContent ?? '';
+    // Both Find Us locations render.
     expect(text).toContain('Lorem City');
     expect(text).toContain('Dolor City');
-    // Hours as a semantic description list
+    // Hours is a semantic description list with one row per span.
     const rows = el.querySelectorAll('dl > div');
     expect(rows.length).toBe(3);
     expect(text).toContain('Mon – Thu');
@@ -34,10 +35,12 @@ describe('HomeAbout', () => {
     const fixture = TestBed.createComponent(HomeAbout);
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
+    // No map destination yet, so each location's "Get Directions" is a button.
     const directions = Array.from(el.querySelectorAll('button')).filter((b) =>
       b.textContent?.includes('Get Directions'),
     );
     expect(directions.length).toBe(2);
+    // Guards the no-emoji rule: the art card uses an SVG flame.
     expect(el.textContent).toContain('Since 2019');
     expect(el.textContent).not.toContain('🔥');
   });
