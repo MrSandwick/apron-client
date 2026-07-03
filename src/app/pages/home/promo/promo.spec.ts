@@ -4,6 +4,7 @@ import { HomePromo } from './promo';
 
 describe('HomePromo', () => {
   beforeEach(async () => {
+    // Router is provided so the "See Full Menu" routerLink resolves.
     await TestBed.configureTestingModule({
       imports: [HomePromo],
       providers: [provideRouter([])],
@@ -24,11 +25,13 @@ describe('HomePromo', () => {
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
 
+    // "See Full Menu" navigates; assert its route.
     const menuLink = Array.from(el.querySelectorAll('a')).find((a) =>
       a.textContent?.includes('See Full Menu'),
     );
     expect(menuLink?.getAttribute('href')).toBe('/menu');
 
+    // "Claim This Deal" has no destination yet, so it stays a button.
     const claim = Array.from(el.querySelectorAll('button')).find((b) =>
       b.textContent?.includes('Claim This Deal'),
     );
@@ -39,6 +42,7 @@ describe('HomePromo', () => {
     const fixture = TestBed.createComponent(HomePromo);
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
+    // Guards the no-emoji rule: the flame is an SVG, not the literal emoji.
     expect(el.textContent).toContain('HOT');
     expect(el.textContent).not.toContain('🔥');
   });

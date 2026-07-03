@@ -4,6 +4,7 @@ import { HomeHero } from './hero';
 
 describe('HomeHero', () => {
   beforeEach(async () => {
+    // Router is provided so the CTA routerLinks resolve to hrefs.
     await TestBed.configureTestingModule({
       imports: [HomeHero],
       providers: [provideRouter([])],
@@ -23,6 +24,7 @@ describe('HomeHero', () => {
     const fixture = TestBed.createComponent(HomeHero);
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
+    // Both CTAs are anchors; assert their resolved routes.
     const hrefs = Array.from(el.querySelectorAll('a')).map((a) => a.getAttribute('href'));
     expect(hrefs).toContain('/reserve');
     expect(hrefs).toContain('/menu');

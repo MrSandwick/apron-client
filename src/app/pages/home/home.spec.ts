@@ -5,6 +5,7 @@ import { routes } from '../../app.routes';
 
 describe('Home page routing', () => {
   it('renders the Home page at /home', async () => {
+    // Drive the real routes through the router to reach the lazy Home component.
     TestBed.configureTestingModule({ providers: [provideRouter(routes)] });
     const harness = await RouterTestingHarness.create();
     await harness.navigateByUrl('/home');
@@ -15,6 +16,7 @@ describe('Home page routing', () => {
   it('redirects the root path to /home', async () => {
     TestBed.configureTestingModule({ providers: [provideRouter(routes)] });
     const harness = await RouterTestingHarness.create();
+    // Navigating to the root should land on /home via the redirect route.
     await harness.navigateByUrl('/');
     expect(TestBed.inject(Router).url).toBe('/home');
   });
