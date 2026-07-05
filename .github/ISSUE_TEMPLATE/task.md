@@ -1,7 +1,7 @@
 ---
 name: Task
 about: A unit of work to track on the kanban board
-title: "[Task] "
+title: ""
 labels: task
 assignees: ""
 ---

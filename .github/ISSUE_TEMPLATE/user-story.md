@@ -1,7 +1,7 @@
 ---
 name: User Story
 about: Describe a feature from the user's perspective
-title: "[Story] "
+title: ""
 labels: story
 assignees: ""
 ---

@@ -1,7 +1,7 @@
 ---
 name: Spike / Research
 about: Time-boxed investigation to reduce uncertainty
-title: "[Spike] "
+title: ""
 labels: spike, research
 assignees: ""
 ---
