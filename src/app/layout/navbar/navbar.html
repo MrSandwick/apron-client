@@ -4,13 +4,13 @@
 >
   <div class="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-6">
     <!-- Brand: logo mark links home -->
-    <a routerLink="/home" class="flex items-center gap-2.5">
+    <a routerLink="/home" (click)="closeMenu()" class="flex items-center gap-2.5">
       <img src="images/logo-mark.svg" alt="" aria-hidden="true" class="size-9" />
       <span class="font-display text-[20px] tracking-[-0.2px] text-brand-amber">Ahjoomah's</span>
     </a>
 
-    <!-- Primary page links; active route shows amber -->
-    <nav aria-label="Primary" class="flex items-center gap-7">
+    <!-- Primary page links (desktop); collapses into the mobile menu below md -->
+    <nav aria-label="Primary" class="hidden items-center gap-7 md:flex">
       <a
         routerLink="/home"
         routerLinkActive="text-brand-amber!"
@@ -28,11 +28,11 @@
       </a>
     </nav>
 
-    <!-- Actions: reservation CTA and cart -->
+    <!-- Actions: reservation CTA (desktop), cart (always), and the mobile menu toggle -->
     <div class="flex items-center gap-3">
       <a
         routerLink="/reserve"
-        class="rounded-full bg-brand-amber px-6 py-2.5 font-display text-[14px] text-brand-bg transition-colors hover:bg-brand-amber/90"
+        class="hidden rounded-full bg-brand-amber px-6 py-2.5 font-display text-[14px] text-brand-bg transition-colors hover:bg-brand-amber/90 md:inline-block"
       >
         Reservations
       </a>
@@ -56,6 +56,74 @@
           />
         </svg>
       </a>
+
+      <!-- Mobile menu toggle: hamburger when closed, close icon when open -->
+      <button
+        type="button"
+        (click)="toggleMenu()"
+        [attr.aria-expanded]="menuOpen()"
+        aria-controls="mobile-menu"
+        aria-label="Toggle menu"
+        class="flex size-10 items-center justify-center rounded-full border border-brand-amber/15 text-brand-cream/70 transition-colors hover:border-brand-amber/40 hover:text-brand-cream md:hidden"
+      >
+        @if (menuOpen()) {
+          <!-- Close icon -->
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            aria-hidden="true"
+            class="size-5"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        } @else {
+          <!-- Hamburger icon -->
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            aria-hidden="true"
+            class="size-5"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+        }
+      </button>
     </div>
   </div>
+
+  <!-- Mobile menu: page links + reservation CTA, revealed by the toggle -->
+  @if (menuOpen()) {
+    <div id="mobile-menu" class="border-t border-brand-amber/15 px-6 py-4 md:hidden">
+      <nav aria-label="Primary" class="flex flex-col">
+        <a
+          routerLink="/home"
+          routerLinkActive="text-brand-amber!"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeMenu()"
+          class="py-3 font-sans text-[15px] text-brand-cream/75 transition-colors hover:text-brand-cream"
+        >
+          Home
+        </a>
+        <a
+          routerLink="/menu"
+          routerLinkActive="text-brand-amber!"
+          (click)="closeMenu()"
+          class="py-3 font-sans text-[15px] text-brand-cream/75 transition-colors hover:text-brand-cream"
+        >
+          Menu
+        </a>
+      </nav>
+      <a
+        routerLink="/reserve"
+        (click)="closeMenu()"
+        class="mt-3 block rounded-full bg-brand-amber px-6 py-3 text-center font-display text-[15px] text-brand-bg transition-colors hover:bg-brand-amber/90"
+      >
+        Reservations
+      </a>
+    </div>
+  }
 </header>
