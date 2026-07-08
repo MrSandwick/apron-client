@@ -13,16 +13,12 @@
     "
   ></div>
 
-  <!-- Decorative blob (exported from Figma) -->
-  <img
-    src="images/hero-blob.png"
-    alt=""
-    aria-hidden="true"
-    class="pointer-events-none absolute inset-0 h-full w-full object-contain opacity-55"
+  <!-- Layered decorative 3D behind the content: a scroll-orbiting amber cube -->
+  <app-section-canvas
+    class="pointer-events-none absolute inset-0 block"
+    variant="cube"
+    color="#f0a500"
   />
-
-  <!-- Three.js proof canvas (#27): layered decorative 3D behind the content -->
-  <app-three-canvas class="pointer-events-none absolute inset-0 block" />
 
   <!-- Vignette darkening the edges -->
   <div
@@ -37,9 +33,9 @@
     "
   ></div>
 
-  <!-- Centered content -->
+  <!-- Centered content, filling the full-height section -->
   <div
-    class="relative mx-auto flex min-h-[767px] max-w-[1400px] flex-col items-center justify-center px-6 text-center"
+    class="relative mx-auto flex min-h-screen max-w-[1400px] flex-col items-center justify-center px-6 text-center"
   >
     <p class="font-sans text-[12px] font-bold uppercase tracking-[4.2px] text-brand-amber/90">
       Lorem · Ipsum · Dolor
@@ -71,13 +67,5 @@
         View Menu →
       </a>
     </div>
-  </div>
-
-  <!-- Scroll hint -->
-  <div
-    class="pointer-events-none absolute bottom-6 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 opacity-40"
-  >
-    <span class="font-sans text-[12px] uppercase tracking-[1.2px] text-brand-cream/60">Scroll</span>
-    <span class="h-10 w-px bg-gradient-to-b from-brand-amber/60 to-transparent"></span>
   </div>
 </section>

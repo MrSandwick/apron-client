@@ -1,16 +1,16 @@
 <section class="relative overflow-hidden bg-[#0a0806]" data-testid="home-reserve">
-  <!-- Decorative octagon, right side -->
-  <img
-    src="images/reserve-octagon.png"
-    alt=""
-    aria-hidden="true"
-    class="pointer-events-none absolute top-0 right-0 hidden h-full w-[700px] max-w-[55%] object-contain md:block"
-  />
-
-  <!-- Fade the art into the background toward the text -->
-  <div
-    class="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0a0806] from-[38%] via-[rgba(10,8,6,0.5)] via-[65%] to-transparent"
-  ></div>
+  <!-- Frame the object + veils to the copy's max width so on ultra-wide screens the
+       object stays inside the section instead of drifting to the viewport edge -->
+  <div class="pointer-events-none absolute inset-0 mx-auto max-w-[1152px]">
+    <!-- 3D object spanning the frame, pinned to the right beside the copy -->
+    <app-section-canvas class="absolute inset-0 block" variant="knot" color="#f5e6c8" align="right" />
+    <!-- Darken the copy side, clearing before the object so it stays bright -->
+    <div
+      class="absolute inset-0 bg-gradient-to-r from-[#0a0806] from-25% via-[#0a0806]/75 via-48% to-transparent to-62%"
+    ></div>
+    <!-- On narrow screens the object sits under the copy, so dim it overall -->
+    <div class="absolute inset-0 bg-[#0a0806]/50 md:hidden"></div>
+  </div>
 
   <!-- Booking copy, feature list, and CTAs -->
   <div class="relative mx-auto max-w-[1152px] px-6 py-24">

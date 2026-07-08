@@ -22,6 +22,16 @@ describe('HomeReserve', () => {
     expect(el.textContent).toContain('Groups of 2 – 30 guests');
   });
 
+  it('renders the decorative 3D object alongside the copy', () => {
+    const fixture = TestBed.createComponent(HomeReserve);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    // The section swaps the old octagon image for a right-aligned Three.js canvas.
+    const canvas = el.querySelector('app-section-canvas');
+    expect(canvas).toBeTruthy();
+    expect(el.querySelector('img')).toBeNull();
+  });
+
   it('links "Reserve a Table" to /reserve and keeps the call CTA as a placeholder', () => {
     const fixture = TestBed.createComponent(HomeReserve);
     fixture.detectChanges();
