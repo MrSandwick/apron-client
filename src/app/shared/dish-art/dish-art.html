@@ -1,0 +1,227 @@
+<!-- Fixed 4:3 frame: the photo or illustration fills it without changing its size -->
+<div
+  class="relative aspect-[4/3] overflow-hidden rounded-2xl"
+  [class]="tone() === 'kitchen' ? 'bg-kitchen-wood/15' : 'bg-brand-raised'"
+  data-testid="dish-art"
+>
+  @if (src(); as photo) {
+    <!-- Real photo, once one exists -->
+    <img
+      [src]="photo"
+      [alt]="alt()"
+      loading="lazy"
+      class="absolute inset-0 size-full object-cover"
+    />
+  } @else {
+    <!-- Illustrated placeholder -->
+    <svg
+      viewBox="0 0 160 120"
+      class="absolute inset-0 size-full"
+      [attr.role]="alt() ? 'img' : null"
+      [attr.aria-label]="alt() || null"
+      [attr.aria-hidden]="alt() ? null : 'true'"
+      [attr.data-kind]="kind()"
+    >
+      <!-- Soft plate shadow shared by every dish -->
+      <ellipse cx="80" cy="98" rx="54" ry="9" class="fill-black/20" />
+
+      @switch (kind()) {
+        @case ('grill') {
+          <!-- Tabletop grill: dark rim, amber grate, sizzling meat, steam -->
+          <ellipse cx="80" cy="80" rx="56" ry="18" class="fill-mascot-hair" />
+          <ellipse cx="80" cy="74" rx="50" ry="15" class="fill-brand-amber" />
+          <path
+            d="M40 70h80M36 76h88M44 82h72"
+            class="fill-none stroke-mascot-hair/40"
+            stroke-width="2"
+          />
+          <rect
+            x="52"
+            y="64"
+            width="26"
+            height="9"
+            rx="4"
+            transform="rotate(-8 65 68)"
+            class="fill-kitchen-wood-dark stroke-mascot-hair"
+            stroke-width="2"
+          />
+          <rect
+            x="82"
+            y="66"
+            width="28"
+            height="9"
+            rx="4"
+            transform="rotate(6 96 70)"
+            class="fill-brand-chili stroke-mascot-hair"
+            stroke-width="2"
+          />
+          <path
+            d="M60 52q-6-8 0-16M80 50q-6-8 0-16M100 52q-6-8 0-16"
+            class="fill-none stroke-brand-cream/70"
+            stroke-width="3"
+            stroke-linecap="round"
+          />
+        }
+        @case ('meat') {
+          <!-- Plate of marinated galbi on a lettuce leaf -->
+          <ellipse
+            cx="80"
+            cy="84"
+            rx="58"
+            ry="16"
+            class="fill-mascot-skin stroke-mascot-hair"
+            stroke-width="2.5"
+          />
+          <path d="M40 80q10-16 30-10q-12 10-30 10z" class="fill-brand-leaf" />
+          <path
+            d="M56 74q14-14 34-6q-6 14-30 12z"
+            class="fill-kitchen-wood-dark stroke-mascot-hair"
+            stroke-width="2.5"
+          />
+          <path
+            d="M80 78q16-14 36-4q-6 12-32 10z"
+            class="fill-brand-chili stroke-mascot-hair"
+            stroke-width="2.5"
+          />
+          <path
+            d="M64 72q8-4 18-2M88 76q8-4 18-1"
+            class="fill-none stroke-mascot-skin"
+            stroke-width="2.5"
+            stroke-linecap="round"
+          />
+        }
+        @case ('stew') {
+          <!-- Bubbling jjigae in a stone pot with tofu and green onion -->
+          <path d="M34 66h92q-4 30-46 30t-46-30z" class="fill-mascot-hair" />
+          <rect x="24" y="64" width="14" height="6" rx="3" class="fill-mascot-hair" />
+          <rect x="122" y="64" width="14" height="6" rx="3" class="fill-mascot-hair" />
+          <ellipse cx="80" cy="66" rx="46" ry="10" class="fill-brand-chili" />
+          <rect x="62" y="60" width="10" height="8" rx="1.5" class="fill-mascot-skin" />
+          <rect x="84" y="62" width="10" height="7" rx="1.5" class="fill-mascot-skin" />
+          <circle cx="76" cy="68" r="2.2" class="fill-brand-leaf" />
+          <circle cx="98" cy="64" r="2.2" class="fill-brand-leaf" />
+          <path
+            d="M66 46q-6-8 0-16M86 44q-6-8 0-16"
+            class="fill-none stroke-brand-cream/70"
+            stroke-width="3"
+            stroke-linecap="round"
+          />
+        }
+        @case ('rice') {
+          <!-- Bowl of rice with chopsticks -->
+          <path
+            d="M106 26l-30 44M118 30l-36 42"
+            class="fill-none stroke-kitchen-wood-dark"
+            stroke-width="4"
+            stroke-linecap="round"
+          />
+          <path d="M44 62q36-26 72 0z" class="fill-white stroke-mascot-hair" stroke-width="2.5" />
+          <path
+            d="M40 62h80q-4 32-40 32t-40-32z"
+            class="fill-brand-cream stroke-mascot-hair"
+            stroke-width="2.5"
+          />
+          <path d="M46 74h68" class="fill-none stroke-brand-apron" stroke-width="4" />
+        }
+        @case ('noodles') {
+          <!-- Noodle bowl with half an egg, noodles lifted on chopsticks -->
+          <path
+            d="M40 60h80q-4 34-40 34t-40-34z"
+            class="fill-brand-apron stroke-mascot-hair"
+            stroke-width="2.5"
+          />
+          <ellipse
+            cx="80"
+            cy="60"
+            rx="40"
+            ry="8"
+            class="fill-brand-amber/80 stroke-mascot-hair"
+            stroke-width="2.5"
+          />
+          <circle cx="98" cy="58" r="7" class="fill-white stroke-mascot-hair" stroke-width="2" />
+          <circle cx="98" cy="58" r="3" class="fill-brand-amber" />
+          <path
+            d="M70 58q-4-10 2-18t-2-18M78 58q-4-10 2-18t-2-18"
+            class="fill-none stroke-brand-amber"
+            stroke-width="3"
+            stroke-linecap="round"
+          />
+          <path
+            d="M60 14l18 10M60 22l18 4"
+            class="fill-none stroke-kitchen-wood-dark"
+            stroke-width="4"
+            stroke-linecap="round"
+          />
+        }
+        @case ('banchan') {
+          <!-- Three small dishes: kimchi, spinach, bean sprouts -->
+          <ellipse
+            cx="46"
+            cy="82"
+            rx="24"
+            ry="10"
+            class="fill-brand-cream stroke-mascot-hair"
+            stroke-width="2.5"
+          />
+          <path d="M30 80q16-12 32 0" class="fill-brand-chili" />
+          <ellipse
+            cx="114"
+            cy="82"
+            rx="24"
+            ry="10"
+            class="fill-brand-cream stroke-mascot-hair"
+            stroke-width="2.5"
+          />
+          <path d="M98 80q16-12 32 0" class="fill-brand-leaf" />
+          <ellipse
+            cx="80"
+            cy="62"
+            rx="24"
+            ry="10"
+            class="fill-brand-cream stroke-mascot-hair"
+            stroke-width="2.5"
+          />
+          <path
+            d="M66 60q6-8 10 0M76 60q6-8 10 0M84 60q4-7 8 0"
+            class="fill-none stroke-mascot-pin"
+            stroke-width="2.5"
+            stroke-linecap="round"
+          />
+        }
+        @case ('drink') {
+          <!-- Plain green bottle (no label, no brand) and a small glass -->
+          <path
+            d="M68 96V58q0-8 6-12V26h12v20q6 4 6 12v38z"
+            class="fill-brand-bottle stroke-mascot-hair"
+            stroke-width="2.5"
+          />
+          <rect x="73" y="20" width="14" height="8" rx="2" class="fill-mascot-hair" />
+          <path
+            d="M74 60v28"
+            class="fill-none stroke-white/40"
+            stroke-width="3"
+            stroke-linecap="round"
+          />
+          <path
+            d="M100 76h20l-3 20h-14z"
+            class="fill-brand-cream/80 stroke-mascot-hair"
+            stroke-width="2.5"
+          />
+        }
+        @case ('dessert') {
+          <!-- Bingsu: shaved-ice mound with red beans and mango -->
+          <path
+            d="M44 66h72q-4 28-36 28t-36-28z"
+            class="fill-brand-cream stroke-mascot-hair"
+            stroke-width="2.5"
+          />
+          <path d="M48 66q32-50 64 0z" class="fill-white stroke-mascot-hair" stroke-width="2.5" />
+          <circle cx="72" cy="46" r="4" class="fill-kitchen-wood-dark" />
+          <circle cx="82" cy="42" r="4" class="fill-kitchen-wood-dark" />
+          <rect x="86" y="50" width="9" height="9" rx="2" class="fill-brand-amber" />
+          <rect x="62" y="54" width="9" height="9" rx="2" class="fill-brand-amber" />
+        }
+      }
+    </svg>
+  }
+</div>

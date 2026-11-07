@@ -8,12 +8,166 @@
  * `bg-brand-bg`, `text-brand-cream`, `font-display`.
  */
 @theme {
+  /* Core palette */
   --color-brand-bg: #0e0c0b;
   --color-brand-amber: #f0a500;
   --color-brand-cream: #f5e6c8;
-  --color-brand-muted: #8a7a62;
+  /* Lifted from #8a7a62 so small secondary text clears WCAG AA on the dark surfaces */
+  --color-brand-muted: #a8977b;
+
+  /* Surfaces: page < deep (footer/reserve) < surface (cards) < raised (inputs, chips) */
+  --color-brand-deep: #0a0806;
+  --color-brand-surface: #17130f;
+  --color-brand-raised: #221c14;
+  /* Secondary accent: a gochujang red-orange for heat, badges and highlights */
+  --color-brand-chili: #e2552d;
+  /* Ahjoomah's red apron; shares accent duty with chili */
+  --color-brand-apron: #c8312b;
+  /* Greens for dish art and the unlabelled bottle */
+  --color-brand-leaf: #5b9a4b;
+  --color-brand-bottle: #2f8f4e;
+
+  /* Mascot palette, mirrored as hex in the public/images SVGs (img tags can't read tokens) */
+  --color-mascot-skin: #fde9cf;
+  --color-mascot-hair: #1a1411;
+  --color-mascot-blush: #f2a08a;
+  --color-mascot-pin: #d9a066;
+
+  /* Darker apron red for filled badges/tags so cream text on it clears AA (5.3:1) */
+  --color-brand-apron-deep: #b02a24;
+
+  /* Day-to-night sky ("Hanok sky", deeper day). The home page scrolls through these in
+     order: hero at dawn, sunset inside Four rounds, footer at night */
+  --color-sky-dawn: #b8ccd5;
+  --color-sky-noon: #cdbfaa;
+  --color-sky-afternoon: #cfae8c;
+  --color-sky-golden: #bd8c6e;
+  --color-sky-sunset: #9a6762;
+  --color-sky-dusk: #554868;
+  --color-sky-twilight: #2b2742;
+  --color-sky-evening: #1a1a2e;
+  --color-sky-night: #12131f;
+  /* Day text: ink clears AA on dawn through golden; ink-soft for secondary copy on dawn to afternoon */
+  --color-day-ink: #1c2433;
+  --color-day-ink-soft: #3a3f4e;
+  /* Burnt amber for small accent text on day skies (eyebrows, links) */
+  --color-day-accent: #5e300a;
+  /* Night text on dusk and darker */
+  --color-night-text: #e8e6f5;
+  /* The flat sun, at midday and as it sets */
+  --color-sun: #f4c26b;
+  --color-sun-set: #e8865a;
+  /* Solid card surface for dusk pages (/menu) so text never sits on a mid-tone */
+  --color-dusk-card: #f6ede2;
+
+  /* Wood tones for the engraved logo, rolling pin and dish art */
+  --color-kitchen-wood: #b5763d;
+  --color-kitchen-wood-dark: #7a4a22;
 
   --font-display: 'Fredoka One', cursive;
   --font-sans: 'Nunito', sans-serif;
   --font-kr: 'Noto Sans KR', sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    background-color: var(--color-brand-bg);
+    color: var(--color-brand-cream);
+  }
+
+  ::selection {
+    background-color: var(--color-brand-amber);
+    color: var(--color-brand-bg);
+  }
+
+  /* One consistent, visible keyboard focus ring across links, buttons and inputs */
+  :focus-visible {
+    outline: 2px solid var(--color-brand-amber);
+    outline-offset: 3px;
+  }
+
+  /* Amber is too faint on the daylight skies (about 1.2:1), so day sections use an ink ring */
+  .world-day :focus-visible {
+    outline-color: var(--color-day-ink);
+  }
+}
+
+@layer components {
+  /* Small uppercase label above section headings */
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--color-brand-amber);
+  }
+
+  /* Primary pill CTA */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    background-color: var(--color-brand-amber);
+    padding: 0.875rem 2.25rem;
+    font-family: var(--font-display);
+    font-size: 17px;
+    color: var(--color-brand-bg);
+    box-shadow: 0 10px 30px -12px rgb(240 165 0 / 0.6);
+    transition:
+      transform 150ms ease,
+      background-color 150ms ease,
+      box-shadow 150ms ease;
+  }
+  .btn-primary:hover {
+    background-color: #ffb81f;
+    transform: translateY(-1px);
+    box-shadow: 0 14px 34px -12px rgb(240 165 0 / 0.75);
+  }
+
+  /* Secondary outline pill */
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    border: 1px solid rgb(245 230 200 / 0.18);
+    padding: 0.875rem 2.25rem;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    font-weight: 700;
+    color: rgb(245 230 200 / 0.85);
+    transition:
+      border-color 150ms ease,
+      color 150ms ease,
+      background-color 150ms ease;
+  }
+  .btn-ghost:hover {
+    border-color: rgb(240 165 0 / 0.5);
+    background-color: rgb(240 165 0 / 0.06);
+    color: var(--color-brand-cream);
+  }
+
+  /* Faint dancheong-inspired lattice used as a decorative backdrop */
+  .lattice {
+    background-image:
+      linear-gradient(45deg, rgb(240 165 0 / 0.07) 1px, transparent 1px),
+      linear-gradient(-45deg, rgb(240 165 0 / 0.07) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
 }

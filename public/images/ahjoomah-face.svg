@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Ahjoomah's">
+  <!-- Amber badge so the black hair still reads on the dark night surfaces -->
+  <circle cx="32" cy="32" r="31" fill="#f0a500"/>
+  <!-- Hair: rounded dome that drops into a short bob at the sides -->
+  <path d="M13 29a19 19 0 0 1 38 0v10q0 3-3 3H16q-3 0-3-3z" fill="#1a1411"/>
+  <!-- Face, with the pointed center parting cut into the hairline -->
+  <path d="M15.5 33Q17 24 32 17q15 7 16.5 16a16.5 16.5 0 0 1-33 0z" fill="#fde9cf"/>
+  <!-- Closed happy-arc eyes -->
+  <path d="M21.5 36.5q3.5-4 7 0M35.5 36.5q3.5-4 7 0" fill="none" stroke="#1a1411" stroke-width="3" stroke-linecap="round"/>
+  <!-- Cheeks -->
+  <circle cx="22" cy="41.5" r="2.2" fill="#f2a08a"/>
+  <circle cx="42" cy="41.5" r="2.2" fill="#f2a08a"/>
+  <!-- Rolling pin across the chin: handles, then the barrel -->
+  <rect x="6" y="46.5" width="9" height="3.4" rx="1.7" fill="#8a5a2e" stroke="#1a1411" stroke-width="1.4"/>
+  <rect x="49" y="46.5" width="9" height="3.4" rx="1.7" fill="#8a5a2e" stroke="#1a1411" stroke-width="1.4"/>
+  <rect x="14" y="45" width="36" height="6.4" rx="3.2" fill="#d9a066" stroke="#1a1411" stroke-width="1.6"/>
+</svg>

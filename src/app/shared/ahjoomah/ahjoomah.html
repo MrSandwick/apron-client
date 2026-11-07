@@ -1,0 +1,111 @@
+<svg
+  viewBox="0 0 200 260"
+  class="h-full w-full overflow-visible"
+  [attr.role]="decorative() ? null : 'img'"
+  [attr.aria-label]="ariaLabel()"
+  [attr.aria-hidden]="decorative() ? 'true' : null"
+  data-testid="ahjoomah"
+>
+  <!-- Ground shadow -->
+  <ellipse cx="100" cy="250" rx="52" ry="6" class="fill-black/25" />
+
+  <!-- Body: shoes, amber top, red apron with bib and pocket -->
+  <g data-part="body">
+    <ellipse cx="82" cy="240" rx="15" ry="8" class="fill-mascot-hair" />
+    <ellipse cx="118" cy="240" rx="15" ry="8" class="fill-mascot-hair" />
+    <path d="M58 150Q100 132 142 150L156 234Q100 248 44 234Z" class="fill-brand-amber" />
+    <path
+      d="M70 162Q100 154 130 162L138 230Q100 240 62 230Z"
+      class="fill-brand-apron"
+      data-part="apron"
+    />
+    <rect x="80" y="142" width="40" height="26" rx="6" class="fill-brand-apron" />
+    <rect x="88" y="196" width="24" height="16" rx="4" class="fill-black/15" />
+  </g>
+
+  <!-- Arms and the rolling pin she holds across her front -->
+  <g data-part="arms">
+    <!-- Inner group so taps and bonks can dip the pin without fighting the bob on arms -->
+    <g data-part="hands">
+      <path
+        d="M62 156Q50 176 64 192"
+        class="fill-none stroke-brand-amber"
+        stroke-width="16"
+        stroke-linecap="round"
+      />
+      <path
+        d="M138 156Q150 176 136 192"
+        class="fill-none stroke-brand-amber"
+        stroke-width="16"
+        stroke-linecap="round"
+      />
+      <g data-part="pin">
+        <rect
+          x="28"
+          y="189"
+          width="26"
+          height="8"
+          rx="4"
+          class="fill-kitchen-wood-dark stroke-mascot-hair"
+          stroke-width="2.5"
+        />
+        <rect
+          x="146"
+          y="189"
+          width="26"
+          height="8"
+          rx="4"
+          class="fill-kitchen-wood-dark stroke-mascot-hair"
+          stroke-width="2.5"
+        />
+        <rect
+          x="50"
+          y="186"
+          width="100"
+          height="14"
+          rx="7"
+          class="fill-mascot-pin stroke-mascot-hair"
+          stroke-width="3"
+        />
+      </g>
+      <circle cx="65" cy="193" r="9" class="fill-mascot-skin" />
+      <circle cx="135" cy="193" r="9" class="fill-mascot-skin" />
+    </g>
+  </g>
+
+  <!-- Head: bob hair, face with the pointed parting, eyes, cheeks, smile -->
+  <g data-part="head">
+    <path d="M36 84a64 64 0 0 1 128 0v26q0 8-8 8H44q-8 0-8-8z" class="fill-mascot-hair" />
+    <path d="M44 96Q50 62 100 40q50 22 56 56a56 56 0 0 1-112 0z" class="fill-mascot-skin" />
+
+    <g data-part="eyes">
+      @if (mood() === 'happy') {
+        <!-- Closed happy arcs, as in the logo -->
+        <path
+          d="M68 106q10-11 20 0M112 106q10-11 20 0"
+          class="fill-none stroke-mascot-hair"
+          stroke-width="6"
+          stroke-linecap="round"
+          data-testid="eyes-happy"
+        />
+      } @else {
+        <!-- Open eyes; pupils move as a unit for cursor tracking -->
+        <g data-part="pupils" data-testid="eyes-open">
+          <circle cx="78" cy="104" r="7" class="fill-mascot-hair" />
+          <circle cx="122" cy="104" r="7" class="fill-mascot-hair" />
+          <circle cx="80.5" cy="101.5" r="2.2" class="fill-white" />
+          <circle cx="124.5" cy="101.5" r="2.2" class="fill-white" />
+        </g>
+      }
+    </g>
+
+    <circle cx="68" cy="122" r="7" class="fill-mascot-blush" />
+    <circle cx="132" cy="122" r="7" class="fill-mascot-blush" />
+    <path
+      d="M92 127q8 7 16 0"
+      class="fill-none stroke-mascot-hair"
+      stroke-width="4"
+      stroke-linecap="round"
+    />
+  </g>
+</svg>

@@ -1,0 +1,25 @@
+@if (voice.enabled()) {
+  <!-- Bubble body with a small tail at the bottom-left -->
+  <p
+    class="relative rounded-2xl px-4 py-3 shadow-[0_12px_30px_-14px_rgba(0,0,0,0.6)]"
+    [class]="
+      tone() === 'kitchen'
+        ? 'bg-dusk-card text-day-ink ring-1 ring-day-ink/15'
+        : 'bg-brand-cream text-brand-bg'
+    "
+    data-testid="voice-bubble"
+  >
+    @if (line().kr; as kr) {
+      <span class="block font-kr text-[16px] font-bold" lang="ko">{{ kr }}</span>
+      @if (line().gloss; as gloss) {
+        <span class="block font-sans text-[11px] italic opacity-70">{{ gloss }}</span>
+      }
+    }
+    <span class="mt-1 block font-display text-[15px] leading-snug">{{ line().text }}</span>
+    <span
+      aria-hidden="true"
+      class="absolute -bottom-1.5 left-6 size-3 rotate-45"
+      [class]="tone() === 'kitchen' ? 'bg-dusk-card' : 'bg-brand-cream'"
+    ></span>
+  </p>
+}
