@@ -1,0 +1,39 @@
+<article
+  class="relative flex h-full flex-col rounded-3xl bg-dusk-card p-4 shadow-[0_24px_50px_-28px_rgba(26,26,46,0.7)]"
+  data-testid="menu-dish"
+>
+  <!-- Image slot: illustration now, photo later -->
+  <app-dish-art
+    [kind]="dish().dish"
+    [src]="dish().src"
+    [alt]="dish().src ? dish().name : ''"
+    tone="kitchen"
+  />
+
+  <!-- Name, Korean name and description -->
+  <div class="mt-4 flex flex-1 flex-col px-1">
+    <h3 class="font-display text-[22px] leading-tight break-words text-day-ink">
+      {{ dish().name }}
+    </h3>
+    @if (dish().kr; as kr) {
+      <p class="mt-0.5 font-kr text-[15px] font-medium text-day-ink-soft" lang="ko">{{ kr }}</p>
+    }
+    <p class="mt-2 font-sans text-[15px] leading-relaxed text-day-ink-soft">
+      {{ dish().description }}
+    </p>
+
+    <!-- Price, pinned to the card bottom so prices line up across a row -->
+    <p class="mt-auto pt-4 font-display text-[20px] text-day-ink">{{ dish().price }}</p>
+  </div>
+
+  @if (dish().pick) {
+    <!-- Sticker over the image corner; real text, so it is read out with the card -->
+    <p
+      class="absolute -top-2 -right-1 inline-flex rotate-6 items-center gap-1.5 rounded-full bg-brand-apron-deep py-1 pr-3.5 pl-1 font-display text-[14px] text-brand-cream shadow-[0_10px_20px_-10px_rgba(176,42,36,0.9)]"
+      data-testid="menu-pick"
+    >
+      <img src="images/ahjoomah-face.svg" alt="" aria-hidden="true" class="size-6" />
+      Ahjoomah's pick
+    </p>
+  }
+</article>
