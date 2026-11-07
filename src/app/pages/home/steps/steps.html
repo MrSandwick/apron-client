@@ -1,0 +1,68 @@
+<!-- Sunset. Static by default (a list of rounds over an afternoon-to-twilight gradient).
+     From md up, with motion allowed, `.is-pinned` turns it into a pinned scene where the sky,
+     the sun and the heading colour change round by round -->
+<section
+  #section
+  class="group relative overflow-hidden bg-[linear-gradient(to_bottom,var(--color-sky-afternoon),var(--color-sky-golden)_18%,var(--color-sky-sunset)_45%,var(--color-sky-dusk)_72%,var(--color-sky-twilight))] px-6 py-24 [&.is-pinned]:flex [&.is-pinned]:h-[calc(100svh-65px)] [&.is-pinned]:items-center [&.is-pinned]:py-0"
+  data-testid="home-steps"
+>
+  <!-- Setting sun: sinks below the section's bottom edge as the rounds advance (pinned mode) -->
+  <div
+    #sun
+    aria-hidden="true"
+    class="pointer-events-none absolute top-[6%] right-[-60px] size-[220px] rounded-full bg-radial from-(--sun-c) from-62% to-transparent to-70% [--sun-c:var(--color-sun)] sm:right-[6%] md:size-[300px]"
+  ></div>
+
+  <div class="relative mx-auto grid w-full max-w-[1152px] gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-start lg:gap-20 lg:group-[.is-pinned]:items-center">
+    <!-- Heading + big round counter; its colour flips from ink to light at dusk (pinned mode) -->
+    <div #lead class="text-day-ink">
+      <p class="eyebrow text-current">How a night goes</p>
+      <h2 class="mt-3 font-display text-[40px] leading-[1.05] sm:text-[56px]">
+        Four rounds<br />at the grill
+      </h2>
+      <!-- Optional Ahjoomah line -->
+      <app-voice-bubble section="steps" class="mt-6 block max-w-[300px] empty:hidden" />
+
+      <!-- Round counter: digits slide like an odometer (pinned mode only) -->
+      <div class="mt-10 hidden items-end gap-4 group-[.is-pinned]:flex" aria-hidden="true">
+        <div class="relative h-[120px] w-[150px] overflow-hidden">
+          @for (r of rounds; track $index) {
+            <span data-counter class="absolute inset-0 font-display text-[120px] leading-none">
+              0{{ $index + 1 }}
+            </span>
+          }
+        </div>
+        <span class="mb-4 font-display text-[28px] opacity-40">/ 0{{ rounds.length }}</span>
+      </div>
+
+      <!-- Progress rail -->
+      <div class="mt-8 hidden h-[3px] w-full max-w-[360px] overflow-hidden rounded-full bg-current/15 group-[.is-pinned]:block">
+        <div data-rail class="h-full origin-left scale-x-0 rounded-full bg-current"></div>
+      </div>
+    </div>
+
+    <!-- Stage: rounds stack on top of each other when pinned, list normally -->
+    <ol class="relative grid gap-4 group-[.is-pinned]:block group-[.is-pinned]:h-[340px]">
+      @for (r of rounds; track $index) {
+        <li
+          data-round
+          class="rounded-[28px] border border-white/10 bg-sky-night p-6 group-[.is-pinned]:absolute group-[.is-pinned]:inset-0 group-[.is-pinned]:flex group-[.is-pinned]:flex-col group-[.is-pinned]:justify-end sm:p-10"
+        >
+          <!-- Dish slot sits above the copy on phones and beside it from sm up -->
+          <div class="flex flex-col gap-5 sm:flex-row-reverse sm:items-end sm:justify-between sm:gap-8">
+            <app-dish-art [kind]="r.dish" class="w-24 shrink-0 sm:w-44" />
+            <div>
+              <span class="font-sans text-[13px] font-bold uppercase tracking-[0.25em] text-brand-chili">
+                Round 0{{ $index + 1 }}
+              </span>
+              <h3 class="mt-3 font-display text-[30px] leading-tight text-brand-cream sm:text-[44px]">
+                {{ r.title }}
+              </h3>
+              <p class="mt-3 max-w-[440px] font-kr text-[16px] leading-[1.7] text-brand-cream/75 sm:text-[17px]">{{ r.body }}</p>
+            </div>
+          </div>
+        </li>
+      }
+    </ol>
+  </div>
+</section>

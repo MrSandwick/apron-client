@@ -1,71 +1,71 @@
-<section class="relative overflow-hidden bg-brand-bg" data-testid="home-hero">
-  <!-- Warm radial glow behind the decorative art -->
-  <div
-    class="pointer-events-none absolute inset-0"
-    style="
-      background: radial-gradient(
-        120% 60% at 50% 50%,
-        #2a1a00 0%,
-        #22190a 22.5%,
-        #1a1714 45%,
-        #0e0c0b 100%
-      );
-    "
-  ></div>
+<!-- Dawn: the start of the page's day-to-night journey. Copy is kept to a minimum so the first
+     look belongs to Ahjoomah and the parallax scene behind her -->
+<section
+  #section
+  class="world-day relative overflow-hidden bg-linear-to-b from-sky-dawn from-60% to-sky-noon"
+  data-testid="home-hero"
+>
+  <!-- Parallax dawn scene: sun, clouds, mountains, skyline, rooftops, lanterns -->
+  <app-hero-scene />
 
-  <!-- Layered decorative 3D behind the content: a scroll-orbiting amber cube -->
-  <app-section-canvas
-    class="pointer-events-none absolute inset-0 block"
-    variant="cube"
-    color="#f0a500"
-  />
-
-  <!-- Vignette darkening the edges -->
   <div
-    class="pointer-events-none absolute inset-0"
-    style="
-      background: radial-gradient(
-        130% 65% at 50% 50%,
-        rgba(0, 0, 0, 0) 20%,
-        rgba(14, 12, 11, 0.55) 70%,
-        rgba(14, 12, 11, 0.9) 100%
-      );
-    "
-  ></div>
-
-  <!-- Centered content, filling the full-height section -->
-  <div
-    class="relative mx-auto flex min-h-screen max-w-[1400px] flex-col items-center justify-center px-6 text-center"
+    #content
+    class="relative mx-auto flex min-h-[calc(100svh-4rem)] max-w-[1280px] origin-top flex-col justify-start px-6 pt-[12svh] pb-24 will-change-transform"
   >
-    <p class="font-sans text-[12px] font-bold uppercase tracking-[4.2px] text-brand-amber/90">
-      Lorem · Ipsum · Dolor
-    </p>
+    <div class="max-w-[680px] lg:max-w-[960px]">
+      <p data-intro="eyebrow" class="eyebrow flex items-center gap-3 text-day-accent">
+        <span class="h-px w-8 bg-day-accent/70" aria-hidden="true"></span>
+        Korean Kitchen<span class="hidden sm:inline"> · New York · Los Angeles</span>
+      </p>
 
-    <h1
-      class="mt-2 font-display text-[64px] leading-none text-brand-cream drop-shadow-[0_25px_25px_rgba(0,0,0,0.15)] sm:text-[88px] lg:text-[112px]"
-    >
-      Ahjoomah's Apron
-    </h1>
-
-    <p class="mt-2 font-display text-[32px] tracking-[6.4px] text-brand-amber/80">아주마스</p>
-
-    <p class="mt-6 max-w-[36rem] font-kr text-[19.2px] leading-[31.2px] text-brand-cream/70">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit
-    </p>
-
-    <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
-      <a
-        routerLink="/reserve"
-        class="rounded-full bg-brand-amber px-10 py-3 font-display text-[17.6px] text-brand-bg transition-colors hover:bg-brand-amber/90"
+      <!-- Title block: Ahjoomah leans over the "Apron" word like it's her counter. Two lines
+           below lg, one line from lg up. She's positioned in em, so she scales with the
+           headline; the em offsets centre her rolling pin over the word at each breakpoint -->
+      <div
+        class="relative mt-5 font-display text-[42px] leading-[0.95] tracking-[-0.01em] min-[360px]:text-[46px] sm:text-[76px] lg:text-[104px]"
       >
-        Reserve a Table
-      </a>
-      <a
-        routerLink="/menu"
-        class="rounded-full border border-brand-amber/15 px-10 py-3 font-sans text-[16px] text-brand-cream/80 transition-colors hover:border-brand-amber/40 hover:text-brand-cream"
-      >
-        View Menu →
-      </a>
+        <h1 data-intro="title" class="text-day-ink lg:pt-[2.43em]">
+          <span class="block lg:inline">Ahjoomah's </span>
+          <span class="mt-[2.6em] block text-brand-apron-deep sm:mt-[2.05em] lg:mt-0 lg:inline">Apron</span>
+        </h1>
+
+        <!-- Tap target for the mascot; on phones this is her main interaction -->
+        <button
+          type="button"
+          class="absolute top-[0.67em] left-0 w-[3em] -rotate-3 cursor-pointer rounded-3xl sm:top-[0.72em] sm:left-[0.29em] sm:w-[2.4em] lg:top-[-0.05em] lg:left-[5.98em] lg:w-[2.6em]"
+          aria-label="Say hi to Ahjoomah"
+          (click)="tap()"
+          data-testid="hero-mascot"
+        >
+          <!-- Clip her just below the rolling pin so the pin rests on the word's top edge -->
+          <span class="block aspect-[200/202] overflow-hidden">
+            <app-ahjoomah #mascot class="block" [mood]="mood()" [decorative]="true" />
+          </span>
+        </button>
+      </div>
+
+      <div data-intro="ctas" class="mt-10 flex flex-wrap items-center gap-4 lg:mt-12">
+        <!-- Hovering or focusing Reserve makes Ahjoomah close her eyes happily and squish -->
+        <a
+          #reserveCta
+          routerLink="/reserve"
+          class="btn-primary"
+          (mouseenter)="cheer(true)"
+          (mouseleave)="cheer(false)"
+          (focus)="cheer(true)"
+          (blur)="cheer(false)"
+          >Reserve a Table</a
+        >
+        <a
+          routerLink="/menu"
+          class="btn-ghost border-day-ink/25 bg-white/30 text-day-ink backdrop-blur hover:border-day-ink/50 hover:bg-white/50"
+        >
+          View Menu →
+        </a>
+      </div>
     </div>
   </div>
+
+  <!-- Opt-in sound (off until the visitor turns it on) -->
+  <app-sound-toggle class="absolute right-5 bottom-6 z-10 sm:right-8" />
 </section>

@@ -1,10 +1,11 @@
-<footer class="border-t border-brand-amber/15 bg-[#0a0806] px-6 pt-16 pb-8" data-testid="footer">
+<!-- Night: the end of the page's day, continuing the reserve section's navy -->
+<footer class="bg-sky-night px-6 pt-16 pb-8" data-testid="footer">
   <div class="mx-auto max-w-[1152px]">
     <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
       <!-- Brand: logo, tagline, and socials -->
       <div>
         <a routerLink="/home" class="flex items-center gap-2.5">
-          <img src="images/logo-mark.svg" alt="" aria-hidden="true" class="size-8" />
+          <img src="images/ahjoomah-face.svg" alt="" aria-hidden="true" class="size-8" />
           <span class="font-display text-[24px] text-brand-amber">Ahjoomah's</span>
         </a>
         <p class="mt-1 font-kr text-[12px] text-brand-muted">아주마스</p>
@@ -17,7 +18,7 @@
           <button
             type="button"
             aria-label="Instagram"
-            class="flex size-10 items-center justify-center rounded-full border border-brand-amber/15 bg-[#2a2318] text-brand-muted transition-colors hover:border-brand-amber/40 hover:text-brand-cream"
+            class="flex size-11 items-center justify-center rounded-full border border-brand-amber/15 bg-white/5 text-brand-muted transition-colors hover:border-brand-amber/40 hover:text-brand-cream"
           >
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="size-[17px]">
               <path
@@ -28,7 +29,7 @@
           <button
             type="button"
             aria-label="TikTok"
-            class="flex size-10 items-center justify-center rounded-full border border-brand-amber/15 bg-[#2a2318] text-brand-muted transition-colors hover:border-brand-amber/40 hover:text-brand-cream"
+            class="flex size-11 items-center justify-center rounded-full border border-brand-amber/15 bg-white/5 text-brand-muted transition-colors hover:border-brand-amber/40 hover:text-brand-cream"
           >
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="size-[17px]">
               <path
@@ -39,7 +40,7 @@
           <button
             type="button"
             aria-label="X"
-            class="flex size-10 items-center justify-center rounded-full border border-brand-amber/15 bg-[#2a2318] text-brand-muted transition-colors hover:border-brand-amber/40 hover:text-brand-cream"
+            class="flex size-11 items-center justify-center rounded-full border border-brand-amber/15 bg-white/5 text-brand-muted transition-colors hover:border-brand-amber/40 hover:text-brand-cream"
           >
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="size-[15px]">
               <path
@@ -50,7 +51,7 @@
           <button
             type="button"
             aria-label="YouTube"
-            class="flex size-10 items-center justify-center rounded-full border border-brand-amber/15 bg-[#2a2318] text-brand-muted transition-colors hover:border-brand-amber/40 hover:text-brand-cream"
+            class="flex size-11 items-center justify-center rounded-full border border-brand-amber/15 bg-white/5 text-brand-muted transition-colors hover:border-brand-amber/40 hover:text-brand-cream"
           >
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="size-[17px]">
               <path
@@ -137,7 +138,7 @@
             id="newsletter-email"
             type="email"
             placeholder="your@email.com"
-            class="w-full rounded-full border border-brand-amber/15 bg-[#2a2318] px-5 py-3 font-kr text-[14px] text-brand-cream placeholder:text-brand-muted focus:border-brand-amber/40 focus:outline-none"
+            class="w-full rounded-full border border-brand-amber/15 bg-white/5 px-5 py-3 font-kr text-[14px] text-brand-cream placeholder:text-brand-muted focus:border-brand-amber/40 focus:outline-none"
           />
           <button
             type="submit"
@@ -153,8 +154,10 @@
     <div
       class="mt-12 flex flex-col items-center justify-between gap-4 border-t border-brand-amber/15 pt-8 sm:flex-row"
     >
+      <!-- Visitor opt-in for Ahjoomah's speech bubbles -->
+      <app-voice-toggle />
       <p class="font-kr text-[12px] text-brand-muted">
-        © 2025 Ahjoomahs Korean Restaurant. All rights reserved.
+        © {{ year }} Ahjoomahs Korean Restaurant. All rights reserved.
       </p>
       <p class="flex items-center gap-1.5 font-kr text-[12px] text-brand-muted">
         Made with
@@ -168,5 +171,20 @@
         in New York &amp; Los Angeles
       </p>
     </div>
+    <!-- Attribution required by the CC BY 4.0 licence of the 3D bottle model -->
+    <p class="mt-4 text-center font-sans text-[11px] text-brand-muted sm:text-left">
+      3D bottle based on
+      <a
+        href="https://sketchfab.com/3d-models/low-poly-soju-bottle-soda-bottle-a03b7f4f72584805afea78894209c77a"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="underline hover:text-brand-cream"
+        >"Low Poly Soju Bottle / soda bottle"</a
+      >
+      by
+      <a href="https://sketchfab.com/ashapanp_17" target="_blank" rel="noopener noreferrer" class="underline hover:text-brand-cream">ashapanp</a>
+      licensed under
+      <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" class="underline hover:text-brand-cream">CC BY 4.0</a>.
+    </p>
   </div>
 </footer>

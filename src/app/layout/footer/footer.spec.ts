@@ -43,7 +43,7 @@ describe('Footer', () => {
     }
     // Guards the no-emoji rule: the credit uses an SVG, not the literal flame.
     expect(el.textContent).toContain('Made with');
-    expect(el.textContent).not.toContain('🔥');
+    expect(el.textContent).not.toContain('\u{1F525}');
   });
 
   it('prevents the placeholder newsletter submit from reloading', () => {
@@ -52,5 +52,15 @@ describe('Footer', () => {
     const event = new Event('submit', { cancelable: true });
     fixture.componentInstance.onSubmit(event);
     expect(event.defaultPrevented).toBe(true);
+  });
+
+  // The CC BY 4.0 bottle model is credited with links to its source and the licence
+  it('credits the 3D bottle model as its licence requires', () => {
+    const fixture = TestBed.createComponent(Footer);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.textContent).toContain('ashapanp');
+    expect(el.querySelector('a[href*="sketchfab.com/3d-models/low-poly-soju-bottle"]')).toBeTruthy();
+    expect(el.querySelector('a[href*="creativecommons.org/licenses/by/4.0"]')).toBeTruthy();
   });
 });

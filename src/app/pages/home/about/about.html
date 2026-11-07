@@ -1,107 +1,48 @@
-<section class="bg-brand-bg px-6 py-24" data-testid="home-about">
-  <div class="mx-auto max-w-[1152px]">
-    <!-- Story row: copy on the left, art card on the right -->
-    <div class="grid gap-12 lg:grid-cols-2">
-      <!-- Left column: story copy -->
-      <div>
-        <p class="font-sans text-[12px] font-bold uppercase tracking-[3.6px] text-brand-amber">
-          Our Story
-        </p>
-        <h2 class="mt-2 font-display text-[40px] leading-[1.15] text-brand-cream sm:text-[48px]">
-          Lorem Ipsum<br />Dolor Sit Amet
-        </h2>
-        <p class="mt-6 max-w-[552px] font-kr text-[18px] leading-[1.6] text-brand-cream/65">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt
-          ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-          ullamco laboris nisi ut aliquip ex ea commodo consequat.
-        </p>
-        <p class="mt-5 max-w-[552px] font-kr text-[18px] leading-[1.6] text-brand-cream/65">
-          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-          nulla pariatur. Excepteur sint occaecat cupidatat non proident.
-        </p>
-      </div>
+<!-- Early afternoon: noon light warming toward the promo's afternoon -->
+<section
+  class="world-day bg-linear-to-b from-sky-noon to-sky-afternoon px-6 py-24 sm:py-32"
+  data-testid="home-about"
+>
+  <!-- Story row: copy on the left, engraved wood logo on the right (stacked on phones) -->
+  <div class="mx-auto grid max-w-[1152px] items-center gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+    <!-- Left column: story copy -->
+    <div appReveal>
+      <p class="eyebrow text-day-accent">Our Story</p>
+      <h2 class="mt-3 font-display text-[38px] leading-[1.1] text-day-ink sm:text-[52px]">
+        Lorem Ipsum<br />Dolor Sit Amet
+      </h2>
+      <p class="mt-6 max-w-[552px] font-kr text-[17px] leading-[1.75] text-day-ink-soft sm:text-[18px]">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
+        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+        laboris nisi ut aliquip ex ea commodo consequat.
+      </p>
+      <p class="mt-5 max-w-[552px] font-kr text-[17px] leading-[1.75] text-day-ink-soft sm:text-[18px]">
+        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+        pariatur. Excepteur sint occaecat cupidatat non proident.
+      </p>
+      <!-- Optional Ahjoomah line (renders nothing while the voice layer is off) -->
+      <app-voice-bubble section="about" tone="kitchen" class="mt-8 block max-w-[320px] empty:hidden" />
+    </div>
 
-      <!-- Right column: art card with flame and "since" line -->
+    <!-- Right column: the engraved wood logo as feature art, with the founding year -->
+    <figure appReveal="120" class="relative">
       <div
-        class="flex min-h-[280px] items-center justify-center rounded-[24px] border border-brand-amber/12"
-        style="
-          background: radial-gradient(
-            ellipse at 50% 40%,
-            #2a1a00 0%,
-            #241a0b 30%,
-            #1e1a16 60%,
-            #0e0c0b 100%
-          );
-        "
+        class="aspect-[4/3] overflow-hidden rounded-[28px] shadow-[0_30px_60px_-30px_rgba(28,36,51,0.55)] ring-1 ring-day-ink/15"
       >
-        <div class="flex flex-col items-center">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="size-24 text-brand-amber">
-            <path
-              fill-rule="evenodd"
-              d="M12.963 2.286a.75.75 0 0 0-1.071-.136 9.742 9.742 0 0 0-3.539 6.176 7.547 7.547 0 0 1-1.705-1.715.75.75 0 0 0-1.152-.082A9 9 0 1 0 15.68 4.534a7.46 7.46 0 0 1-2.717-2.248Z"
-              clip-rule="evenodd"
-            />
-          </svg>
-          <p class="mt-4 font-sans text-[14px] uppercase tracking-[1.4px] text-brand-amber/60">
-            Since 2019
-          </p>
-        </div>
+        <img
+          src="images/ahjoomah-wood.svg"
+          alt="Ahjoomah's logo engraved into a wooden board"
+          class="size-full object-cover"
+        />
       </div>
-    </div>
-
-    <!-- Find Us / Hours -->
-    <div class="mt-20 grid gap-14 md:grid-cols-2">
-      <div>
-        <h3 class="font-display text-[24px] text-brand-amber">Find Us</h3>
-        <div class="mt-6 space-y-8">
-          <div>
-            <p class="font-display text-[18px] text-brand-cream">Lorem City</p>
-            <p class="mt-1 font-kr text-[14px] text-brand-muted">123 Lorem St, Ipsum NY 00000</p>
-            <p class="font-kr text-[14px] text-brand-muted">(000) 000-0000</p>
-            <!-- Placeholder: external map link not wired yet -->
-            <button
-              type="button"
-              class="mt-2 font-sans text-[14px] font-bold text-brand-amber hover:underline"
-            >
-              Get Directions →
-            </button>
-          </div>
-          <div>
-            <p class="font-display text-[18px] text-brand-cream">Dolor City</p>
-            <p class="mt-1 font-kr text-[14px] text-brand-muted">456 Dolor Ave, Sit CA 00000</p>
-            <p class="font-kr text-[14px] text-brand-muted">(000) 000-0000</p>
-            <!-- Placeholder: external map link not wired yet -->
-            <button
-              type="button"
-              class="mt-2 font-sans text-[14px] font-bold text-brand-amber hover:underline"
-            >
-              Get Directions →
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <h3 class="font-display text-[24px] text-brand-amber">Hours</h3>
-        <dl class="mt-6">
-          <div
-            class="flex items-center justify-between border-b border-brand-amber/15 py-3"
-          >
-            <dt class="font-kr text-[16px] font-medium text-brand-cream">Mon – Thu</dt>
-            <dd class="font-kr text-[14px] text-brand-muted">11:00 AM – 10:00 PM</dd>
-          </div>
-          <div
-            class="flex items-center justify-between border-b border-brand-amber/15 py-3"
-          >
-            <dt class="font-kr text-[16px] font-medium text-brand-cream">Fri – Sat</dt>
-            <dd class="font-kr text-[14px] text-brand-muted">11:00 AM – 12:00 AM</dd>
-          </div>
-          <div class="flex items-center justify-between py-3">
-            <dt class="font-kr text-[16px] font-medium text-brand-cream">Sunday</dt>
-            <dd class="font-kr text-[14px] text-brand-muted">12:00 PM – 9:00 PM</dd>
-          </div>
-        </dl>
-      </div>
-    </div>
+      <figcaption class="mt-5 flex flex-wrap items-center justify-center gap-3">
+        <span class="h-px w-10 bg-day-ink/30" aria-hidden="true"></span>
+        <span class="font-kr text-[15px] font-bold text-day-accent">아주마스</span>
+        <span class="font-sans text-[13px] font-bold uppercase tracking-[0.3em] text-day-ink-soft">
+          Since 2019
+        </span>
+        <span class="h-px w-10 bg-day-ink/30" aria-hidden="true"></span>
+      </figcaption>
+    </figure>
   </div>
 </section>

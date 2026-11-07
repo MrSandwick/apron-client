@@ -1,0 +1,17 @@
+<!-- Noon: the brightest, calmest stretch of the day -->
+<section #section class="world-day bg-sky-noon px-6 py-24 sm:py-40" data-testid="home-statement">
+  <div class="mx-auto grid max-w-[1152px] gap-8 md:grid-cols-[180px_1fr]">
+    <!-- Side label -->
+    <p class="eyebrow flex items-center gap-3 self-start text-day-accent md:pt-4">
+      <span class="size-1.5 rounded-full bg-day-accent" aria-hidden="true"></span>
+      The Table
+    </p>
+
+    <!-- Statement: each word fades from dim to full as the section scrolls -->
+    <p class="font-display text-[32px] leading-[1.2] text-day-ink sm:text-[52px] lg:text-[60px]">
+      @for (w of words; track $index) {
+        <span data-word [class.text-brand-apron-deep]="w.accent">{{ w.word }}</span>{{ ' ' }}
+      }
+    </p>
+  </div>
+</section>

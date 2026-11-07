@@ -1,0 +1,102 @@
+<!-- Decorative dawn scene behind the hero. Each [data-layer] moves at its own [data-depth] for
+     parallax; its inner [data-intro] element is what the first-look intro animates, so the two
+     never fight over the same transform. Far layers are paler (atmospheric haze) -->
+<div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+  <!-- Flat morning sun -->
+  <div data-layer data-depth="0.1" class="absolute inset-0 mx-auto max-w-[1280px]">
+    <div
+      data-intro="sun"
+      class="absolute -top-10 -right-20 size-[260px] rounded-full bg-radial from-sun from-62% to-transparent to-70% sm:size-[380px] md:top-6 md:right-[6%] md:size-[460px]"
+    ></div>
+  </div>
+
+  <!-- Clouds drifting slowly across the sky -->
+  <div data-layer data-depth="0.15" class="absolute inset-x-0 top-[8%] h-[30%]">
+    <svg data-intro viewBox="0 0 1440 240" preserveAspectRatio="xMidYMin slice" class="size-full">
+      <g data-cloud class="fill-white/55">
+        <ellipse cx="220" cy="90" rx="110" ry="26" />
+        <ellipse cx="270" cy="70" rx="60" ry="30" />
+        <ellipse cx="190" cy="76" rx="44" ry="22" />
+      </g>
+      <g data-cloud class="fill-white/40">
+        <ellipse cx="820" cy="150" rx="140" ry="24" />
+        <ellipse cx="870" cy="128" rx="70" ry="28" />
+      </g>
+      <g data-cloud class="fill-white/50">
+        <ellipse cx="1260" cy="60" rx="96" ry="20" />
+        <ellipse cx="1290" cy="44" rx="48" ry="22" />
+      </g>
+    </svg>
+  </div>
+
+  <!-- Far mountains (Bukhansan-style ridges) -->
+  <div data-layer data-depth="0.2" class="absolute inset-x-0 bottom-0 h-[52%]">
+    <svg data-intro viewBox="0 0 1440 300" preserveAspectRatio="xMidYMax slice" class="size-full fill-[#a5bac5]">
+      <path
+        d="M0 300V172C120 124 200 92 300 110s160-50 260-40 160 70 280 50 200-80 320-60 200 70 280 60v198Z"
+      />
+    </svg>
+  </div>
+
+  <!-- City skyline with Namsan Tower on its hill -->
+  <div data-layer data-depth="0.35" class="absolute inset-x-0 bottom-0 h-[40%]">
+    <svg data-intro viewBox="0 0 1440 260" preserveAspectRatio="xMidYMax slice" class="size-full fill-[#8fa6b2]">
+      <!-- Namsan hill and tower -->
+      <path d="M940 260c40-70 100-100 160-100s120 30 160 100Z" />
+      <rect x="1096" y="70" width="8" height="96" />
+      <rect x="1084" y="92" width="32" height="14" rx="5" />
+      <rect x="1088" y="80" width="24" height="10" rx="3" />
+      <rect x="1099" y="36" width="2" height="36" />
+      <!-- Blocks of buildings -->
+      <path
+        d="M0 260V176h60v-30h50v50h40v-70h60v80h44v-40h70v60h50v-90h46v70h60v-40h70v60h50v-24h80v34h60v-56h40v56h120v-30h60v40h50v-60h70v80h60v-50h70v40h60v-30h70v60Z"
+      />
+    </svg>
+  </div>
+
+  <!-- Hanok rooftops with upturned eaves, and a chimney sending up smoke -->
+  <div data-layer data-depth="0.55" class="absolute inset-x-0 bottom-0 h-[26%]">
+    <svg data-intro viewBox="0 0 1440 200" preserveAspectRatio="xMidYMax slice" class="size-full fill-[#6f8692]">
+      <g>
+        <rect x="378" y="88" width="16" height="40" />
+        <g data-smoke class="fill-white/60">
+          <circle cx="386" cy="80" r="9" />
+          <circle cx="386" cy="80" r="9" />
+          <circle cx="386" cy="80" r="9" />
+        </g>
+      </g>
+      <path d="M-20 200v-58h20q36-30 70-32h150q34 2 70 32h-16v58Z" />
+      <path d="M250 200v-74h18q44-36 86-38h180q42 2 86 38h-18v74Z" />
+      <path d="M600 200v-50h14q30-24 58-26h120q28 2 58 26h-14v50Z" />
+      <path d="M840 200v-66h18q40-32 78-34h160q38 2 78 34h-18v66Z" />
+      <path d="M1160 200v-54h16q32-26 62-28h130q30 2 62 28h-16v54Z" />
+      <rect x="0" y="176" width="1440" height="24" />
+    </svg>
+  </div>
+
+  <!-- String of paper lanterns. Both ends of the string run up past the top edge (beyond the
+       furthest the cursor parallax can shift it), so it always reads as hung from something just
+       out of view. Anchored: it follows the cursor but never drifts on scroll, which would pull
+       the ends into view -->
+  <div data-layer data-anchored data-depth="0.85" class="absolute top-0 right-0 h-[140px] w-[62%] sm:h-[200px] md:w-[46%]">
+    <svg data-intro viewBox="0 0 600 200" preserveAspectRatio="xMaxYMin meet" class="size-full overflow-visible">
+      <path d="M-20 -48Q300 150 660 -40" class="fill-none stroke-day-ink/45" stroke-width="2" />
+      @for (lantern of lanterns; track lantern.x) {
+        <!-- Each lantern swings from its knot on the string -->
+        <g data-lantern [attr.transform]="'translate(' + lantern.x + ' ' + lantern.y + ')'">
+          <g data-swing>
+            <path d="M0 0v14" class="stroke-day-ink/45" stroke-width="2" />
+            <rect x="-10" y="12" width="20" height="6" rx="2" class="fill-day-ink/70" />
+            <ellipse cx="0" cy="40" rx="20" ry="24" class="fill-brand-apron-deep" />
+            <path d="M-12 30q12 4 24 0M-14 42q14 4 28 0M-12 54q12 4 24 0" class="fill-none stroke-brand-amber/60" stroke-width="2" />
+            <rect x="-8" y="62" width="16" height="5" rx="2" class="fill-day-ink/70" />
+            <path d="M0 67v12" class="stroke-brand-amber" stroke-width="2" />
+          </g>
+        </g>
+      }
+    </svg>
+  </div>
+
+  <!-- Soft fade into the statement section's noon colour -->
+  <div class="absolute inset-x-0 bottom-0 h-28 bg-linear-to-b from-transparent to-sky-noon"></div>
+</div>
