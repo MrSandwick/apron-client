@@ -8,11 +8,16 @@
     [src]="dish().src"
     [alt]="dish().src ? dish().name : ''"
     tone="kitchen"
+    [class.opacity-60]="dish().soldOut"
+    [class.grayscale]="dish().soldOut"
   />
 
   <!-- Name, Korean name and description -->
   <div class="mt-4 flex flex-1 flex-col px-1">
-    <h3 class="font-display text-[22px] leading-tight break-words text-day-ink">
+    <h3
+      class="font-display text-[22px] leading-tight break-words"
+      [class]="dish().soldOut ? 'text-day-ink-soft' : 'text-day-ink'"
+    >
       {{ dish().name }}
     </h3>
     @if (dish().kr; as kr) {
@@ -22,9 +27,45 @@
       {{ dish().description }}
     </p>
 
+    <!-- Dietary and spice badges; only rendered when the dish has tags -->
+    @if (tags().length) {
+      <ul class="mt-3 flex flex-wrap gap-1.5" aria-label="Dish tags">
+        @for (t of tags(); track t.tag) {
+          <li
+            class="rounded-full px-2.5 py-1 font-sans text-[12px] leading-none font-bold ring-1 ring-day-ink/20"
+            [class]="t.styles"
+            data-testid="menu-tag"
+          >
+            {{ t.label }}
+          </li>
+        }
+      </ul>
+    }
+
     <!-- Price, pinned to the card bottom so prices line up across a row -->
-    <p class="mt-auto pt-4 font-display text-[20px] text-day-ink">{{ dish().price }}</p>
+    <div class="mt-auto flex items-center justify-between gap-3 pt-4">
+      <p class="font-display text-[20px] text-day-ink">{{ dish().price }}</p>
+      @if (dish().soldOut) {
+        <!-- Sold-out label beside the price, clear of the NEW and pick markers on the image -->
+        <p
+          class="rounded-full bg-day-ink px-3 py-1 font-sans text-[13px] leading-none font-bold text-brand-cream"
+          data-testid="menu-sold-out"
+        >
+          Sold out
+        </p>
+      }
+    </div>
   </div>
+
+  @if (dish().isNew) {
+    <!-- NEW marker over the image's top-left corner, opposite the pick sticker -->
+    <p
+      class="absolute -top-2 -left-1 -rotate-6 rounded-full bg-day-ink px-3 py-1 font-display text-[14px] leading-none tracking-[0.04em] text-sun shadow-[0_10px_20px_-10px_rgba(28,36,51,0.9)]"
+      data-testid="menu-new"
+    >
+      New
+    </p>
+  }
 
   @if (dish().pick) {
     <!-- Sticker over the image corner; real text, so it is read out with the card -->

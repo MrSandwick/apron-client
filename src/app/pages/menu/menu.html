@@ -42,7 +42,7 @@
     <ul
       class="mx-auto flex max-w-[1152px] gap-2 overflow-x-auto px-6 py-2 [scrollbar-width:none] lg:justify-center"
     >
-      @for (category of categories; track category.id) {
+      @for (category of categories(); track category.id) {
         <li class="shrink-0">
           <!-- Fragment via the router: a plain #id would resolve against <base href="/"> and leave the page -->
           <a
@@ -61,8 +61,40 @@
   </nav>
 
   <!-- Categories: every heading and card sits on a solid surface, never on the mid-tone sky -->
-  <div class="mx-auto mt-24 max-w-[1152px] space-y-20 px-6 sm:mt-28">
-    @for (category of categories; track category.id; let first = $first) {
+  <div class="mx-auto mt-24 max-w-[1152px] space-y-20 px-6 sm:mt-28" [attr.aria-busy]="!result()">
+    <!-- Loading skeleton: plain blocks until the menu arrives -->
+    @if (!result()) {
+      <div class="space-y-8" data-testid="menu-loading">
+        <p class="sr-only" role="status">Loading menu</p>
+        @for (n of skeleton; track n) {
+          <div class="space-y-6">
+            <div class="h-20 rounded-3xl bg-sky-twilight/80 motion-safe:animate-pulse"></div>
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div class="h-72 rounded-3xl bg-dusk-card/70 motion-safe:animate-pulse"></div>
+              <div
+                class="hidden h-72 rounded-3xl bg-dusk-card/70 motion-safe:animate-pulse sm:block"
+              ></div>
+              <div
+                class="hidden h-72 rounded-3xl bg-dusk-card/70 motion-safe:animate-pulse lg:block"
+              ></div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Calm notice when the bundled sample menu is shown instead of live data -->
+    @if (result()?.source === 'fallback') {
+      <p
+        role="status"
+        class="mx-auto w-fit rounded-full bg-dusk-card px-5 py-2 text-center font-sans text-[15px] text-day-ink-soft"
+        data-testid="menu-fallback"
+      >
+        Showing our sample menu while we reconnect.
+      </p>
+    }
+
+    @for (category of categories(); track category.id; let first = $first) {
       <section
         [id]="category.id"
         [attr.aria-labelledby]="category.id + '-title'"

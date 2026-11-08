@@ -12,6 +12,16 @@ ng serve
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
+## Menu data (API)
+
+The `/menu` page loads its dishes from the Django API in `../server` (see `../server/README.md` for setup).
+
+- **Development**: run the API on `127.0.0.1:8000`. `ng serve` forwards `/api` and `/media` to it (`proxy.conf.json`). If the API is down the page shows the bundled sample menu with a quiet notice.
+- **Rendering**: `/menu` is server-rendered on each request, not prerendered, so database edits show up without a rebuild. The server's copy of the menu is embedded in the page, so the browser does not ask the API again after hydration.
+- **Production**: put a reverse proxy in front that sends `/api`, `/media` and `/admin` to Django and everything else to the Angular server.
+- **The server must reach the API**: either leave `API_INTERNAL_URL` unset (the server calls the site's own public address, through the proxy), or set `API_INTERNAL_URL` to the API's internal address, for example `http://127.0.0.1:8000`.
+- **Allowed hosts**: Angular's server rejects requests whose `Host` header is not allowed and falls back to client-side rendering (no server-rendered menu). Set `NG_ALLOWED_HOSTS` to the site's domain or domains, comma separated, in production. `localhost` is accepted by default.
+
 ## Code scaffolding
 
 Angular CLI includes powerful code scaffolding tools. To generate a new component, run:

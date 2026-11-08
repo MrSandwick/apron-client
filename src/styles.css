@@ -23,6 +23,8 @@
   --color-brand-chili: #e2552d;
   /* Ahjoomah's red apron; shares accent duty with chili */
   --color-brand-apron: #c8312b;
+  /* Vegetarian badge on menu cards; cream text on it is 5.2:1 */
+  --color-tag-leaf: #2f6b3a;
   /* Greens for dish art and the unlabelled bottle */
   --color-brand-leaf: #5b9a4b;
   --color-brand-bottle: #2f8f4e;
