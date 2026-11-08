@@ -26,7 +26,7 @@ describe('HomeReserve', () => {
     const fixture = TestBed.createComponent(HomeReserve);
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
-    // The section swaps the old octagon image for a right-aligned Three.js canvas.
+    // The section uses a right-aligned Three.js canvas (the unlabelled bottle), not an image.
     const canvas = el.querySelector('app-section-canvas');
     expect(canvas).toBeTruthy();
     expect(el.querySelector('img')).toBeNull();
@@ -48,5 +48,22 @@ describe('HomeReserve', () => {
       b.textContent?.includes('Or call us directly'),
     );
     expect(call).toBeTruthy();
+  });
+
+  // The old knot is now the green bottle variant
+  it('uses the green bottle variant for its 3D object', () => {
+    const fixture = TestBed.createComponent(HomeReserve);
+    fixture.detectChanges();
+    const canvas = (fixture.nativeElement as HTMLElement).querySelector('app-section-canvas');
+    expect(canvas?.getAttribute('variant')).toBe('bottle');
+    expect(canvas?.getAttribute('color')).toBe('#2f8f4e');
+  });
+
+  // The bottle loads the textured soju model on top of the built-in fallback
+  it('points the bottle at the soju model', () => {
+    const fixture = TestBed.createComponent(HomeReserve);
+    fixture.detectChanges();
+    const canvas = (fixture.nativeElement as HTMLElement).querySelector('app-section-canvas');
+    expect(canvas?.getAttribute('model')).toBe('modelAssets/soju/scene.gltf');
   });
 });

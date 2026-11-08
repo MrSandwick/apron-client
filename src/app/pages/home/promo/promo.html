@@ -1,70 +1,105 @@
-<section class="bg-[#1a1714] px-6 py-20" data-testid="home-promo">
-  <div
-    class="relative mx-auto w-full max-w-[1024px] overflow-hidden rounded-[32px] border border-brand-amber/15 bg-[linear-gradient(155deg,#1e1a16_0%,#2a2318_60%,#1a1200_100%)] p-8 sm:p-14"
-  >
-    <!-- Amber glow, top-right -->
+<!-- Afternoon: solid sky so the ticket notches below can match it exactly -->
+<section class="bg-sky-afternoon px-6 py-20 sm:py-28" data-testid="home-promo">
+  <!-- Wrapper lets Ahjoomah peek over the ticket's top edge without being clipped by it -->
+  <div class="relative mx-auto w-full max-w-[1100px]">
+    <app-ahjoomah-peek class="absolute bottom-full left-10 z-10 w-20 sm:left-14 sm:w-24" />
+    <!-- Optional Ahjoomah line, beside her -->
+    <app-voice-bubble section="promo" class="absolute bottom-full left-36 mb-2 hidden w-60 sm:block sm:left-44" />
+    <!-- Offer ticket rises in as it scrolls into view: details on the left, price stub on the right -->
     <div
-      class="pointer-events-none absolute -top-24 -right-16 size-72 rounded-full"
-      style="
-        background: radial-gradient(
-          circle,
-          rgba(240, 165, 0, 0.18) 0%,
-          rgba(120, 83, 0, 0.09) 35%,
-          rgba(0, 0, 0, 0) 70%
-        );
-      "
-    ></div>
-
-    <!-- HOT DEAL badge, top-right -->
-    <div
-      class="absolute top-8 right-8 flex size-20 -rotate-6 flex-col items-center justify-center rounded-full bg-[#e8890a] text-center shadow-[0_10px_8px_rgba(0,0,0,0.1)] sm:right-14"
+      appReveal
+      class="relative grid w-full overflow-hidden rounded-[32px] border border-brand-amber/20 bg-brand-surface shadow-[0_40px_80px_-40px_rgba(240,165,0,0.25)] md:grid-cols-[1fr_300px]"
     >
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="size-5 text-brand-cream">
-        <path
-          fill-rule="evenodd"
-          d="M12.963 2.286a.75.75 0 0 0-1.071-.136 9.742 9.742 0 0 0-3.539 6.176 7.547 7.547 0 0 1-1.705-1.715.75.75 0 0 0-1.152-.082A9 9 0 1 0 15.68 4.534a7.46 7.46 0 0 1-2.717-2.248Z"
-          clip-rule="evenodd"
-        />
-      </svg>
-      <span class="font-display text-[10px] leading-[1.1] text-brand-bg">HOT<br />DEAL</span>
-    </div>
+      <!-- Details -->
+      <div class="relative p-8 sm:p-12">
+        <!-- Amber glow, top-left -->
+        <div
+          class="pointer-events-none absolute -top-32 -left-24 size-96 rounded-full"
+          style="background: radial-gradient(circle, rgba(240, 165, 0, 0.16) 0%, rgba(0, 0, 0, 0) 65%)"
+        ></div>
 
-    <!-- Limited-time badge -->
-    <div
-      class="inline-flex items-center gap-2 rounded-full border border-brand-amber/15 bg-[#2a2318] px-4 py-1.5"
-    >
-      <span class="size-2 rounded-full bg-brand-amber/50"></span>
-      <span class="font-sans text-[12px] font-bold uppercase tracking-[1.2px] text-brand-amber">
-        Limited Time
-      </span>
-    </div>
+        <div class="relative">
+          <!-- Limited-time badge with a live pulse -->
+          <div
+            class="inline-flex items-center gap-2 rounded-full border border-brand-chili/30 bg-brand-chili/10 px-4 py-1.5"
+          >
+            <span class="relative flex size-2">
+              <span class="absolute inline-flex size-full animate-ping rounded-full bg-brand-chili opacity-60 motion-reduce:hidden"></span>
+              <span class="relative inline-flex size-2 rounded-full bg-brand-chili"></span>
+            </span>
+            <span class="font-sans text-[12px] font-bold uppercase tracking-[0.15em] text-brand-chili">
+              Limited Time
+            </span>
+          </div>
 
-    <h2 class="mt-6 font-display text-[40px] leading-tight text-brand-cream sm:text-[60px]">
-      Unlimited KBBQ Night
-    </h2>
+          <h2 class="mt-6 font-display text-[40px] leading-[1.05] text-brand-cream sm:text-[56px]">
+            Unlimited KBBQ Night
+          </h2>
 
-    <p class="mt-2 font-display text-[28px] text-brand-amber">$35 / person · Every Fri &amp; Sat</p>
+          <p class="mt-5 max-w-[520px] font-kr text-[17px] leading-[1.7] text-brand-cream/70">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
+            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+            laboris.
+          </p>
 
-    <p class="mt-4 max-w-[576px] font-kr text-[18px] leading-[1.6] text-brand-cream/65">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
-      labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-      laboris.
-    </p>
+          <div class="mt-8 flex flex-wrap items-center gap-4">
+            <!-- Placeholder CTA: no destination wired yet -->
+            <button type="button" class="btn-primary">Claim This Deal →</button>
+            <a routerLink="/menu" class="btn-ghost">See Full Menu</a>
+          </div>
+        </div>
+      </div>
 
-    <div class="mt-8 flex flex-wrap items-center gap-4">
-      <!-- Placeholder CTA: no destination wired yet -->
-      <button
-        type="button"
-        class="rounded-full bg-brand-amber px-9 py-3.5 font-display text-[17.6px] text-brand-bg transition-colors hover:bg-brand-amber/90"
+      <!-- Price stub, separated by a perforated edge -->
+      <div
+        class="relative flex flex-col items-center justify-center gap-1 border-t-2 border-dashed border-brand-amber/25 bg-[linear-gradient(160deg,#2a1d06_0%,#1a1200_100%)] px-8 py-10 text-center md:border-t-0 md:border-l-2"
       >
-        Claim This Deal →
-      </button>
-      <a
-        routerLink="/menu"
-        class="rounded-full border border-brand-amber/15 px-9 py-3.5 font-sans text-[16px] text-brand-cream/70 transition-colors hover:border-brand-amber/40 hover:text-brand-cream"
-      >
-        See Full Menu
-      </a>
+        <!-- Ticket notches where the perforation meets the card edge: top and bottom of the stub on
+           desktop, both ends of the tear line on phones -->
+        <span
+          aria-hidden="true"
+          class="absolute top-0 left-0 size-8 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-afternoon max-md:hidden"
+        ></span>
+        <span
+          aria-hidden="true"
+          class="absolute bottom-0 left-0 size-8 -translate-x-1/2 translate-y-1/2 rounded-full bg-sky-afternoon max-md:hidden"
+        ></span>
+        <span
+          aria-hidden="true"
+          class="absolute top-0 left-0 size-8 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-afternoon md:hidden"
+        ></span>
+        <span
+          aria-hidden="true"
+          class="absolute top-0 right-0 size-8 translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-afternoon md:hidden"
+        ></span>
+
+        <!-- HOT DEAL tag -->
+        <span
+          class="mb-3 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-apron-deep px-3.5 py-1 font-display text-[13px] tracking-[0.05em] text-brand-cream shadow-[0_8px_20px_-8px_rgba(200,49,43,0.8)]"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="size-3.5">
+            <path
+              fill-rule="evenodd"
+              d="M12.963 2.286a.75.75 0 0 0-1.071-.136 9.742 9.742 0 0 0-3.539 6.176 7.547 7.547 0 0 1-1.705-1.715.75.75 0 0 0-1.152-.082A9 9 0 1 0 15.68 4.534a7.46 7.46 0 0 1-2.717-2.248Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          HOT DEAL
+        </span>
+
+        <p class="font-display text-[88px] leading-none text-brand-amber">
+          <span class="align-top text-[40px]">$</span>35
+        </p>
+        <p class="font-sans text-[14px] font-bold uppercase tracking-[0.2em] text-brand-cream/70">
+          <span class="sr-only">$35 / person</span>
+          <span aria-hidden="true">/ person</span>
+        </p>
+
+        <div class="mt-5 w-full border-t border-brand-amber/15 pt-5">
+          <p class="font-display text-[20px] text-brand-cream">Every Fri &amp; Sat</p>
+          <p class="mt-1 font-kr text-[13px] text-brand-muted">All-you-can-eat grill</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>

@@ -44,6 +44,6 @@ describe('HomePromo', () => {
     const el = fixture.nativeElement as HTMLElement;
     // Guards the no-emoji rule: the flame is an SVG, not the literal emoji.
     expect(el.textContent).toContain('HOT');
-    expect(el.textContent).not.toContain('🔥');
+    expect(el.textContent).not.toContain('\u{1F525}');
   });
 });

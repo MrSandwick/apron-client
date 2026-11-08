@@ -6,7 +6,8 @@ describe('HomeAbout', () => {
     await TestBed.configureTestingModule({ imports: [HomeAbout] }).compileComponents();
   });
 
-  it('renders the story heading and both paragraphs anchor', () => {
+  // The story heading keeps both placeholder lines
+  it('renders the story heading', () => {
     const fixture = TestBed.createComponent(HomeAbout);
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
@@ -16,32 +17,27 @@ describe('HomeAbout', () => {
     expect(h2).toContain('Dolor Sit Amet');
   });
 
-  it('renders Find Us locations and an Hours list', () => {
+  // Sits in the daylight part of the page with the engraved wood logo as its art
+  it('renders in daylight with the wood logo and founding year', () => {
     const fixture = TestBed.createComponent(HomeAbout);
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
-    const text = el.textContent ?? '';
-    // Both Find Us locations render.
-    expect(text).toContain('Lorem City');
-    expect(text).toContain('Dolor City');
-    // Hours is a semantic description list with one row per span.
-    const rows = el.querySelectorAll('dl > div');
-    expect(rows.length).toBe(3);
-    expect(text).toContain('Mon – Thu');
-    expect(text).toContain('Sunday');
+    const section = el.querySelector('[data-testid="home-about"]');
+    expect(section?.classList).toContain('from-sky-noon');
+    const art = el.querySelector('figure img');
+    expect(art?.getAttribute('src')).toBe('images/ahjoomah-wood.svg');
+    expect(art?.getAttribute('alt')).toContain('engraved');
+    expect(el.textContent).toContain('Since 2019');
   });
 
-  it('keeps "Get Directions" as placeholder buttons and uses no emoji', () => {
+  // Locations and hours moved out to HomeVisit, and no emoji sneaks into the art
+  it('leaves Find Us and Hours to the visit section and uses no emoji', () => {
     const fixture = TestBed.createComponent(HomeAbout);
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
-    // No map destination yet, so each location's "Get Directions" is a button.
-    const directions = Array.from(el.querySelectorAll('button')).filter((b) =>
-      b.textContent?.includes('Get Directions'),
-    );
-    expect(directions.length).toBe(2);
-    // Guards the no-emoji rule: the art card uses an SVG flame.
-    expect(el.textContent).toContain('Since 2019');
-    expect(el.textContent).not.toContain('🔥');
+    expect(el.textContent).not.toContain('Find Us');
+    expect(el.querySelector('dl')).toBeNull();
+    // Guards the no-emoji rule: the feature art is an SVG, never an emoji.
+    expect(el.textContent).not.toContain('\u{1F525}');
   });
 });

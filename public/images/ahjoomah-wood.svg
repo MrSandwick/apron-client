@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Ahjoomah's logo engraved in wood">
+  <defs>
+    <!-- Long horizontal grain streaks -->
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.006 0.16" numOctaves="3" seed="7"/>
+      <feColorMatrix values="0 0 0 0 0.36  0 0 0 0 0.2  0 0 0 0 0.08  1.5 0 0 0 -0.5"/>
+    </filter>
+    <!-- Ragged, burnt edge for the recessed disc -->
+    <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="3"/>
+      <feDisplacementMap in="SourceGraphic" scale="22"/>
+    </filter>
+    <clipPath id="disc">
+      <circle cx="200" cy="150" r="112"/>
+    </clipPath>
+    <!-- The engraved face, drawn once and stamped twice (shadow + highlight) -->
+    <g id="engraving" fill="none" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="200" cy="150" r="96"/>
+      <circle cx="200" cy="150" r="84" stroke-width="2.5"/>
+      <path d="M166 176a46 46 0 1 1 68 0"/>
+      <path d="M160 152l40-46 40 46"/>
+      <path d="M177 160q8-8 16 0M207 160q8-8 16 0"/>
+      <rect x="148" y="174" width="104" height="11" rx="5.5"/>
+      <path d="M130 179.5h18M252 179.5h18"/>
+    </g>
+  </defs>
+
+  <!-- Light wood board -->
+  <rect width="400" height="300" fill="#c98b4f"/>
+  <rect width="400" height="300" filter="url(#grain)"/>
+
+  <!-- Recessed, darker disc with a ragged edge, carrying its own grain -->
+  <circle cx="200" cy="150" r="118" fill="#6e3f1c" filter="url(#rough)"/>
+  <g clip-path="url(#disc)" opacity="0.55">
+    <rect width="400" height="300" filter="url(#grain)"/>
+  </g>
+
+  <!-- Engraving: dark cut shadow offset down-right, raised light edge on top -->
+  <use href="#engraving" stroke="#2f1a0b" transform="translate(2.5 2.5)"/>
+  <use href="#engraving" stroke="#e2ad74"/>
+</svg>

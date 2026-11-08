@@ -1,7 +1,12 @@
-<!-- Navbar (#7) and footer (#8) wrap this via the app shell -->
+<!-- Navbar and footer wrap this via the app shell. Sections run in time-of-day order:
+     dawn hero, noon statement, afternoon story and promo, sunset inside the rounds,
+     evening visit and reserve, then the night footer -->
 <main class="home" data-testid="home-page">
   <app-home-hero />
-  <app-home-promo />
+  <app-home-statement />
   <app-home-about />
+  <app-home-promo />
+  <app-home-steps />
+  <app-home-visit />
   <app-home-reserve />
 </main>
