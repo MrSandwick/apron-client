@@ -1,19 +1,39 @@
+import { DishTag } from '../../shared/api/menu.dto';
 import { DishKind } from '../../shared/dish-art/dish-art';
 
-// Placeholder menu: every name, description and price below is filler so the layout can
+export type { DishTag };
+
+// Placeholder menu: every name, description, price and tag below is filler so the layout can
 // be built and reviewed. Real dishes and prices are out of scope this round.
+
+// Order tags are shown in on a card, so the same tag always sits in the same place
+export const DISH_TAG_ORDER: readonly DishTag[] = ['spicy', 'mild', 'vegetarian'];
+
+// Visible text for each tag: badges always carry words, never colour alone
+export const DISH_TAG_LABELS: Record<DishTag, string> = {
+  vegetarian: 'Vegetarian',
+  mild: 'Mild',
+  spicy: 'Spicy',
+};
 
 // One dish card
 export interface MenuDish {
   id: string;
   name: string;
-  kr?: string;
+  // Korean name, shown on every card
+  kr: string;
   description: string;
   price: string;
   // Illustration shown in the image slot until a photo exists
   dish: DishKind;
   // Shows the "Ahjoomah's pick" sticker
   pick?: boolean;
+  // Dietary and spice badges
+  tags?: DishTag[];
+  // Shows the NEW marker
+  isNew?: boolean;
+  // Greyed out with a "Sold out" label
+  soldOut?: boolean;
   // Real photo, once one exists
   src?: string;
 }
@@ -29,6 +49,8 @@ export interface MenuCategory {
 
 const LOREM = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.';
 const LOREM_SHORT = 'Lorem ipsum dolor sit amet, consectetur adipiscing.';
+// Stand-in Korean name ("dish") for placeholder dishes that have no real name yet
+const KR_PLACEHOLDER = '요리';
 
 export const MENU: MenuCategory[] = [
   {
@@ -45,6 +67,7 @@ export const MENU: MenuCategory[] = [
         price: '$00',
         dish: 'grill',
         pick: true,
+        tags: ['mild'],
       },
       {
         id: 'bbq-2',
@@ -53,6 +76,7 @@ export const MENU: MenuCategory[] = [
         description: LOREM_SHORT,
         price: '$00',
         dish: 'meat',
+        tags: ['mild'],
       },
       {
         id: 'bbq-3',
@@ -62,8 +86,18 @@ export const MENU: MenuCategory[] = [
         price: '$00',
         dish: 'meat',
         pick: true,
+        tags: ['mild'],
       },
-      { id: 'bbq-4', name: 'Dish name', description: LOREM_SHORT, price: '$00', dish: 'grill' },
+      {
+        id: 'bbq-4',
+        name: 'Dish name',
+        kr: KR_PLACEHOLDER,
+        description: LOREM_SHORT,
+        price: '$00',
+        dish: 'grill',
+        tags: ['spicy'],
+        isNew: true,
+      },
     ],
   },
   {
@@ -80,6 +114,7 @@ export const MENU: MenuCategory[] = [
         price: '$00',
         dish: 'stew',
         pick: true,
+        tags: ['spicy'],
       },
       {
         id: 'stews-2',
@@ -88,8 +123,17 @@ export const MENU: MenuCategory[] = [
         description: LOREM_SHORT,
         price: '$00',
         dish: 'stew',
+        tags: ['mild', 'vegetarian'],
       },
-      { id: 'stews-3', name: 'Dish name', description: LOREM, price: '$00', dish: 'stew' },
+      {
+        id: 'stews-3',
+        name: 'Dish name',
+        kr: KR_PLACEHOLDER,
+        description: LOREM,
+        price: '$00',
+        dish: 'stew',
+        tags: ['spicy'],
+      },
     ],
   },
   {
@@ -106,6 +150,7 @@ export const MENU: MenuCategory[] = [
         price: '$00',
         dish: 'rice',
         pick: true,
+        tags: ['mild', 'vegetarian'],
       },
       {
         id: 'rice-noodles-2',
@@ -114,6 +159,7 @@ export const MENU: MenuCategory[] = [
         description: LOREM_SHORT,
         price: '$00',
         dish: 'noodles',
+        tags: ['mild'],
       },
       {
         id: 'rice-noodles-3',
@@ -126,9 +172,12 @@ export const MENU: MenuCategory[] = [
       {
         id: 'rice-noodles-4',
         name: 'Dish name',
+        kr: KR_PLACEHOLDER,
         description: LOREM_SHORT,
         price: '$00',
         dish: 'noodles',
+        tags: ['spicy', 'vegetarian'],
+        isNew: true,
       },
     ],
   },
@@ -146,6 +195,7 @@ export const MENU: MenuCategory[] = [
         price: '$00',
         dish: 'banchan',
         pick: true,
+        tags: ['spicy', 'vegetarian'],
       },
       {
         id: 'banchan-2',
@@ -154,13 +204,16 @@ export const MENU: MenuCategory[] = [
         description: LOREM,
         price: '$00',
         dish: 'banchan',
+        tags: ['mild', 'vegetarian'],
       },
       {
         id: 'banchan-3',
         name: 'Dish name',
+        kr: KR_PLACEHOLDER,
         description: LOREM_SHORT,
         price: '$00',
         dish: 'banchan',
+        tags: ['vegetarian'],
       },
     ],
   },
@@ -187,7 +240,15 @@ export const MENU: MenuCategory[] = [
         price: '$00',
         dish: 'drink',
       },
-      { id: 'drinks-3', name: 'Dish name', description: LOREM_SHORT, price: '$00', dish: 'drink' },
+      {
+        id: 'drinks-3',
+        name: 'Dish name',
+        kr: KR_PLACEHOLDER,
+        description: LOREM_SHORT,
+        price: '$00',
+        dish: 'drink',
+        isNew: true,
+      },
     ],
   },
   {
@@ -204,6 +265,7 @@ export const MENU: MenuCategory[] = [
         price: '$00',
         dish: 'dessert',
         pick: true,
+        tags: ['vegetarian'],
       },
       {
         id: 'desserts-2',
@@ -212,8 +274,16 @@ export const MENU: MenuCategory[] = [
         description: LOREM_SHORT,
         price: '$00',
         dish: 'dessert',
+        tags: ['vegetarian'],
       },
-      { id: 'desserts-3', name: 'Dish name', description: LOREM, price: '$00', dish: 'dessert' },
+      {
+        id: 'desserts-3',
+        name: 'Dish name',
+        kr: KR_PLACEHOLDER,
+        description: LOREM,
+        price: '$00',
+        dish: 'dessert',
+      },
     ],
   },
 ];
