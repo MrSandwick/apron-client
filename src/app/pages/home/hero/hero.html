@@ -1,50 +1,53 @@
 <!-- Dawn: the start of the page's day-to-night journey. Copy is kept to a minimum so the first
-     look belongs to Ahjoomah and the parallax scene behind her -->
+     look belongs to Ahjoomah rising over the rooftops of the parallax scene -->
 <section
   #section
   class="world-day relative overflow-hidden bg-linear-to-b from-sky-dawn from-60% to-sky-noon"
   data-testid="home-hero"
 >
-  <!-- Parallax dawn scene: sun, clouds, mountains, skyline, rooftops, lanterns -->
-  <app-hero-scene />
+  <!-- Parallax dawn scene, with Ahjoomah on its stage between the skyline and the rooftops -->
+  <app-hero-scene>
+    <!-- She rises from behind the rooftop wall like it's her counter: centred at the bottom on
+         phones, large on the right from md up. Sized by screen height too, so on short phones
+         she never runs into the buttons above. The frame clips on the bottom edge only (the negative
+         insets leave the top and sides open, so a hop or squash never chops her head). On phones
+         it ends just below her rolling pin, with that edge tucked behind the rooftop wall; from md
+         up it covers her whole figure and the rooftops hide her lower half. min-h-0 keeps the
+         phone frame at its aspect ratio instead of growing to fit her. On phones the tap is her
+         main interaction -->
+    <button
+      type="button"
+      class="pointer-events-auto absolute bottom-[calc(7%_-_6px)] left-1/2 md:bottom-[calc(7%_-_24px)] w-[min(70vw,calc(100svh_-_440px),290px)] -translate-x-1/2 cursor-pointer rounded-t-[40%] md:right-[6%] md:left-auto md:w-[min(40vw,calc(83svh_-_250px),350px)] md:translate-x-0 lg:right-[5%] lg:w-[min(33vw,calc(83svh_-_190px),400px)]"
+      aria-label="Say hi to Ahjoomah"
+      (click)="tap()"
+      data-testid="hero-mascot"
+    >
+      <span class="block aspect-[200/202] min-h-0 md:aspect-auto [clip-path:inset(-60%_-20%_0_-20%)]">
+        <app-ahjoomah #mascot class="block" [mood]="mood()" [decorative]="true" />
+      </span>
+    </button>
+  </app-hero-scene>
 
+  <!-- Copy column. Clicks pass through the empty part of the hero to Ahjoomah below -->
   <div
     #content
-    class="relative mx-auto flex min-h-[calc(100svh-4rem)] max-w-[1280px] origin-top flex-col justify-start px-6 pt-[12svh] pb-24 will-change-transform"
+    class="pointer-events-none relative mx-auto flex min-h-[calc(100svh-4rem)] max-w-[1280px] origin-top flex-col justify-start px-6 pt-[9svh] pb-24 will-change-transform md:pt-[12svh]"
   >
-    <div class="max-w-[680px] lg:max-w-[960px]">
+    <div class="pointer-events-auto max-w-[680px]">
       <p data-intro="eyebrow" class="eyebrow flex items-center gap-3 text-day-accent">
         <span class="h-px w-8 bg-day-accent/70" aria-hidden="true"></span>
         Korean Kitchen<span class="hidden sm:inline"> · New York · Los Angeles</span>
       </p>
 
-      <!-- Title block: Ahjoomah leans over the "Apron" word like it's her counter. Two lines
-           below lg, one line from lg up. She's positioned in em, so she scales with the
-           headline; the em offsets centre her rolling pin over the word at each breakpoint -->
-      <div
-        class="relative mt-5 font-display text-[42px] leading-[0.95] tracking-[-0.01em] min-[360px]:text-[46px] sm:text-[76px] lg:text-[104px]"
+      <h1
+        data-intro="title"
+        class="mt-5 font-display text-[42px] leading-[0.95] tracking-[-0.01em] text-day-ink min-[360px]:text-[46px] sm:text-[76px] lg:text-[104px]"
       >
-        <h1 data-intro="title" class="text-day-ink lg:pt-[2.43em]">
-          <span class="block lg:inline">Ahjoomah's </span>
-          <span class="mt-[2.6em] block text-brand-apron-deep sm:mt-[2.05em] lg:mt-0 lg:inline">Apron</span>
-        </h1>
+        <span class="block">Ahjoomah's </span>
+        <span class="block text-brand-apron-deep">Apron</span>
+      </h1>
 
-        <!-- Tap target for the mascot; on phones this is her main interaction -->
-        <button
-          type="button"
-          class="absolute top-[0.67em] left-0 w-[3em] -rotate-3 cursor-pointer rounded-3xl sm:top-[0.72em] sm:left-[0.29em] sm:w-[2.4em] lg:top-[-0.05em] lg:left-[5.98em] lg:w-[2.6em]"
-          aria-label="Say hi to Ahjoomah"
-          (click)="tap()"
-          data-testid="hero-mascot"
-        >
-          <!-- Clip her just below the rolling pin so the pin rests on the word's top edge -->
-          <span class="block aspect-[200/202] overflow-hidden">
-            <app-ahjoomah #mascot class="block" [mood]="mood()" [decorative]="true" />
-          </span>
-        </button>
-      </div>
-
-      <div data-intro="ctas" class="mt-10 flex flex-wrap items-center gap-4 lg:mt-12">
+      <div data-intro="ctas" class="mt-8 flex flex-wrap items-center gap-3 sm:mt-10 sm:gap-4">
         <!-- Hovering or focusing Reserve makes Ahjoomah close her eyes happily and squish -->
         <a
           #reserveCta

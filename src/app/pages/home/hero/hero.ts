@@ -12,14 +12,16 @@ import { HeroScene } from './hero-scene';
 const TAP_JOY_MS = 1200;
 // How far (px) the nearest scene layer shifts toward the cursor; farther layers move less
 const POINTER_SHIFT = 28;
-// How far (%) the nearest scene layer drifts as the hero scrolls away
-const SCROLL_SHIFT = 40;
+// How far, as a fraction of the hero's height, a layer at depth 0 sinks while the hero scrolls
+// away. Far layers (low depth) sink the most so they seem to hang back, near ones the least
+const SCROLL_SHIFT = 0.5;
 // Input that skips the intro straight to its end
 const SKIP_EVENTS = ['wheel', 'touchstart', 'keydown', 'pointerdown'] as const;
 
-// Home hero at dawn: a short headline with Ahjoomah leaning over its "Apron" word, the
-// reserve/menu CTAs, and a layered parallax scene behind. On first load a short intro
-// raises the scene layer by layer, then the title, then pops her up with a greeting bonk;
+// Home hero at dawn: a short headline and the reserve/menu CTAs, with Ahjoomah rising huge
+// over the rooftops of a layered parallax scene (she stands on its stage, between the skyline
+// and the rooftop wall). On first load a short intro raises the scene layer by layer, then the
+// title, then pops her up from behind the wall with a greeting bonk;
 // any scroll, tap or key skips it. After that the scene drifts with scroll (and with the
 // cursor on desktop), clouds, smoke and lanterns idle gently, and she keeps her own life:
 // bob, blink, eye-follow, idle routines and the Reserve nudge. Sound is opt-in only.
@@ -64,7 +66,7 @@ export class HomeHero implements OnDestroy {
         const stopIntro = this.playIntro(el, layers, depth);
         this.startIdleScene(el);
 
-        // Scroll: copy recedes; scene layers drift at their own speed for depth
+        // Scroll: copy recedes; scene layers sink at their own speed for depth
         const scrub = { trigger: el, start: 'top top', end: 'bottom top', scrub: true };
         gsap.to(this.content().nativeElement, {
           scale: 0.92,
@@ -74,8 +76,14 @@ export class HomeHero implements OnDestroy {
           ease: 'none',
           scrollTrigger: scrub,
         });
+        // Each layer's travel is set in hero heights, then converted to a % of its own height
+        // (layers differ in height), and re-measured on resize
         drifting.forEach((layer) =>
-          gsap.to(layer, { yPercent: depth(layer) * SCROLL_SHIFT, ease: 'none', scrollTrigger: { ...scrub } }),
+          gsap.to(layer, {
+            yPercent: () => ((1 - depth(layer)) * SCROLL_SHIFT * el.offsetHeight * 100) / layer.offsetHeight,
+            ease: 'none',
+            scrollTrigger: { ...scrub, invalidateOnRefresh: true },
+          }),
         );
 
         const stopMascot = animateMascot(this.mascotEl(), { nudgeTarget: this.reserveCta().nativeElement });
@@ -137,7 +145,7 @@ export class HomeHero implements OnDestroy {
       .from(el.querySelector('[data-intro="eyebrow"]'), { y: 14, opacity: 0, duration: 0.6 }, 0.45)
       .from(el.querySelector('[data-intro="title"]'), { y: 30, opacity: 0, duration: 0.8 }, 0.6)
       .from(el.querySelector('[data-intro="ctas"]'), { y: 20, opacity: 0, duration: 0.7 }, 1.0)
-      // She rises from behind "Apron" with a pop, then greets the visitor
+      // She rises from behind the rooftop wall with a pop, then greets the visitor
       .from(this.mascotEl(), { yPercent: 75, duration: 0.8, ease: 'back.out(1.8)' }, 1.1)
       .call(() => this.sound.play('pop'), [], 1.15)
       .call(
@@ -159,16 +167,23 @@ export class HomeHero implements OnDestroy {
     return removeSkip;
   }
 
-  // Gentle idle loops: clouds drift, chimney smoke rises, lanterns sway
+  // Gentle idle loops: clouds drift and morph, chimney smoke rises, lanterns sway
   private startIdleScene(el: HTMLElement): void {
-    gsap.utils.toArray<SVGGElement>('[data-cloud]', el).forEach((cloud, i) => {
-      gsap.to(cloud, { x: i % 2 ? -60 : 60, duration: 40 + i * 12, ease: 'sine.inOut', yoyo: true, repeat: -1 });
-    });
+    this.driftClouds(el);
     gsap.utils.toArray<SVGCircleElement>('[data-smoke] circle', el).forEach((puff, i) => {
       gsap.fromTo(
         puff,
         { y: 0, x: 0, scale: 0.6, opacity: 0.7, transformOrigin: '50% 50%' },
-        { y: -70, x: 18, scale: 2, opacity: 0, duration: 3.6, ease: 'sine.out', repeat: -1, delay: i * 1.2 },
+        {
+          y: -90,
+          x: gsap.utils.random(10, 30),
+          scale: 2.2,
+          opacity: 0,
+          duration: 4.2,
+          ease: 'sine.out',
+          repeat: -1,
+          delay: i * 1.4,
+        },
       );
     });
     gsap.utils.toArray<SVGGElement>('[data-lantern] [data-swing]', el).forEach((swing, i) => {
@@ -180,6 +195,40 @@ export class HomeHero implements OnDestroy {
         yoyo: true,
         repeat: -1,
         delay: 2 + i * 0.2,
+      });
+    });
+  }
+
+  // Clouds travel the full width of the sky and wrap around, so the sky is always changing.
+  // Speed follows size (bigger means nearer and faster), each cloud also bobs gently, and
+  // its puffs swell and shrink out of step, so the shape shifts as it goes
+  private driftClouds(el: HTMLElement): void {
+    const SKY_WIDTH = 1440; // the cloud SVG's viewBox width
+    const MARGIN = 40;
+    gsap.utils.toArray<SVGGElement>('[data-cloud]', el).forEach((cloud) => {
+      // getBBox is missing in some non-browser environments; skip drifting there
+      if (typeof cloud.getBBox !== 'function') return;
+      const box = cloud.getBBox();
+      const from = -(box.x + box.width) - MARGIN;
+      const to = SKY_WIDTH - box.x + MARGIN;
+      // Slow on purpose: a big cloud takes well over a minute to cross, so it reads as drifting
+      const speed = 7 + box.width * 0.05; // viewBox units per second
+      const drift = gsap.fromTo(cloud, { x: from }, { x: to, duration: (to - from) / speed, ease: 'none', repeat: -1 });
+      // Start where the cloud is drawn rather than off the left edge
+      drift.progress((0 - from) / (to - from));
+
+      gsap.to(cloud, { y: gsap.utils.random(-9, 9), duration: gsap.utils.random(5, 9), ease: 'sine.inOut', yoyo: true, repeat: -1 });
+      cloud.querySelectorAll('ellipse').forEach((puff) => {
+        gsap.to(puff, {
+          scaleX: gsap.utils.random(1.06, 1.16),
+          scaleY: gsap.utils.random(0.86, 0.94),
+          transformOrigin: '50% 50%',
+          duration: gsap.utils.random(4, 8),
+          ease: 'sine.inOut',
+          yoyo: true,
+          repeat: -1,
+          delay: gsap.utils.random(0, 3),
+        });
       });
     });
   }
