@@ -1,36 +1,50 @@
-<!-- Decorative dawn scene behind the hero. Each [data-layer] moves at its own [data-depth] for
-     parallax; its inner [data-intro] element is what the first-look intro animates, so the two
-     never fight over the same transform. Far layers are paler (atmospheric haze) -->
-<div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+<!-- Dawn scene behind the hero. Each [data-layer] moves at its own [data-depth] for parallax;
+     its inner [data-intro] element is what the first-look intro animates, so the two never fight
+     over the same transform. Far layers are paler (atmospheric haze). Decorative layers are
+     hidden from assistive tech one by one, because the stage slot holds the host's interactive
+     mascot. Clicks pass through everything except what the host puts on the stage -->
+<div class="pointer-events-none absolute inset-0 overflow-hidden">
   <!-- Flat morning sun -->
-  <div data-layer data-depth="0.1" class="absolute inset-0 mx-auto max-w-[1280px]">
+  <div data-layer data-depth="0.1" aria-hidden="true" class="absolute inset-0 mx-auto max-w-[1280px]">
     <div
       data-intro="sun"
       class="absolute -top-10 -right-20 size-[260px] rounded-full bg-radial from-sun from-62% to-transparent to-70% sm:size-[380px] md:top-6 md:right-[6%] md:size-[460px]"
     ></div>
   </div>
 
-  <!-- Clouds drifting slowly across the sky -->
-  <div data-layer data-depth="0.15" class="absolute inset-x-0 top-[8%] h-[30%]">
-    <svg data-intro viewBox="0 0 1440 240" preserveAspectRatio="xMidYMin slice" class="size-full">
+  <!-- Clouds. Each [data-cloud] drifts across the whole sky and wraps around, at a speed that
+       follows its size (bigger and nearer is faster), while its puffs slowly change shape -->
+  <div data-layer data-depth="0.15" aria-hidden="true" class="absolute inset-x-0 top-[6%] h-[34%]">
+    <svg data-intro viewBox="0 0 1440 280" preserveAspectRatio="xMidYMin slice" class="size-full overflow-visible">
       <g data-cloud class="fill-white/55">
-        <ellipse cx="220" cy="90" rx="110" ry="26" />
-        <ellipse cx="270" cy="70" rx="60" ry="30" />
-        <ellipse cx="190" cy="76" rx="44" ry="22" />
+        <ellipse cx="220" cy="96" rx="120" ry="28" />
+        <ellipse cx="280" cy="74" rx="66" ry="32" />
+        <ellipse cx="180" cy="80" rx="48" ry="24" />
+        <ellipse cx="330" cy="98" rx="52" ry="20" />
       </g>
       <g data-cloud class="fill-white/40">
-        <ellipse cx="820" cy="150" rx="140" ry="24" />
-        <ellipse cx="870" cy="128" rx="70" ry="28" />
+        <ellipse cx="820" cy="170" rx="150" ry="24" />
+        <ellipse cx="880" cy="148" rx="76" ry="28" />
+        <ellipse cx="760" cy="156" rx="52" ry="20" />
       </g>
       <g data-cloud class="fill-white/50">
-        <ellipse cx="1260" cy="60" rx="96" ry="20" />
-        <ellipse cx="1290" cy="44" rx="48" ry="22" />
+        <ellipse cx="1260" cy="62" rx="100" ry="20" />
+        <ellipse cx="1292" cy="44" rx="52" ry="22" />
+        <ellipse cx="1220" cy="52" rx="38" ry="16" />
+      </g>
+      <g data-cloud class="fill-white/35">
+        <ellipse cx="540" cy="46" rx="64" ry="12" />
+        <ellipse cx="566" cy="36" rx="32" ry="13" />
+      </g>
+      <g data-cloud class="fill-white/30">
+        <ellipse cx="1040" cy="118" rx="54" ry="10" />
+        <ellipse cx="1060" cy="108" rx="28" ry="11" />
       </g>
     </svg>
   </div>
 
   <!-- Far mountains (Bukhansan-style ridges) -->
-  <div data-layer data-depth="0.2" class="absolute inset-x-0 bottom-0 h-[52%]">
+  <div data-layer data-depth="0.2" aria-hidden="true" class="absolute inset-x-0 bottom-0 h-[52%]">
     <svg data-intro viewBox="0 0 1440 300" preserveAspectRatio="xMidYMax slice" class="size-full fill-[#a5bac5]">
       <path
         d="M0 300V172C120 124 200 92 300 110s160-50 260-40 160 70 280 50 200-80 320-60 200 70 280 60v198Z"
@@ -39,7 +53,7 @@
   </div>
 
   <!-- City skyline with Namsan Tower on its hill -->
-  <div data-layer data-depth="0.35" class="absolute inset-x-0 bottom-0 h-[40%]">
+  <div data-layer data-depth="0.35" aria-hidden="true" class="absolute inset-x-0 bottom-0 h-[40%]">
     <svg data-intro viewBox="0 0 1440 260" preserveAspectRatio="xMidYMax slice" class="size-full fill-[#8fa6b2]">
       <!-- Namsan hill and tower -->
       <path d="M940 260c40-70 100-100 160-100s120 30 160 100Z" />
@@ -54,9 +68,16 @@
     </svg>
   </div>
 
-  <!-- Hanok rooftops with upturned eaves, and a chimney sending up smoke -->
-  <div data-layer data-depth="0.55" class="absolute inset-x-0 bottom-0 h-[26%]">
-    <svg data-intro viewBox="0 0 1440 200" preserveAspectRatio="xMidYMax slice" class="size-full fill-[#6f8692]">
+  <!-- Stage: the host's mascot stands here, between the skyline and the rooftops, so the
+       rooftop wall in front hides her below the waist like a counter -->
+  <div data-layer data-depth="0.45" class="absolute inset-0 mx-auto max-w-[1280px]">
+    <ng-content />
+  </div>
+
+  <!-- Hanok rooftops with upturned eaves, a chimney sending up smoke, and a continuous wall
+       along the bottom so there's never a gap where the mascot's cut-off edge could show -->
+  <div data-layer data-depth="0.55" aria-hidden="true" class="absolute inset-x-0 bottom-0 h-[26%]">
+    <svg data-intro viewBox="0 0 1440 200" preserveAspectRatio="xMidYMax slice" class="size-full overflow-visible fill-[#6f8692]">
       <g>
         <rect x="378" y="88" width="16" height="40" />
         <g data-smoke class="fill-white/60">
@@ -70,7 +91,8 @@
       <path d="M600 200v-50h14q30-24 58-26h120q28 2 58 26h-14v50Z" />
       <path d="M840 200v-66h18q40-32 78-34h160q38 2 78 34h-18v66Z" />
       <path d="M1160 200v-54h16q32-26 62-28h130q30 2 62 28h-16v54Z" />
-      <rect x="0" y="176" width="1440" height="24" />
+      <rect x="0" y="150" width="1440" height="50" />
+      <rect x="0" y="146" width="1440" height="7" rx="2" class="fill-[#5c7380]" />
     </svg>
   </div>
 
@@ -78,7 +100,7 @@
        furthest the cursor parallax can shift it), so it always reads as hung from something just
        out of view. Anchored: it follows the cursor but never drifts on scroll, which would pull
        the ends into view -->
-  <div data-layer data-anchored data-depth="0.85" class="absolute top-0 right-0 h-[140px] w-[62%] sm:h-[200px] md:w-[46%]">
+  <div data-layer data-anchored data-depth="0.85" aria-hidden="true" class="absolute top-0 right-0 h-[140px] w-[62%] sm:h-[200px] md:w-[46%]">
     <svg data-intro viewBox="0 0 600 200" preserveAspectRatio="xMaxYMin meet" class="size-full overflow-visible">
       <path d="M-20 -48Q300 150 660 -40" class="fill-none stroke-day-ink/45" stroke-width="2" />
       @for (lantern of lanterns; track lantern.x) {
@@ -98,5 +120,5 @@
   </div>
 
   <!-- Soft fade into the statement section's noon colour -->
-  <div class="absolute inset-x-0 bottom-0 h-28 bg-linear-to-b from-transparent to-sky-noon"></div>
+  <div aria-hidden="true" class="absolute inset-x-0 bottom-0 h-28 bg-linear-to-b from-transparent to-sky-noon"></div>
 </div>
