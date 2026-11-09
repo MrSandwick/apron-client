@@ -12,4 +12,12 @@ describe('HomeStatement', () => {
     // Static text stays fully readable without JS-driven motion
     expect(el.textContent?.replace(/\s+/g, ' ')).toContain('A Seoul night out,');
   });
+
+  // The statement says the restaurant serves Chicago, not other cities
+  it('mentions Chicago and no other city', () => {
+    const fixture = TestBed.createComponent(HomeStatement);
+    expect(fixture.componentInstance.text).toContain('served in Chicago');
+    expect(fixture.componentInstance.text).not.toContain('New York');
+    expect(fixture.componentInstance.text).not.toContain('Los Angeles');
+  });
 });
