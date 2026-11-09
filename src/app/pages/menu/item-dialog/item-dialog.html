@@ -1,0 +1,226 @@
+<!-- Native modal: focus is trapped, Escape closes it, and the backdrop sits behind the card -->
+<dialog
+  #dlg
+  aria-labelledby="item-dialog-title"
+  class="m-auto h-dvh max-h-dvh w-full max-w-none overflow-hidden bg-transparent p-0 text-day-ink backdrop:bg-day-ink/70 sm:h-auto sm:max-h-[90dvh] sm:max-w-xl"
+  data-testid="item-dialog"
+  (close)="onNativeClose()"
+  (click)="onDialogClick($event)"
+>
+  @if (dish(); as d) {
+    <!-- Card: header and footer stay put, only the middle scrolls -->
+    <div
+      class="flex h-full max-h-dvh flex-col bg-dusk-card text-day-ink sm:h-auto sm:max-h-[90dvh] sm:rounded-3xl"
+    >
+      <!-- Header: dish name with an always-reachable close button -->
+      <div class="flex items-start gap-3 border-b border-day-ink/10 px-5 pt-5 pb-4 sm:px-7">
+        <div class="min-w-0 flex-1">
+          <h2 id="item-dialog-title" class="font-display text-[26px] leading-tight break-words">
+            @if (d.code) {
+              <span class="mr-2 text-day-accent">{{ d.code }}</span>
+            }
+            {{ d.name }}
+          </h2>
+          @if (d.kr) {
+            <p class="mt-0.5 font-kr text-[16px] font-medium text-day-ink-soft" lang="ko">
+              {{ d.kr }}
+            </p>
+          }
+        </div>
+        <button
+          type="button"
+          class="inline-flex size-11 shrink-0 items-center justify-center rounded-full text-day-ink hover:bg-day-ink/10 motion-safe:transition-colors"
+          aria-label="Close dialog"
+          data-testid="item-dialog-close-x"
+          (click)="closed.emit()"
+        >
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            class="size-5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Scrolling body -->
+      <div class="min-h-0 flex-1 space-y-6 overflow-y-auto px-5 py-5 sm:px-7">
+        <!-- Description and tags -->
+        <div>
+          <p class="font-sans text-[16px] leading-relaxed text-day-ink-soft">{{ d.description }}</p>
+          @if (tags().length) {
+            <ul class="mt-3 flex flex-wrap gap-1.5" aria-label="Dish tags">
+              @for (tag of tags(); track tag) {
+                <li
+                  class="rounded-full bg-day-ink/10 px-2.5 py-1 font-sans text-[12px] leading-none font-bold text-day-ink"
+                >
+                  {{ tag }}
+                </li>
+              }
+            </ul>
+          }
+        </div>
+
+        <!-- Option groups -->
+        @for (group of groups(); track group.id) {
+          <fieldset class="min-w-0" [attr.data-group]="group.id" data-testid="item-dialog-group">
+            <legend class="mb-2 w-full p-0">
+              <span class="block font-display text-[19px] leading-tight">
+                {{ group.name }}
+                @if (group.kr) {
+                  <span class="ml-1 font-kr text-[15px] font-medium text-day-ink-soft" lang="ko">{{
+                    group.kr
+                  }}</span>
+                }
+              </span>
+              <span class="mt-0.5 block font-sans text-[13px] font-bold text-day-ink-soft">{{
+                groupLegend(group)
+              }}</span>
+            </legend>
+
+            <!-- Choices: radios for pick-one, checkboxes otherwise -->
+            <ul class="divide-y divide-day-ink/10 rounded-2xl bg-white/60 px-3">
+              @for (choice of group.choices; track choice.id) {
+                <li>
+                  <label
+                    class="flex min-h-11 cursor-pointer items-center gap-3 py-2 has-disabled:cursor-not-allowed"
+                    data-testid="item-dialog-choice"
+                  >
+                    <input
+                      [type]="isRadio(group) ? 'radio' : 'checkbox'"
+                      class="size-5 shrink-0 accent-brand-apron-deep"
+                      [name]="group.id"
+                      [checked]="isPicked(selection(), group, choice.id)"
+                      [disabled]="!canPick(selection(), group, choice)"
+                      (change)="pick(group, choice, $any($event.target))"
+                    />
+                    <span
+                      class="min-w-0 flex-1 font-sans text-[16px] leading-snug break-words"
+                      [class.opacity-75]="!canPick(selection(), group, choice)"
+                    >
+                      {{ choice.name }}
+                      @if (choice.kr) {
+                        <span class="ml-1 font-kr text-[14px] text-day-ink-soft" lang="ko">{{
+                          choice.kr
+                        }}</span>
+                      }
+                    </span>
+                    <span class="shrink-0 font-sans text-[15px] font-bold text-day-ink-soft">
+                      {{ choice.soldOut ? 'Sold out' : extraText(choice) }}
+                    </span>
+                  </label>
+                </li>
+              }
+            </ul>
+
+            <!-- Quiet hint once an optional group is full -->
+            <p
+              class="font-sans text-[13px] text-day-ink-soft"
+              [class.mt-1.5]="limitReached(group)"
+              aria-live="polite"
+              data-testid="item-dialog-limit"
+            >
+              {{ limitReached(group) ? 'Limit reached: untick one to choose another.' : '' }}
+            </p>
+          </fieldset>
+        }
+
+        <!-- Note box, only for dishes that take notes -->
+        @if (noteMax() > 0) {
+          <div>
+            <label for="item-dialog-note" class="block font-display text-[19px] leading-tight">
+              Special request
+            </label>
+            <p class="mt-0.5 font-sans text-[13px] font-bold text-day-ink-soft">Important notes</p>
+            <textarea
+              id="item-dialog-note"
+              rows="3"
+              class="mt-2 w-full resize-none rounded-2xl border border-day-ink/20 bg-white/70 px-4 py-3 font-sans text-[16px] text-day-ink placeholder:text-day-ink-soft"
+              placeholder="Add allergies or other notes..."
+              [attr.maxlength]="noteMax()"
+              [value]="note()"
+              (input)="setNote($any($event.target).value)"
+              data-testid="item-dialog-note"
+            ></textarea>
+            <p
+              class="mt-1 text-right font-sans text-[13px] text-day-ink-soft"
+              data-testid="item-dialog-note-count"
+            >
+              {{ note().length }}/{{ noteMax() }}
+            </p>
+          </div>
+        }
+
+        <!-- Quantity stepper -->
+        <div class="flex items-center justify-between gap-4">
+          <span class="font-display text-[19px]">Quantity</span>
+          <div class="flex items-center gap-3">
+            <button
+              type="button"
+              class="inline-flex size-11 items-center justify-center rounded-full bg-day-ink font-sans text-[22px] leading-none text-brand-cream aria-disabled:opacity-40"
+              aria-label="Decrease quantity"
+              [attr.aria-disabled]="quantity() <= minQuantity"
+              (click)="step(-1)"
+            >
+              -
+            </button>
+            <span
+              class="min-w-8 text-center font-sans text-[20px] font-bold"
+              aria-live="polite"
+              data-testid="item-dialog-qty"
+              >{{ quantity() }}</span
+            >
+            <button
+              type="button"
+              class="inline-flex size-11 items-center justify-center rounded-full bg-day-ink font-sans text-[22px] leading-none text-brand-cream aria-disabled:opacity-40"
+              aria-label="Increase quantity"
+              [attr.aria-disabled]="quantity() >= maxQuantity"
+              (click)="step(1)"
+            >
+              +
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer: what is missing, then Close and Add to cart -->
+      <div class="border-t border-day-ink/10 px-5 py-4 sm:px-7">
+        <p
+          id="item-dialog-missing"
+          class="font-sans text-[14px] font-bold text-day-accent"
+          [class.mb-3]="missingText()"
+          role="status"
+          data-testid="item-dialog-missing"
+        >
+          {{ missingText() }}
+        </p>
+        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            class="inline-flex min-h-12 items-center justify-center rounded-full border border-day-ink/30 px-6 font-sans text-[16px] font-bold text-day-ink hover:bg-day-ink/10"
+            data-testid="item-dialog-close"
+            (click)="closed.emit()"
+          >
+            Close
+          </button>
+          <button
+            type="button"
+            class="btn-primary min-h-12 aria-disabled:cursor-not-allowed aria-disabled:opacity-50 aria-disabled:shadow-none"
+            [attr.aria-label]="addLabel()"
+            [attr.aria-describedby]="missing().length > 0 ? 'item-dialog-missing' : null"
+            [attr.aria-disabled]="missing().length > 0"
+            data-testid="item-dialog-add"
+            (click)="add()"
+          >
+            Add to cart | {{ totalText() }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</dialog>

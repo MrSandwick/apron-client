@@ -1,6 +1,7 @@
 <!-- Dusk sky: golden hour under the header, sunset through the menu, twilight by the footer -->
 <main
-  class="bg-linear-to-b from-sky-golden via-sky-sunset via-40% to-sky-twilight pb-24 sm:pb-32"
+  class="bg-linear-to-b from-sky-golden via-sky-sunset via-40% to-sky-twilight"
+  [class]="cart.count() > 0 ? 'pb-44 sm:pb-48' : 'pb-24 sm:pb-32'"
   data-testid="menu-page"
 >
   <!-- Header on solid golden sky, with the sun sinking below its bottom edge -->
@@ -94,13 +95,24 @@
       </p>
     }
 
-    @for (category of categories(); track category.id; let first = $first) {
+    @for (category of categories(); track category.id; let first = $first; let i = $index) {
       <section
         [id]="category.id"
         [attr.aria-labelledby]="category.id + '-title'"
         class="scroll-mt-36"
         data-testid="menu-category"
       >
+        <!-- Menu tab label above the first section of each tab -->
+        @if (category.group && (first || categories()[i - 1].group !== category.group)) {
+          <p
+            class="w-fit rounded-full bg-dusk-card px-4 py-1 font-sans text-[13px] font-bold tracking-[0.2em] text-day-ink uppercase"
+            [class]="first ? 'mb-16' : 'mb-4'"
+            data-testid="menu-group"
+          >
+            {{ category.group }}
+          </p>
+        }
+
         <!-- Heading band; the first one carries Ahjoomah peeking over its top edge -->
         <div class="relative rounded-3xl bg-sky-twilight px-6 py-5 text-night-text sm:px-8">
           @if (first) {
@@ -128,11 +140,46 @@
         <ul class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           @for (dish of category.dishes; track dish.id; let i = $index) {
             <li [appReveal]="i * 80">
-              <app-dish-card [dish]="dish" />
+              <app-dish-card [dish]="dish" (select)="open($event)" />
             </li>
           }
         </ul>
       </section>
     }
   </div>
+
+  <!-- Item dialog: one instance, driven by the ?item= address -->
+  <app-item-dialog [dish]="activeDish()" (closed)="close()" (added)="add($event)" />
+
+  <!-- Confirmation after adding: the live region stays in the page and only its text changes -->
+  <div
+    role="status"
+    class="pointer-events-none fixed bottom-24 left-1/2 z-50 -translate-x-1/2"
+    data-testid="menu-cart-toast"
+  >
+    @if (toastText(); as text) {
+      <p
+        class="w-max max-w-[calc(100vw-2rem)] rounded-full bg-day-ink px-5 py-2 text-center font-sans text-[15px] font-bold text-brand-cream shadow-lg"
+      >
+        {{ text }}
+      </p>
+    }
+  </div>
+
+  <!-- Slim cart bar, only once something is in the cart -->
+  @if (cart.count() > 0) {
+    <div
+      class="fixed inset-x-0 bottom-0 z-40 border-t border-day-ink/10 bg-dusk-card text-day-ink"
+      data-testid="menu-cart-bar"
+    >
+      <div class="mx-auto flex max-w-[1152px] items-center justify-between gap-4 px-6 py-3">
+        <p class="font-sans text-[16px] font-bold">
+          {{ cart.count() }} {{ cart.count() === 1 ? 'item' : 'items' }}
+          <span aria-hidden="true">|</span> {{ cartTotalText() }}
+        </p>
+        <!-- /order is not built yet (tracked separately); the navbar already links to it -->
+        <a routerLink="/order" class="btn-primary min-h-11 px-6 py-2">View cart</a>
+      </div>
+    </div>
+  }
 </main>

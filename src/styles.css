@@ -25,6 +25,9 @@
   --color-brand-apron: #c8312b;
   /* Vegetarian badge on menu cards; cream text on it is 5.2:1 */
   --color-tag-leaf: #2f6b3a;
+  /* Other tag badges; cream text on each is at least 5:1 */
+  --color-tag-ember: #6f1d1b;
+  --color-tag-teal: #1f6b64;
   /* Greens for dish art and the unlabelled bottle */
   --color-brand-leaf: #5b9a4b;
   --color-brand-bottle: #2f8f4e;
@@ -72,6 +75,11 @@
 }
 
 @layer base {
+  /* Freeze the page behind an open modal dialog */
+  body:has(dialog[open]) {
+    overflow: hidden;
+  }
+
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;

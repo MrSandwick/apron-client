@@ -2,19 +2,23 @@ import { MenuDto } from './menu.dto';
 
 // A small typed sample of the API's response. Specs flush it through the HTTP layer so they
 // never depend on the placeholder data, and it covers the cases cards must handle: a photo,
-// a sold-out dish, tags, NEW and the pick sticker, and a dish with no Korean name.
+// a sold-out dish, every kind of tag, NEW, featured and the pick sticker, a dish code, a dish
+// with no Korean name, and option groups (a required pick-one with a pre-selected choice, an
+// optional pick-up-to-3 with surcharges and a sold-out choice).
 export const menuFixture: MenuDto = {
   version: '7',
   currency: 'USD',
   categories: [
     {
       id: 'bbq',
+      group: 'MAIN',
       title: 'BBQ',
       titleKr: '고기구이',
       blurb: 'Grilled at your table.',
       dishes: [
         {
           id: 'bbq-galbi',
+          code: 'B1',
           name: 'Galbi',
           nameKr: '갈비',
           description: 'Marinated short rib.',
@@ -29,11 +33,76 @@ export const menuFixture: MenuDto = {
           },
           pick: true,
           isNew: false,
+          featured: true,
           soldOut: false,
-          tags: ['mild'],
+          tags: ['mild', 'gluten-free'],
+          optionGroups: [
+            {
+              id: 'bbq-galbi-cut',
+              name: 'Cut',
+              nameKr: null,
+              required: true,
+              min: 1,
+              max: 1,
+              choices: [
+                {
+                  id: 'bbq-galbi-cut-bone-in',
+                  name: 'Bone-in',
+                  nameKr: null,
+                  extraMinor: 0,
+                  preSelected: true,
+                  soldOut: false,
+                },
+                {
+                  id: 'bbq-galbi-cut-boneless',
+                  name: 'Boneless',
+                  nameKr: null,
+                  extraMinor: 300,
+                  preSelected: false,
+                  soldOut: false,
+                },
+              ],
+            },
+            {
+              id: 'bbq-galbi-extras',
+              name: 'Extras',
+              nameKr: null,
+              required: false,
+              min: 0,
+              max: 3,
+              choices: [
+                {
+                  id: 'bbq-galbi-extras-rice',
+                  name: 'Side of rice',
+                  nameKr: '밥',
+                  extraMinor: 200,
+                  preSelected: false,
+                  soldOut: false,
+                },
+                {
+                  id: 'bbq-galbi-extras-kimchi',
+                  name: 'Pint of kimchi',
+                  nameKr: '김치',
+                  extraMinor: 700,
+                  preSelected: false,
+                  soldOut: false,
+                },
+                {
+                  id: 'bbq-galbi-extras-egg',
+                  name: 'Fried egg',
+                  nameKr: null,
+                  extraMinor: 150,
+                  preSelected: false,
+                  soldOut: true,
+                },
+              ],
+            },
+          ],
+          noteMaxLength: 200,
         },
         {
           id: 'bbq-pork-belly',
+          code: null,
           name: 'Pork belly',
           nameKr: null,
           description: 'Thick-cut samgyeopsal.',
@@ -43,19 +112,24 @@ export const menuFixture: MenuDto = {
           image: null,
           pick: false,
           isNew: true,
+          featured: false,
           soldOut: true,
-          tags: ['spicy'],
+          tags: ['extra-hot'],
+          optionGroups: [],
+          noteMaxLength: 200,
         },
       ],
     },
     {
       id: 'banchan',
+      group: 'APPETIZER',
       title: 'Banchan',
       titleKr: '반찬',
       blurb: 'Small plates for the table.',
       dishes: [
         {
           id: 'banchan-kimchi',
+          code: 'S1',
           name: 'Kimchi',
           nameKr: '김치',
           description: 'House-fermented cabbage.',
@@ -65,8 +139,11 @@ export const menuFixture: MenuDto = {
           image: null,
           pick: false,
           isNew: false,
+          featured: false,
           soldOut: false,
-          tags: ['spicy', 'vegetarian'],
+          tags: ['spicy', 'vegan', 'organic'],
+          optionGroups: [],
+          noteMaxLength: 200,
         },
       ],
     },
