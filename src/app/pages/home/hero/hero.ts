@@ -6,6 +6,7 @@ import { animateMascot, bonk, squish, stopNudge } from '../../../shared/ahjoomah
 import { AhjoomahSound } from '../../../shared/sound/ahjoomah-sound';
 import { SoundToggle } from '../../../shared/sound/sound-toggle';
 import { whenMotionAllowed } from '../../../shared/motion';
+import { driftClouds } from '../../../shared/sky-clouds/sky-clouds';
 import { HeroScene } from './hero-scene';
 
 // How long her happy eyes last after a tap, in ms
@@ -175,7 +176,7 @@ export class HomeHero implements OnDestroy {
 
   // Gentle idle loops: clouds drift and morph, chimney smoke rises, lanterns sway
   private startIdleScene(el: HTMLElement): void {
-    this.driftClouds(el);
+    driftClouds(el);
     gsap.utils.toArray<SVGCircleElement>('[data-smoke] circle', el).forEach((puff, i) => {
       gsap.fromTo(
         puff,
@@ -201,40 +202,6 @@ export class HomeHero implements OnDestroy {
         yoyo: true,
         repeat: -1,
         delay: 2 + i * 0.2,
-      });
-    });
-  }
-
-  // Clouds travel the full width of the sky and wrap around, so the sky is always changing.
-  // Speed follows size (bigger means nearer and faster), each cloud also bobs gently, and
-  // its puffs swell and shrink out of step, so the shape shifts as it goes
-  private driftClouds(el: HTMLElement): void {
-    const SKY_WIDTH = 1440; // the cloud SVG's viewBox width
-    const MARGIN = 40;
-    gsap.utils.toArray<SVGGElement>('[data-cloud]', el).forEach((cloud) => {
-      // getBBox is missing in some non-browser environments; skip drifting there
-      if (typeof cloud.getBBox !== 'function') return;
-      const box = cloud.getBBox();
-      const from = -(box.x + box.width) - MARGIN;
-      const to = SKY_WIDTH - box.x + MARGIN;
-      // Slow on purpose: a big cloud takes well over a minute to cross, so it reads as drifting
-      const speed = 7 + box.width * 0.05; // viewBox units per second
-      const drift = gsap.fromTo(cloud, { x: from }, { x: to, duration: (to - from) / speed, ease: 'none', repeat: -1 });
-      // Start where the cloud is drawn rather than off the left edge
-      drift.progress((0 - from) / (to - from));
-
-      gsap.to(cloud, { y: gsap.utils.random(-9, 9), duration: gsap.utils.random(5, 9), ease: 'sine.inOut', yoyo: true, repeat: -1 });
-      cloud.querySelectorAll('ellipse').forEach((puff) => {
-        gsap.to(puff, {
-          scaleX: gsap.utils.random(1.06, 1.16),
-          scaleY: gsap.utils.random(0.86, 0.94),
-          transformOrigin: '50% 50%',
-          duration: gsap.utils.random(4, 8),
-          ease: 'sine.inOut',
-          yoyo: true,
-          repeat: -1,
-          delay: gsap.utils.random(0, 3),
-        });
       });
     });
   }
