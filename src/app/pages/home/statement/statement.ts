@@ -13,7 +13,7 @@ import { whenMotionAllowed } from '../../../shared/motion';
 export class HomeStatement implements OnDestroy {
   // Placeholder brand copy; swap for the final line when it's written.
   readonly text =
-    'Charcoal on the grill, jjigae bubbling at the table and banchan that keeps on coming. A Seoul night out, served in New York and Los Angeles.';
+    'Charcoal on the grill, jjigae bubbling at the table and banchan that keeps on coming. A Seoul night out, served in Chicago.';
   // Words rendered in the accent colour once lit
   private readonly accent = new Set(['Seoul', 'night', 'out,']);
 

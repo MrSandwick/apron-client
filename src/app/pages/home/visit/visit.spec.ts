@@ -6,15 +6,16 @@ describe('HomeVisit', () => {
     await TestBed.configureTestingModule({ imports: [HomeVisit] }).compileComponents();
   });
 
-  // Both Find Us locations render, and Hours is a description list with one row per span
+  // The one Chicago location renders, and Hours is a description list with one row per span
   it('renders Find Us locations and an Hours list', () => {
     const fixture = TestBed.createComponent(HomeVisit);
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
     expect(el.querySelector('[data-testid="home-visit"]')).toBeTruthy();
     const text = el.textContent ?? '';
-    expect(text).toContain('Lorem City');
-    expect(text).toContain('Dolor City');
+    expect(text).toContain('Chicago');
+    expect(text).not.toContain('New York');
+    expect(text).not.toContain('Los Angeles');
     expect(el.querySelectorAll('dl > div').length).toBe(3);
     expect(text).toContain('Mon – Thu');
     expect(text).toContain('Sunday');
@@ -28,7 +29,7 @@ describe('HomeVisit', () => {
     const directions = Array.from(el.querySelectorAll('button')).filter((b) =>
       b.textContent?.includes('Get Directions'),
     );
-    expect(directions.length).toBe(2);
+    expect(directions.length).toBe(1);
     expect(directions.every((b) => b.classList.contains('min-h-11'))).toBe(true);
   });
 

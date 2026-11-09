@@ -63,4 +63,14 @@ describe('Footer', () => {
     expect(el.querySelector('a[href*="sketchfab.com/3d-models/low-poly-soju-bottle"]')).toBeTruthy();
     expect(el.querySelector('a[href*="creativecommons.org/licenses/by/4.0"]')).toBeTruthy();
   });
+
+  // The restaurant is in Chicago only, so the footer names no other city
+  it('names Chicago and no other city', () => {
+    const fixture = TestBed.createComponent(Footer);
+    fixture.detectChanges();
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Chicago');
+    expect(text).not.toContain('New York');
+    expect(text).not.toContain('Los Angeles');
+  });
 });

@@ -132,4 +132,14 @@ describe('HomeHero', () => {
     expect(clouds.length).toBe(5);
     expect(Array.from(clouds).every((c) => c.querySelectorAll('ellipse').length >= 2)).toBe(true);
   });
+
+  // The eyebrow line names the one city the restaurant is in
+  it('names Chicago in the eyebrow and no other city', () => {
+    const fixture = TestBed.createComponent(HomeHero);
+    fixture.detectChanges();
+    const eyebrow = (fixture.nativeElement as HTMLElement).querySelector('.eyebrow')?.textContent ?? '';
+    expect(eyebrow).toContain('Chicago');
+    expect(eyebrow).not.toContain('New York');
+    expect(eyebrow).not.toContain('Los Angeles');
+  });
 });

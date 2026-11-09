@@ -10,10 +10,10 @@ import { AhjoomahPeek } from '../../../shared/ahjoomah/ahjoomah-peek';
   templateUrl: './visit.html',
 })
 export class HomeVisit {
-  // Restaurant locations shown as cards under "Find Us" (placeholders until real data exists).
+  // The restaurant's location, shown as a card under "Find Us". It is the only one, in Chicago;
+  // the address and phone are placeholders until real data exists.
   readonly locations = [
-    { city: 'Lorem City', address: '123 Lorem St, Ipsum NY 00000', phone: '(000) 000-0000' },
-    { city: 'Dolor City', address: '456 Dolor Ave, Sit CA 00000', phone: '(000) 000-0000' },
+    { city: 'Chicago', address: '123 Lorem St, Chicago IL 00000', phone: '(000) 000-0000' },
   ];
 
   // Opening hours; `days` uses Date#getDay() numbering (0 = Sunday) to highlight today.
