@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
+import { SkyClouds } from '../../../shared/sky-clouds/sky-clouds';
 
 // Decorative dawn scene for the hero: sun, clouds, mountains, the Namsan skyline, hanok
 // rooftops and a string of lanterns. Pure markup; HomeHero animates it (intro, parallax,
 // idle loops) through the data-layer / data-intro / data-cloud / data-smoke / data-swing hooks.
 @Component({
   selector: 'app-hero-scene',
+  imports: [SkyClouds],
   templateUrl: './hero-scene.html',
   host: { class: 'contents' },
 })

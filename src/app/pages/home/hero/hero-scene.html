@@ -15,32 +15,8 @@
   <!-- Clouds. Each [data-cloud] drifts across the whole sky and wraps around, at a speed that
        follows its size (bigger and nearer is faster), while its puffs slowly change shape -->
   <div data-layer data-depth="0.15" aria-hidden="true" class="absolute inset-x-0 top-[6%] h-[34%]">
-    <svg data-intro viewBox="0 0 1440 280" preserveAspectRatio="xMidYMin slice" class="size-full overflow-visible">
-      <g data-cloud class="fill-white/55">
-        <ellipse cx="220" cy="96" rx="120" ry="28" />
-        <ellipse cx="280" cy="74" rx="66" ry="32" />
-        <ellipse cx="180" cy="80" rx="48" ry="24" />
-        <ellipse cx="330" cy="98" rx="52" ry="20" />
-      </g>
-      <g data-cloud class="fill-white/40">
-        <ellipse cx="820" cy="170" rx="150" ry="24" />
-        <ellipse cx="880" cy="148" rx="76" ry="28" />
-        <ellipse cx="760" cy="156" rx="52" ry="20" />
-      </g>
-      <g data-cloud class="fill-white/50">
-        <ellipse cx="1260" cy="62" rx="100" ry="20" />
-        <ellipse cx="1292" cy="44" rx="52" ry="22" />
-        <ellipse cx="1220" cy="52" rx="38" ry="16" />
-      </g>
-      <g data-cloud class="fill-white/35">
-        <ellipse cx="540" cy="46" rx="64" ry="12" />
-        <ellipse cx="566" cy="36" rx="32" ry="13" />
-      </g>
-      <g data-cloud class="fill-white/30">
-        <ellipse cx="1040" cy="118" rx="54" ry="10" />
-        <ellipse cx="1060" cy="108" rx="28" ry="11" />
-      </g>
-    </svg>
+    <!-- Shared with the menu header so both skies carry the same clouds -->
+    <app-sky-clouds data-intro class="size-full" />
   </div>
 
   <!-- Far mountains (Bukhansan-style ridges) -->

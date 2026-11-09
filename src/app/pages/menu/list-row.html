@@ -1,0 +1,71 @@
+<!-- Row; the add button's stretched hit area makes the whole row tappable -->
+<article
+  class="relative flex items-start gap-4 rounded-2xl px-3 py-4 transition-colors has-[button:focus-visible]:outline-2 has-[button:focus-visible]:outline-offset-2 has-[button:focus-visible]:outline-day-ink"
+  [class]="dish().soldOut ? '' : 'hover:bg-day-ink/5'"
+  data-testid="menu-row"
+>
+  <!-- Name, Korean name, description and tags -->
+  <div class="min-w-0 flex-1">
+    <h3
+      class="font-display text-[18px] leading-snug break-words"
+      [class]="dish().soldOut ? 'text-day-ink-soft' : 'text-day-ink'"
+    >
+      {{ dish().name }}
+      @if (dish().kr; as kr) {
+        <span class="ml-1 font-kr text-[14px] font-medium text-day-ink-soft" lang="ko">{{
+          kr
+        }}</span>
+      }
+    </h3>
+    @if (dish().description) {
+      <p class="mt-1 line-clamp-2 font-sans text-[14px] leading-relaxed text-day-ink-soft">
+        {{ dish().description }}
+      </p>
+    }
+    @if (tagText()) {
+      <p class="mt-1 font-sans text-[12px] font-bold text-day-ink-soft" data-testid="menu-tag">
+        {{ tagText() }}
+      </p>
+    }
+  </div>
+
+  <!-- Price and the add control, right-aligned so prices form a column -->
+  <div class="flex shrink-0 items-center gap-3">
+    <p
+      class="font-display text-[18px]"
+      [class]="dish().soldOut ? 'text-day-ink-soft' : 'text-day-ink'"
+    >
+      {{ dish().price }}
+    </p>
+    @if (dish().soldOut) {
+      <p
+        class="rounded-full bg-day-ink px-3 py-1 font-sans text-[13px] leading-none font-bold text-brand-cream"
+        data-testid="menu-sold-out"
+      >
+        Sold out
+      </p>
+    } @else {
+      <!-- Real button; its ::after covers the row. Untransformed, the inner span animates -->
+      <button
+        type="button"
+        class="group inline-flex size-11 cursor-pointer items-center justify-center after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none"
+        [attr.aria-label]="actionLabel()"
+        data-testid="menu-order"
+        (click)="select.emit(dish())"
+      >
+        <span
+          class="inline-flex size-11 items-center justify-center rounded-full bg-day-ink text-brand-cream transition-transform group-active:scale-95"
+        >
+          <svg aria-hidden="true" viewBox="0 0 20 20" class="size-5" fill="none">
+            <path
+              d="M10 4v12M4 10h12"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+            />
+          </svg>
+        </span>
+      </button>
+    }
+  </div>
+</article>

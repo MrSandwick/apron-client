@@ -1,0 +1,77 @@
+@switch (kind()) {
+  @case ('eave') {
+    <!-- Hanok eave on a heading bar: static tiled roof, rafter ends, beam and painted trim.
+      Drawn with its inner end (hidden behind the bar) on the left and the tip on the right; mirrored for the left margin -->
+    <svg
+      viewBox="0 0 96 40"
+      class="block h-auto w-full overflow-visible"
+      [class.-scale-x-100]="flip()"
+    >
+      <path
+        d="M0 0H70C84 0 92 8 96 16C86 14 76 20 64 22H0Z"
+        class="fill-sky-evening stroke-sky-dusk"
+        stroke-width="1"
+      />
+      <path
+        d="M10 1V21M22 1V21M34 1V21M46 1V21M58 1V21M70 1V19"
+        class="stroke-sky-dusk"
+        stroke-width="1"
+        fill="none"
+      />
+      <rect x="6" y="22" width="5" height="5" class="fill-kitchen-wood-dark" />
+      <rect x="19" y="22" width="5" height="5" class="fill-kitchen-wood-dark" />
+      <rect x="32" y="22" width="5" height="5" class="fill-kitchen-wood-dark" />
+      <rect x="45" y="22" width="5" height="5" class="fill-kitchen-wood-dark" />
+      <rect x="58" y="22" width="5" height="5" class="fill-kitchen-wood-dark" />
+      <rect x="6" y="25" width="5" height="2" class="fill-tag-ember" />
+      <rect x="19" y="25" width="5" height="2" class="fill-tag-teal" />
+      <rect x="32" y="25" width="5" height="2" class="fill-tag-ember" />
+      <rect x="45" y="25" width="5" height="2" class="fill-tag-teal" />
+      <rect x="58" y="25" width="5" height="2" class="fill-tag-ember" />
+      <rect x="0" y="27" width="84" height="7" rx="1.5" class="fill-kitchen-wood-dark" />
+      <rect x="0" y="34" width="84" height="5" class="fill-tag-ember" />
+      <rect x="4" y="35" width="6" height="3" class="fill-tag-teal" />
+      <rect x="16" y="35" width="6" height="3" class="fill-sun" />
+      <rect x="28" y="35" width="6" height="3" class="fill-tag-teal" />
+      <rect x="40" y="35" width="6" height="3" class="fill-sun" />
+      <rect x="52" y="35" width="6" height="3" class="fill-tag-teal" />
+      <rect x="64" y="35" width="6" height="3" class="fill-sun" />
+      <rect x="76" y="35" width="6" height="3" class="fill-tag-teal" />
+    </svg>
+    <!-- Lanterns hang on short cords from the beam's underside and sway; the roof stays still -->
+    @for (l of lanterns(); track l.at) {
+      <div data-sway class="absolute top-full w-8 {{ l.at }}">
+        <ng-container [ngTemplateOutlet]="lantern" />
+      </div>
+    }
+  }
+}
+
+<!-- Paper lantern on a string: soft warm glow behind, body and caps in front. The cord starts
+  at the top of the viewBox, which sits on the beam -->
+<ng-template #lantern>
+  <div
+    data-glow
+    class="absolute top-[47%] left-1/2 aspect-square w-[170%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,var(--color-sun)_0%,transparent_70%)] opacity-40"
+  ></div>
+  <svg viewBox="0 0 56 110" class="relative h-auto w-full">
+    <path d="M28 0V24" class="stroke-night-text/60" stroke-width="1.5" fill="none" />
+    <rect x="16" y="24" width="24" height="5" rx="2" class="fill-sun-set" />
+    <ellipse cx="28" cy="52" rx="20" ry="24" class="fill-brand-apron-deep" />
+    <path
+      d="M28 28V76M18 30C12 44 12 60 18 74M38 30C44 44 44 60 38 74M8.5 52H47.5"
+      class="stroke-sun/60"
+      stroke-width="1.5"
+      fill="none"
+    />
+    <rect x="16" y="76" width="24" height="5" rx="2" class="fill-sun-set" />
+    <path
+      d="M28 81V102"
+      class="stroke-sun-set"
+      stroke-width="2"
+      stroke-linecap="round"
+      fill="none"
+    />
+    <ellipse cx="28" cy="104" rx="3" ry="4" class="fill-sun-set" />
+  </svg>
+</ng-template>

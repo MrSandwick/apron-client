@@ -1,151 +1,272 @@
 <!-- Dusk sky: golden hour under the header, sunset through the menu, twilight by the footer -->
 <main
-  class="bg-linear-to-b from-sky-golden via-sky-sunset via-40% to-sky-twilight"
+  class="overflow-x-clip bg-linear-to-b from-sky-golden via-sky-sunset via-40% to-sky-twilight"
   [class]="cart.count() > 0 ? 'pb-44 sm:pb-48' : 'pb-24 sm:pb-32'"
   data-testid="menu-page"
 >
-  <!-- Header on solid golden sky, with the sun sinking below its bottom edge -->
-  <header
-    class="relative overflow-hidden bg-sky-golden px-6 pt-16 pb-36 text-center sm:pt-24 sm:pb-44"
-  >
-    <!-- Flat low sun, clipped by the horizon -->
-    <div
-      aria-hidden="true"
-      class="pointer-events-none absolute bottom-0 left-1/2 size-[300px] -translate-x-1/2 translate-y-[60%] rounded-full bg-sun-set sm:size-[440px]"
-    ></div>
-    <!-- Horizon line -->
-    <div
-      aria-hidden="true"
-      class="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-day-ink/25"
-    ></div>
+  <!-- Golden header with the sun, clouds, title and seal -->
+  <app-menu-header />
 
-    <!-- Title copy, kept above the sun so small text stays on golden -->
-    <div class="relative mx-auto max-w-[720px]">
-      <p class="eyebrow text-day-ink">Ahjoomah's kitchen</p>
-      <h1 class="mt-4 font-display text-[56px] leading-none text-day-ink sm:text-[80px]">
-        The Menu
-      </h1>
-      <p class="mt-3 font-kr text-[28px] font-bold text-day-accent sm:text-[32px]" lang="ko">
-        메뉴
-      </p>
-      <p class="mx-auto mt-4 max-w-[480px] font-sans text-[17px] leading-relaxed text-day-ink">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-      </p>
-    </div>
-  </header>
-
-  <!-- Category quick-nav: sticks under the navbar and scrolls sideways on phones -->
-  <nav
-    aria-label="Menu categories"
-    class="sticky top-16 z-40 border-b border-night-text/10 bg-sky-twilight/95 backdrop-blur"
-    data-testid="menu-nav"
-  >
-    <ul
-      class="mx-auto flex max-w-[1152px] gap-2 overflow-x-auto px-6 py-2 [scrollbar-width:none] lg:justify-center"
+  <!-- Category quick-nav, sticky; hidden when filters leave nothing -->
+  @if (visibleCategories().length > 0) {
+    <nav
+      aria-label="Menu categories"
+      class="sticky top-16 z-40 border-b border-night-text/10 bg-sky-twilight/95 backdrop-blur"
+      data-testid="menu-nav"
     >
-      @for (category of categories(); track category.id) {
-        <li class="shrink-0">
-          <!-- Fragment via the router: a plain #id would resolve against <base href="/"> and leave the page -->
-          <a
-            routerLink="/menu"
-            [fragment]="category.id"
-            class="inline-flex min-h-11 items-center gap-2 rounded-full bg-dusk-card px-4 font-sans text-[15px] font-bold whitespace-nowrap text-day-ink transition-colors hover:bg-sun"
-          >
-            {{ category.title }}
-            <span class="font-kr text-[13px] font-medium text-day-ink-soft" lang="ko">{{
-              category.kr
-            }}</span>
-          </a>
-        </li>
-      }
-    </ul>
-  </nav>
+      <!-- Frame for the edge fades that hint at more pills -->
+      <div class="relative mx-auto max-w-[1152px]">
+        <!-- Left edge fade, from md up (clicks pass through) -->
+        @if (canScrollLeft()) {
+          <div
+            aria-hidden="true"
+            class="pointer-events-none absolute inset-y-0 left-0 z-10 hidden w-10 bg-linear-to-r from-sky-twilight to-transparent md:block"
+          ></div>
+        }
+        <ul
+          #navList
+          class="relative flex gap-2 overflow-x-auto px-6 py-2 [scrollbar-width:none] select-none scroll-px-6 md:scroll-px-10 lg:justify-center-safe"
+          [class]="navCursor()"
+        >
+          @for (category of visibleCategories(); track category.id) {
+            <li class="shrink-0">
+              <!-- Router fragment (a plain #id would leave the page); the active pill is sun-filled -->
+              <a
+                routerLink="/menu"
+                [fragment]="category.id"
+                [attr.data-nav-id]="category.id"
+                [attr.aria-current]="activeId() === category.id ? 'location' : null"
+                class="inline-flex min-h-11 items-center gap-2 rounded-full px-4 font-sans text-[15px] font-bold whitespace-nowrap text-day-ink transition-colors hover:bg-sun"
+                [class]="(activeId() === category.id ? 'bg-sun ' : 'bg-dusk-card ') + navCursor()"
+              >
+                {{ category.title }}
+                <span class="font-kr text-[13px] font-medium text-day-ink-soft" lang="ko">{{
+                  category.kr
+                }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+        <!-- Right edge fade, from md up (clicks pass through) -->
+        @if (canScrollRight()) {
+          <div
+            aria-hidden="true"
+            class="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-10 bg-linear-to-l from-sky-twilight to-transparent md:block"
+          ></div>
+        }
+      </div>
+    </nav>
+  }
 
-  <!-- Categories: every heading and card sits on a solid surface, never on the mid-tone sky -->
-  <div class="mx-auto mt-24 max-w-[1152px] space-y-20 px-6 sm:mt-28" [attr.aria-busy]="!result()">
-    <!-- Loading skeleton: plain blocks until the menu arrives -->
-    @if (!result()) {
-      <div class="space-y-8" data-testid="menu-loading">
-        <p class="sr-only" role="status">Loading menu</p>
-        @for (n of skeleton; track n) {
-          <div class="space-y-6">
-            <div class="h-20 rounded-3xl bg-sky-twilight/80 motion-safe:animate-pulse"></div>
-            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <div class="h-72 rounded-3xl bg-dusk-card/70 motion-safe:animate-pulse"></div>
-              <div
-                class="hidden h-72 rounded-3xl bg-dusk-card/70 motion-safe:animate-pulse sm:block"
-              ></div>
-              <div
-                class="hidden h-72 rounded-3xl bg-dusk-card/70 motion-safe:animate-pulse lg:block"
-              ></div>
-            </div>
-          </div>
+  <!-- Content area: filter chips sit on the light golden top of the sky in day-ink for contrast; headings and cards below sit on solid surfaces -->
+  <div class="mx-auto mt-8 max-w-[1152px] px-6 sm:mt-10">
+    <!-- Filter chips: one scrolling row on phones, wrapping from sm; not sticky -->
+    @if (result()) {
+      <div
+        class="-mx-6 flex items-center gap-2 overflow-x-auto px-6 py-1 font-sans text-day-ink [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0"
+        role="group"
+        aria-label="Filter dishes"
+        data-testid="menu-filters"
+      >
+        <!-- Label on a solid pill: the sky behind darkens on short pages -->
+        <span
+          class="inline-flex min-h-11 shrink-0 items-center rounded-full bg-dusk-card px-3 text-[15px] font-bold"
+          >Filter</span
+        >
+        @for (filter of filters; track filter.id) {
+          <!-- Toggle chip: filled with a check when on -->
+          <button
+            type="button"
+            class="inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-4 text-[15px] font-bold whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-day-ink"
+            [class]="
+              activeFilters().has(filter.id)
+                ? 'bg-day-ink text-brand-cream'
+                : 'bg-dusk-card text-day-ink ring-1 ring-day-ink hover:bg-sun'
+            "
+            [attr.aria-pressed]="activeFilters().has(filter.id)"
+            data-testid="menu-filter"
+            (click)="toggleFilter(filter.id)"
+          >
+            @if (activeFilters().has(filter.id)) {
+              <svg aria-hidden="true" viewBox="0 0 20 20" class="size-4" fill="none">
+                <path
+                  d="M4 10.5l4 4 8-9"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            }
+            {{ filter.label }}
+          </button>
+        }
+
+        <!-- Result count (live region always present, text only while a filter is on) and reset -->
+        <p
+          role="status"
+          class="shrink-0 text-[15px] whitespace-nowrap"
+          [class]="
+            activeFilters().size > 0
+              ? 'inline-flex min-h-11 items-center rounded-full bg-dusk-card px-3'
+              : ''
+          "
+          data-testid="menu-filter-count"
+        >
+          @if (activeFilters().size > 0) {
+            {{ visibleDishes() }} of {{ totalDishes() }} dishes
+          }
+        </p>
+        @if (activeFilters().size > 0) {
+          <button
+            type="button"
+            class="min-h-11 shrink-0 cursor-pointer rounded-full bg-dusk-card px-3 text-[15px] font-bold underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-day-ink"
+            data-testid="menu-filter-clear"
+            (click)="clearFilters()"
+          >
+            Clear
+          </button>
         }
       </div>
     }
 
-    <!-- Calm notice when the bundled sample menu is shown instead of live data -->
-    @if (result()?.source === 'fallback') {
-      <p
-        role="status"
-        class="mx-auto w-fit rounded-full bg-dusk-card px-5 py-2 text-center font-sans text-[15px] text-day-ink-soft"
-        data-testid="menu-fallback"
-      >
-        Showing our sample menu while we reconnect.
-      </p>
-    }
-
-    @for (category of categories(); track category.id; let first = $first; let i = $index) {
-      <section
-        [id]="category.id"
-        [attr.aria-labelledby]="category.id + '-title'"
-        class="scroll-mt-36"
-        data-testid="menu-category"
-      >
-        <!-- Menu tab label above the first section of each tab -->
-        @if (category.group && (first || categories()[i - 1].group !== category.group)) {
-          <p
-            class="w-fit rounded-full bg-dusk-card px-4 py-1 font-sans text-[13px] font-bold tracking-[0.2em] text-day-ink uppercase"
-            [class]="first ? 'mb-16' : 'mb-4'"
-            data-testid="menu-group"
-          >
-            {{ category.group }}
-          </p>
-        }
-
-        <!-- Heading band; the first one carries Ahjoomah peeking over its top edge -->
-        <div class="relative rounded-3xl bg-sky-twilight px-6 py-5 text-night-text sm:px-8">
-          @if (first) {
-            <app-ahjoomah-peek class="absolute right-6 bottom-full w-20 sm:right-10 sm:w-24" />
-            <!-- Optional Ahjoomah line beside her; renders nothing while the voice layer is off -->
-            <app-voice-bubble
-              section="menu"
-              tone="night"
-              class="absolute right-30 bottom-full mb-4 hidden w-60 sm:block sm:right-38"
-            />
+    <!-- Sections; the small gap under the filter row plus the first label's margin leave room for the Ahjoomah peek -->
+    <div class="mt-3 space-y-20 sm:mt-6" [attr.aria-busy]="!result()">
+      <!-- Loading skeleton: plain blocks until the menu arrives -->
+      @if (!result()) {
+        <div class="space-y-8" data-testid="menu-loading">
+          <p class="sr-only" role="status">Loading menu</p>
+          @for (n of skeleton; track n) {
+            <div class="space-y-6">
+              <div class="h-20 rounded-3xl bg-sky-twilight/80 motion-safe:animate-pulse"></div>
+              <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div class="h-72 rounded-3xl bg-dusk-card/70 motion-safe:animate-pulse"></div>
+                <div
+                  class="hidden h-72 rounded-3xl bg-dusk-card/70 motion-safe:animate-pulse sm:block"
+                ></div>
+                <div
+                  class="hidden h-72 rounded-3xl bg-dusk-card/70 motion-safe:animate-pulse lg:block"
+                ></div>
+              </div>
+            </div>
           }
-          <h2
-            [id]="category.id + '-title'"
-            class="font-display text-[32px] leading-tight sm:text-[40px]"
-          >
-            {{ category.title }}
-            <span class="ml-2 font-kr text-[20px] font-bold text-sun sm:text-[22px]" lang="ko">{{
-              category.kr
-            }}</span>
-          </h2>
-          <p class="mt-1 font-sans text-[16px] leading-relaxed">{{ category.blurb }}</p>
         </div>
+      }
 
-        <!-- Dish grid: 1 column on phones, 2 from sm, 3 from lg -->
-        <ul class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          @for (dish of category.dishes; track dish.id; let i = $index) {
-            <li [appReveal]="i * 80">
-              <app-dish-card [dish]="dish" (select)="open($event)" />
-            </li>
+      <!-- Calm notice when the bundled sample menu is shown instead of live data -->
+      @if (result()?.source === 'fallback') {
+        <p
+          role="status"
+          class="mx-auto w-fit rounded-full bg-dusk-card px-5 py-2 text-center font-sans text-[15px] text-day-ink-soft"
+          data-testid="menu-fallback"
+        >
+          Showing our sample menu while we reconnect.
+        </p>
+      }
+
+      <!-- Nothing left after filtering -->
+      @if (result() && activeFilters().size > 0 && visibleCategories().length === 0) {
+        <div
+          class="rounded-3xl bg-dusk-card p-8 text-center font-sans text-day-ink shadow-[0_24px_50px_-28px_rgba(26,26,46,0.7)]"
+          data-testid="menu-filter-empty"
+        >
+          <p class="font-display text-[22px]">No dishes match all of these filters.</p>
+          <button
+            type="button"
+            class="mt-4 min-h-11 cursor-pointer rounded-full bg-day-ink px-6 text-[15px] font-bold text-brand-cream focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-day-ink"
+            (click)="clearFilters()"
+          >
+            Clear filters
+          </button>
+        </div>
+      }
+
+      @for (
+        category of visibleCategories();
+        track category.id;
+        let first = $first;
+        let i = $index
+      ) {
+        <section
+          [id]="category.id"
+          [attr.aria-labelledby]="category.id + '-title'"
+          #section
+          class="relative scroll-mt-36"
+          [class.pt-16]="first && !category.group"
+          data-testid="menu-category"
+        >
+          @let startsGroup =
+            !!category.group && (first || visibleCategories()[i - 1].group !== category.group);
+
+          <!-- Menu tab label above the first section of each tab; on the first it shares height with the peek on the right -->
+          @if (startsGroup) {
+            <p
+              class="w-fit rounded-full bg-dusk-card px-4 py-1 font-sans text-[13px] font-bold tracking-[0.2em] text-day-ink uppercase"
+              [class]="first ? 'mb-9 sm:mb-16' : 'mb-4'"
+              data-testid="menu-group"
+            >
+              {{ category.group }}
+            </p>
           }
-        </ul>
-      </section>
-    }
+
+          <!-- Heading band; the first one carries Ahjoomah peeking over its top edge -->
+          <!-- Wrapper so the eave can sit before the bar: the bar then paints over the roof's flat inner end -->
+          <div class="relative">
+            <!-- Hanok eave behind the bar's outer top corner, jutting into the margin (xl and up) -->
+            @if (eaveSide(i); as side) {
+              <app-menu-decor kind="eave" [side]="side" />
+            }
+            <div class="relative rounded-3xl bg-sky-twilight px-6 py-5 text-night-text sm:px-8">
+              @if (first) {
+                <app-ahjoomah-peek class="absolute right-6 bottom-full w-20 sm:right-10 sm:w-24" />
+                <!-- Optional Ahjoomah line beside her; renders nothing while the voice layer is off -->
+                <app-voice-bubble
+                  section="menu"
+                  tone="night"
+                  class="absolute right-30 bottom-full mb-4 hidden w-60 sm:block sm:right-38"
+                />
+              }
+              <h2
+                [id]="category.id + '-title'"
+                class="font-display text-[32px] leading-tight sm:text-[40px]"
+              >
+                {{ category.title }}
+                <span
+                  class="ml-2 font-kr text-[20px] font-bold text-sun sm:text-[22px]"
+                  lang="ko"
+                  >{{ category.kr }}</span
+                >
+              </h2>
+            </div>
+          </div>
+
+          @if (listIds().has(category.id)) {
+            <!-- List sections (drinks, off menu): one cream panel holding a priced list, 2 columns from md -->
+            <div
+              class="mt-8 rounded-3xl bg-dusk-card p-2 shadow-[0_24px_50px_-28px_rgba(26,26,46,0.7)] sm:p-4"
+            >
+              <ul class="grid md:grid-cols-2 md:gap-x-4">
+                @for (dish of category.dishes; track dish.id) {
+                  <!-- Thin divider above every row except the top of each column -->
+                  <li class="border-t border-day-ink/10 first:border-t-0 md:nth-2:border-t-0">
+                    <app-list-row [dish]="dish" (select)="open($event)" />
+                  </li>
+                }
+              </ul>
+            </div>
+          } @else {
+            <!-- Dish grid: 1 column on phones, 2 from sm, 3 from lg -->
+            <ul class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              @for (dish of category.dishes; track dish.id; let i = $index) {
+                <li [appReveal]="i * 80">
+                  <app-dish-card [dish]="dish" (select)="open($event)" />
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      }
+    </div>
   </div>
 
   <!-- Item dialog: one instance, driven by the ?item= address -->
@@ -178,7 +299,9 @@
           <span aria-hidden="true">|</span> {{ cartTotalText() }}
         </p>
         <!-- /order is not built yet (tracked separately); the navbar already links to it -->
-        <a routerLink="/order" class="btn-primary min-h-11 px-6 py-2">View cart</a>
+        <a routerLink="/order" class="btn-primary min-h-11 px-6 py-2 focus-visible:outline-day-ink"
+          >View cart</a
+        >
       </div>
     </div>
   }
