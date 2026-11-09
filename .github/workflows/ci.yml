@@ -1,0 +1,60 @@
+name: CI
+
+# Runs the unit suite and a production build, so a pass or fail is one short check to read
+# instead of someone re-running the tests by hand
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'package*.json'
+      - 'angular.json'
+      - 'tsconfig*.json'
+      - '.github/workflows/ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'package*.json'
+      - 'angular.json'
+      - 'tsconfig*.json'
+
+# A newer push to the same branch cancels the older run
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    # Draft PRs wait until they are ready for review
+    if: github.event.pull_request.draft != true
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci --prefer-offline --no-audit --no-fund
+
+      # Angular's incremental build cache, keyed on dependencies and config
+      - uses: actions/cache@v4
+        with:
+          path: .angular/cache
+          key: ng-${{ runner.os }}-${{ hashFiles('package-lock.json', 'angular.json') }}-${{ github.sha }}
+          restore-keys: |
+            ng-${{ runner.os }}-${{ hashFiles('package-lock.json', 'angular.json') }}-
+
+      - name: Unit tests
+        run: npx ng test --watch=false
+
+      - name: Production build
+        run: npx ng build
