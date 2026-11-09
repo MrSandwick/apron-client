@@ -6,24 +6,69 @@ export type { DishTag };
 // Placeholder menu: every name, description, price and tag below is filler so the layout can
 // be built and reviewed. Real dishes and prices are out of scope this round.
 
-// Order tags are shown in on a card, so the same tag always sits in the same place
-export const DISH_TAG_ORDER: readonly DishTag[] = ['spicy', 'mild', 'vegetarian'];
+// Order tags are shown in on a card, so the same tag always sits in the same place: heat first,
+// then dietary
+export const DISH_TAG_ORDER: readonly DishTag[] = [
+  'extra-hot',
+  'spicy',
+  'mild',
+  'vegetarian',
+  'vegan',
+  'gluten-free',
+  'organic',
+];
 
 // Visible text for each tag: badges always carry words, never colour alone
 export const DISH_TAG_LABELS: Record<DishTag, string> = {
-  vegetarian: 'Vegetarian',
-  mild: 'Mild',
+  'extra-hot': 'Extra hot',
   spicy: 'Spicy',
+  mild: 'Mild',
+  vegetarian: 'Vegetarian',
+  vegan: 'Vegan',
+  'gluten-free': 'Gluten free',
+  organic: 'Organic',
 };
+
+// One choice inside an option group on a dish
+export interface MenuOptionChoice {
+  id: string;
+  name: string;
+  // Korean name, empty when there is none
+  kr: string;
+  // Surcharge in minor units (0 means included) and its display text, for example "+$2"; the text
+  // is empty when the choice is included
+  extraMinor: number;
+  extra: string;
+  // Ticked when the item opens
+  preSelected: boolean;
+  soldOut: boolean;
+}
+
+// A set of choices on a dish. required means at least `min` picks (min is 1 or more); `max` is
+// the most a guest can pick, and max 1 means pick one
+export interface MenuOptionGroup {
+  id: string;
+  name: string;
+  kr: string;
+  required: boolean;
+  min: number;
+  max: number;
+  choices: MenuOptionChoice[];
+}
 
 // One dish card
 export interface MenuDish {
   id: string;
+  // Short menu code shown before the name, for example "A1"
+  code?: string;
   name: string;
   // Korean name, shown on every card
   kr: string;
   description: string;
   price: string;
+  // Base price in minor units and its currency, for working out an order total
+  priceMinor?: number;
+  currency?: string;
   // Illustration shown in the image slot until a photo exists
   dish: DishKind;
   // Shows the "Ahjoomah's pick" sticker
@@ -32,8 +77,14 @@ export interface MenuDish {
   tags?: DishTag[];
   // Shows the NEW marker
   isNew?: boolean;
+  // Highlighted by the restaurant
+  featured?: boolean;
   // Greyed out with a "Sold out" label
   soldOut?: boolean;
+  // Choices a guest makes before ordering; empty or missing when the dish has none
+  optionGroups?: MenuOptionGroup[];
+  // Most characters allowed in the note box; 0 means the dish takes no notes
+  noteMaxLength?: number;
   // Real photo, once one exists
   src?: string;
 }
@@ -41,6 +92,8 @@ export interface MenuDish {
 // One menu section with its heading copy and dishes
 export interface MenuCategory {
   id: string;
+  // The menu tab this section sits under, for example "MAIN"
+  group?: string;
   title: string;
   kr: string;
   blurb: string;

@@ -1,19 +1,26 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { By } from '@angular/platform-browser';
+import { Location } from '@angular/common';
+import { Router, provideRouter } from '@angular/router';
 import { RenderMode } from '@angular/ssr';
 import { Subject, of } from 'rxjs';
+import { DishCard } from './dish-card';
 import { Menu } from './menu';
-import { MENU } from './menu.data';
+import { MENU, MenuCategory, MenuDish } from './menu.data';
 import { MenuResult, MenuService } from './menu.service';
 import { routes } from '../../app.routes';
 import { serverRoutes } from '../../app.routes.server';
 
-// Builds the page against a fake service that emits the given stream
-async function setup(load: () => ReturnType<MenuService['load']>) {
+// Builds the page against a fake service that emits the given stream. `url` is visited first,
+// so a test can open the page on a ?item= link
+async function setup(load: () => ReturnType<MenuService['load']>, url?: string) {
   await TestBed.configureTestingModule({
     imports: [Menu],
     providers: [provideRouter([]), { provide: MenuService, useValue: { load } }],
   }).compileComponents();
+  if (url) {
+    await TestBed.inject(Router).navigateByUrl(url);
+  }
   const fixture = TestBed.createComponent(Menu);
   await fixture.whenStable();
   return { fixture, el: fixture.nativeElement as HTMLElement };
@@ -149,5 +156,178 @@ describe('Menu loading and fallback', () => {
     expect(notice?.getAttribute('role')).toBe('status');
     expect(notice?.textContent).toContain('sample menu');
     expect(el.querySelectorAll('[data-testid="menu-category"]').length).toBe(MENU.length);
+  });
+});
+
+// Two tabs, three sections: one dish with a price, one sold out
+const dish = (id: string, over: Partial<MenuDish> = {}): MenuDish => ({
+  id,
+  name: `Dish ${id}`,
+  kr: '요리',
+  description: 'Tasty.',
+  price: '$12',
+  priceMinor: 1200,
+  currency: 'USD',
+  dish: 'rice',
+  noteMaxLength: 200,
+  optionGroups: [],
+  ...over,
+});
+const ORDERABLE: MenuCategory[] = [
+  {
+    id: 'a',
+    group: 'MAIN',
+    title: 'A',
+    kr: '',
+    blurb: '',
+    dishes: [dish('d1'), dish('d2', { soldOut: true })],
+  },
+  { id: 'b', group: 'MAIN', title: 'B', kr: '', blurb: '', dishes: [dish('d3')] },
+  { id: 'c', group: 'DRINKS', title: 'C', kr: '', blurb: '', dishes: [dish('d4')] },
+];
+const load = () => of<MenuResult>({ categories: ORDERABLE, source: 'api' });
+const q = (el: HTMLElement, id: string) => el.querySelector<HTMLElement>(`[data-testid="${id}"]`);
+
+describe('Menu ordering', () => {
+  beforeEach(() => {
+    // The cart reads and writes localStorage, so give each test a private one
+    const data: Record<string, string> = {};
+    vi.stubGlobal('localStorage', {
+      getItem: (k: string) => data[k] ?? null,
+      setItem: (k: string, v: string) => {
+        data[k] = v;
+      },
+    });
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
+  });
+
+  // Selecting a card opens the dialog for that dish and records it in the address
+  it('opens the dialog and sets ?item= when a card is selected', async () => {
+    const { fixture, el } = await setup(load);
+    const card = fixture.debugElement.queryAll(By.directive(DishCard))[0];
+    card.triggerEventHandler('select', ORDERABLE[0].dishes[0]);
+    await fixture.whenStable();
+    expect((q(el, 'item-dialog') as HTMLDialogElement).open).toBe(true);
+    expect(q(el, 'item-dialog')?.textContent).toContain('Dish d1');
+    expect(TestBed.inject(Router).url).toContain('item=d1');
+  });
+
+  // Closing removes the parameter and shuts the dialog
+  it('removes ?item= when the dialog closes', async () => {
+    const { fixture, el } = await setup(load);
+    // Going back one entry lands on the page without the parameter
+    vi.spyOn(TestBed.inject(Location), 'back').mockImplementation(
+      () => void TestBed.inject(Router).navigateByUrl('/'),
+    );
+    fixture.debugElement
+      .queryAll(By.directive(DishCard))[0]
+      .triggerEventHandler('select', ORDERABLE[0].dishes[0]);
+    await fixture.whenStable();
+    q(el, 'item-dialog-close')?.click();
+    await fixture.whenStable();
+    expect(TestBed.inject(Router).url).not.toContain('item=');
+    expect((q(el, 'item-dialog') as HTMLDialogElement).open).toBe(false);
+  });
+
+  // Adding closes the dialog, shows the toast and the cart bar, and the toast then goes away
+  it('confirms an add with a toast and a cart bar', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    const { fixture, el } = await setup(load);
+    vi.spyOn(TestBed.inject(Location), 'back').mockImplementation(
+      () => void TestBed.inject(Router).navigateByUrl('/'),
+    );
+    expect(q(el, 'menu-cart-bar')).toBeNull();
+    fixture.debugElement
+      .queryAll(By.directive(DishCard))[0]
+      .triggerEventHandler('select', ORDERABLE[0].dishes[0]);
+    await fixture.whenStable();
+    q(el, 'item-dialog-add')?.click();
+    await fixture.whenStable();
+    const toast = q(el, 'menu-cart-toast');
+    expect(toast?.getAttribute('role')).toBe('status');
+    expect(toast?.textContent).toContain('Added to cart');
+    const bar = q(el, 'menu-cart-bar');
+    expect(bar?.textContent).toContain('1 item');
+    expect(bar?.textContent).toContain('$12');
+    expect(bar?.querySelector('a')?.getAttribute('href')).toBe('/order');
+    expect(TestBed.inject(Router).url).not.toContain('item=');
+
+    vi.advanceTimersByTime(5000);
+    await fixture.whenStable();
+    // The live region stays, only its text goes
+    expect(q(el, 'menu-cart-toast')?.textContent?.trim()).toBe('');
+    expect(q(el, 'menu-cart-bar')).toBeTruthy();
+  });
+
+  // A shared ?item= link opens that dish once the menu is there
+  it('opens the dialog for a ?item= link', async () => {
+    const { el } = await setup(load, '/?item=d3');
+    expect((q(el, 'item-dialog') as HTMLDialogElement).open).toBe(true);
+    expect(q(el, 'item-dialog')?.textContent).toContain('Dish d3');
+  });
+
+  // Unknown and sold-out ids open nothing
+  it('ignores unknown and sold-out ?item= ids', async () => {
+    for (const id of ['nope', 'd2']) {
+      TestBed.resetTestingModule();
+      const { el } = await setup(load, `/?item=${id}`);
+      expect((q(el, 'item-dialog') as HTMLDialogElement).open).toBe(false);
+    }
+  });
+
+  // The tab name sits above the first section of each tab only
+  it('labels each menu tab once', async () => {
+    const { el } = await setup(load);
+    const labels = Array.from(el.querySelectorAll('[data-testid="menu-group"]')).map((e) =>
+      e.textContent?.trim(),
+    );
+    expect(labels).toEqual(['MAIN', 'DRINKS']);
+  });
+
+  // A dialog opened from a card closes by stepping back one history entry
+  it('goes back one entry when a card-opened dialog closes', async () => {
+    const { fixture, el } = await setup(load);
+    const back = vi.spyOn(TestBed.inject(Location), 'back').mockImplementation(() => undefined);
+    fixture.debugElement
+      .queryAll(By.directive(DishCard))[0]
+      .triggerEventHandler('select', ORDERABLE[0].dishes[0]);
+    await fixture.whenStable();
+    q(el, 'item-dialog-close')?.click();
+    expect(back).toHaveBeenCalledTimes(1);
+  });
+
+  // A deep-linked dialog has no earlier entry, so closing replaces the address instead
+  it('replaces the address when a deep-linked dialog closes', async () => {
+    const { fixture, el } = await setup(load, '/?item=d3');
+    const back = vi.spyOn(TestBed.inject(Location), 'back').mockImplementation(() => undefined);
+    q(el, 'item-dialog-close')?.click();
+    await fixture.whenStable();
+    expect(back).not.toHaveBeenCalled();
+    expect(TestBed.inject(Router).url).not.toContain('item=');
+  });
+
+  // The Back button (address loses ?item=) closes the open dialog
+  it('closes the dialog when the address loses ?item=', async () => {
+    const { fixture, el } = await setup(load, '/?item=d3');
+    await TestBed.inject(Router).navigateByUrl('/');
+    await fixture.whenStable();
+    expect((q(el, 'item-dialog') as HTMLDialogElement).open).toBe(false);
+  });
+
+  // Room is kept under the page for the fixed cart bar
+  it('pads the page while the cart bar shows', async () => {
+    const { fixture, el } = await setup(load);
+    const main = q(el, 'menu-page')!;
+    expect(main.className).toContain('pb-24');
+    fixture.debugElement
+      .queryAll(By.directive(DishCard))[0]
+      .triggerEventHandler('select', ORDERABLE[0].dishes[0]);
+    await fixture.whenStable();
+    q(el, 'item-dialog-add')?.click();
+    await fixture.whenStable();
+    expect(main.className).toContain('pb-44');
   });
 });

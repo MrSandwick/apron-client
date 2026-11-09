@@ -102,4 +102,73 @@ describe('DishCard', () => {
     expect(el.querySelector('[data-testid="menu-new"]')).toBeTruthy();
     expect(el.querySelector('[data-testid="menu-pick"]')).toBeTruthy();
   });
+
+  // The code sits inside the heading so screen readers read it with the name
+  it('shows the dish code in the heading when present', async () => {
+    const el = await render({ ...base, code: 'A1' });
+    expect(el.querySelector('h3')?.textContent?.replace(/\s+/g, ' ').trim()).toBe('A1 Test dish');
+    const plain = await render(base);
+    expect(plain.querySelector('[data-testid="menu-code"]')).toBeNull();
+  });
+
+  // Featured is a text badge shown only on featured dishes
+  it('shows the Featured badge only when featured', async () => {
+    const plain = await render(base);
+    expect(plain.querySelector('[data-testid="menu-featured"]')).toBeNull();
+    const el = await render({ ...base, featured: true });
+    expect(el.querySelector('[data-testid="menu-featured"]')?.textContent?.trim()).toBe('Featured');
+  });
+
+  // The label tells guests whether choices follow
+  it('labels the order button by whether the dish has options', async () => {
+    const plain = await render(base);
+    expect(plain.querySelector('[data-testid="menu-order"]')?.textContent?.trim()).toBe(
+      'Add to order',
+    );
+    const group = { id: 'g', name: 'Cut', kr: '', required: false, min: 0, max: 1, choices: [] };
+    const custom = await render({ ...base, optionGroups: [group] });
+    expect(custom.querySelector('[data-testid="menu-order"]')?.textContent?.trim()).toBe(
+      'Customize',
+    );
+  });
+
+  // Clicking the button emits the card's own dish
+  it('emits select with the dish when the order button is clicked', async () => {
+    const fixture = TestBed.createComponent(DishCard);
+    const dish = { ...base, id: 'picked' };
+    fixture.componentRef.setInput('dish', dish);
+    await fixture.whenStable();
+    const emitted: MenuDish[] = [];
+    fixture.componentInstance.select.subscribe((d) => emitted.push(d));
+    (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>('[data-testid="menu-order"]')
+      ?.click();
+    expect(emitted).toEqual([dish]);
+  });
+
+  // A sold-out dish cannot be ordered, so no button is offered
+  it('offers no order button on a sold-out dish', async () => {
+    const el = await render({ ...base, soldOut: true });
+    expect(el.querySelector('[data-testid="menu-order"]')).toBeNull();
+  });
+
+  // All seven tags show their names in the fixed order whatever the input order
+  it('renders all seven tags in the fixed order', async () => {
+    const el = await render({
+      ...base,
+      tags: ['organic', 'gluten-free', 'vegan', 'vegetarian', 'mild', 'spicy', 'extra-hot'],
+    });
+    const labels = Array.from(el.querySelectorAll('[data-testid="menu-tag"]')).map((t) =>
+      t.textContent?.trim(),
+    );
+    expect(labels).toEqual([
+      'Extra hot',
+      'Spicy',
+      'Mild',
+      'Vegetarian',
+      'Vegan',
+      'Gluten free',
+      'Organic',
+    ]);
+  });
 });

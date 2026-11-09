@@ -18,8 +18,25 @@
       class="font-display text-[22px] leading-tight break-words"
       [class]="dish().soldOut ? 'text-day-ink-soft' : 'text-day-ink'"
     >
+      @if (dish().code; as code) {
+        <!-- Menu code, quiet and part of the heading text -->
+        <span
+          class="mr-1.5 font-sans text-[14px] font-bold text-day-ink-soft"
+          data-testid="menu-code"
+          >{{ code }}</span
+        >
+      }
       {{ dish().name }}
     </h3>
+    @if (dish().featured) {
+      <!-- Featured badge; outlined so it differs from the filled NEW and pick markers -->
+      <p
+        class="mt-1.5 w-fit rounded-md border-2 border-brand-apron-deep px-2 py-0.5 font-sans text-[12px] leading-none font-bold tracking-wide text-brand-apron-deep uppercase"
+        data-testid="menu-featured"
+      >
+        Featured
+      </p>
+    }
     @if (dish().kr; as kr) {
       <p class="mt-0.5 font-kr text-[15px] font-medium text-day-ink-soft" lang="ko">{{ kr }}</p>
     }
@@ -55,6 +72,18 @@
         </p>
       }
     </div>
+
+    @if (!dish().soldOut) {
+      <!-- Order button; the page opens the item dialog on select -->
+      <button
+        type="button"
+        class="mt-3 min-h-11 w-full cursor-pointer rounded-full bg-day-ink px-5 py-2.5 font-sans text-[15px] font-bold text-brand-cream"
+        data-testid="menu-order"
+        (click)="select.emit(dish())"
+      >
+        {{ orderLabel() }}
+      </button>
+    }
   </div>
 
   @if (dish().isNew) {
