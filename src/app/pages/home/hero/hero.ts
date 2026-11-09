@@ -15,6 +15,9 @@ const POINTER_SHIFT = 28;
 // How far, as a fraction of the hero's height, a layer at depth 0 sinks while the hero scrolls
 // away. Far layers (low depth) sink the most so they seem to hang back, near ones the least
 const SCROLL_SHIFT = 0.5;
+// When (s) she pops up in the intro: after the rooftop layer (starts at 0.6s, 1.1s long) is
+// solid, so the wall is there to hide her before she rises from behind it
+const MASCOT_POP_AT = 1.6;
 // Input that skips the intro straight to its end
 const SKIP_EVENTS = ['wheel', 'touchstart', 'keydown', 'pointerdown'] as const;
 
@@ -145,16 +148,19 @@ export class HomeHero implements OnDestroy {
       .from(el.querySelector('[data-intro="eyebrow"]'), { y: 14, opacity: 0, duration: 0.6 }, 0.45)
       .from(el.querySelector('[data-intro="title"]'), { y: 30, opacity: 0, duration: 0.8 }, 0.6)
       .from(el.querySelector('[data-intro="ctas"]'), { y: 20, opacity: 0, duration: 0.7 }, 1.0)
-      // She rises from behind the rooftop wall with a pop, then greets the visitor
-      .from(this.mascotEl(), { yPercent: 75, duration: 0.8, ease: 'back.out(1.8)' }, 1.1)
-      .call(() => this.sound.play('pop'), [], 1.15)
+      // She stays hidden until the rooftops have fully risen in front of her (the template
+      // hides her before hydration too), then pops up from behind the wall and greets the visitor
+      .set(this.mascotEl(), { autoAlpha: 0 }, 0)
+      .set(this.mascotEl(), { autoAlpha: 1 }, MASCOT_POP_AT)
+      .from(this.mascotEl(), { yPercent: 75, duration: 0.8, ease: 'back.out(1.8)' }, MASCOT_POP_AT)
+      .call(() => this.sound.play('pop'), [], MASCOT_POP_AT + 0.05)
       .call(
         () => {
           bonk(this.mascotEl());
           this.sound.play('bonk');
         },
         [],
-        1.9,
+        MASCOT_POP_AT + 0.8,
       );
 
     const removeSkip = () => SKIP_EVENTS.forEach((type) => window.removeEventListener(type, skip));

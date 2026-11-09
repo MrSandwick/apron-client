@@ -23,7 +23,8 @@
       data-testid="hero-mascot"
     >
       <span class="block aspect-[200/202] min-h-0 md:aspect-auto [clip-path:inset(-60%_-20%_0_-20%)]">
-        <app-ahjoomah #mascot class="block" [mood]="mood()" [decorative]="true" />
+        <!-- Hidden until the intro reveals her, so she never shows before the city does -->
+        <app-ahjoomah #mascot class="block motion-safe:invisible"[mood]="mood()" [decorative]="true" />
       </span>
     </button>
   </app-hero-scene>
