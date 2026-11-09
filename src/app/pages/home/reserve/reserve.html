@@ -18,12 +18,14 @@
       align="right"
       model="modelAssets/soju/scene.gltf"
     />
-    <!-- Darken the copy side, clearing before the object so it stays bright -->
+    <!-- Darken the copy side, clearing before the object so it stays bright. It repeats the
+         section's own evening-to-night gradient and fades out sideways with a mask, so its edges
+         match the background exactly instead of showing a seam at the frame's sides -->
     <div
-      class="absolute inset-0 bg-gradient-to-r from-sky-evening from-25% via-sky-evening/75 via-48% to-transparent to-62%"
+      class="absolute inset-0 bg-linear-to-b from-sky-evening to-sky-night [mask-image:linear-gradient(to_right,black_25%,rgb(0_0_0/0.75)_48%,transparent_62%)]"
     ></div>
-    <!-- On narrow screens the object sits under the copy, so dim it strongly -->
-    <div class="absolute inset-0 bg-sky-evening/85 md:hidden"></div>
+    <!-- On narrow screens the object sits under the copy, so dim it strongly (same gradient, no seam) -->
+    <div class="absolute inset-0 bg-linear-to-b from-sky-evening/85 to-sky-night/85 md:hidden"></div>
   </div>
 
   <!-- Booking copy, feature list, and CTAs -->
