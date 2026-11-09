@@ -119,17 +119,36 @@ describe('DishCard', () => {
     expect(el.querySelector('[data-testid="menu-featured"]')?.textContent?.trim()).toBe('Featured');
   });
 
-  // The label tells guests whether choices follow
-  it('labels the order button by whether the dish has options', async () => {
-    const plain = await render(base);
-    expect(plain.querySelector('[data-testid="menu-order"]')?.textContent?.trim()).toBe(
-      'Add to order',
-    );
+  // Plain dishes get an icon-only "+" button, so the name lives in the accessible label
+  it('shows a round plus icon button labelled with the dish name for a plain dish', async () => {
+    const button = (await render(base)).querySelector('[data-testid="menu-order"]');
+    expect(button?.getAttribute('aria-label')).toBe('Add Test dish to order');
+    expect(button?.textContent?.trim()).toBe('');
+    expect(button?.querySelector('svg')).toBeTruthy();
+    // The round look lives on the inner span, not the stretched button
+    expect(button?.querySelector('span')?.className).toContain('size-11');
+    expect(button?.querySelector('span')?.className).toContain('rounded-full');
+    expect(button?.className).not.toContain('rounded-full');
+  });
+
+  // Dishes with choices show visible "Customize" text and a matching label
+  it('shows visible Customize text for a dish with options', async () => {
     const group = { id: 'g', name: 'Cut', kr: '', required: false, min: 0, max: 1, choices: [] };
-    const custom = await render({ ...base, optionGroups: [group] });
-    expect(custom.querySelector('[data-testid="menu-order"]')?.textContent?.trim()).toBe(
-      'Customize',
+    const button = (await render({ ...base, optionGroups: [group] })).querySelector(
+      '[data-testid="menu-order"]',
     );
+    expect(button?.textContent?.trim()).toBe('Customize');
+    expect(button?.getAttribute('aria-label')).toBe('Customize Test dish');
+    expect(button?.querySelector('svg')).toBeNull();
+    // The pill look lives on the inner span
+    expect(button?.querySelector('span')?.className).toContain('rounded-full');
+  });
+
+  // The button stretches over the whole card so any tap on the card orders it
+  it('gives the order button a stretched hit area covering the card', async () => {
+    const el = await render(base);
+    expect(el.querySelector('[data-testid="menu-order"]')?.className).toContain('after:inset-0');
+    expect(el.querySelector('article')?.className).toContain('relative');
   });
 
   // Clicking the button emits the card's own dish

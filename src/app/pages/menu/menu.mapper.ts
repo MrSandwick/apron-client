@@ -116,11 +116,30 @@ function toMenuDish(dto: DishDto): MenuDish {
   };
 }
 
+// Short words kept lower case inside a title, and initialisms kept upper case
+const MINOR_WORDS = new Set(['a', 'an', 'and', 'for', 'of', 'or', 'the', 'to', 'with']);
+const INITIALISMS = new Set(['BBQ', 'OB']);
+
+// Admin titles mix cases ("SOUP", "Hot Pot: DINNER FOR 2"); words typed in all caps become Title
+// Case so the nav and headings read as one set. Mixed-case words are left as typed
+export function tidyTitle(title: string): string {
+  return title.replace(/[\p{L}’']+/gu, (word, offset: number) => {
+    if (word !== word.toUpperCase() || INITIALISMS.has(word)) {
+      return word;
+    }
+    const lower = word.toLowerCase();
+    if (offset > 0 && MINOR_WORDS.has(lower)) {
+      return lower;
+    }
+    return lower.charAt(0).toUpperCase() + lower.slice(1);
+  });
+}
+
 function toMenuCategory(dto: CategoryDto): MenuCategory {
   return {
     id: dto.id,
     group: dto.group ?? undefined,
-    title: dto.title,
+    title: tidyTitle(dto.title),
     kr: dto.titleKr ?? '',
     blurb: dto.blurb,
     dishes: dto.dishes.map(toMenuDish),

@@ -28,9 +28,11 @@ export class DishCard {
   // Emitted when a guest chooses to order this dish; the page opens the item dialog for it
   readonly select = output<MenuDish>();
 
-  // Dishes with choices read "Customize" and plain ones "Add to order"; both open the item dialog
-  protected readonly orderLabel = computed(() =>
-    this.dish().optionGroups?.length ? 'Customize' : 'Add to order',
+  // Dishes with choices show a "Customize" pill and plain ones a round "+"; both open the item dialog
+  protected readonly hasOptions = computed(() => !!this.dish().optionGroups?.length);
+  // The icon button has no visible text, so the name goes in its accessible label
+  protected readonly ariaLabel = computed(() =>
+    this.hasOptions() ? `Customize ${this.dish().name}` : `Add ${this.dish().name} to order`,
   );
 
   // The dish's tags in the fixed display order, with their label and colours

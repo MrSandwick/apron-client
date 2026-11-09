@@ -7,6 +7,7 @@ import { Subject, of } from 'rxjs';
 import { DishCard } from './dish-card';
 import { Menu } from './menu';
 import { MENU, MenuCategory, MenuDish } from './menu.data';
+import { isListCategory } from './menu.filters';
 import { MenuResult, MenuService } from './menu.service';
 import { routes } from '../../app.routes';
 import { serverRoutes } from '../../app.routes.server';
@@ -54,15 +55,20 @@ describe('Menu', () => {
     });
   });
 
-  // One card per dish in the data file
-  it('renders a card for every dish', () => {
+  // Every dish renders once: as a card, or as a row in a list category
+  it('renders a card or list row for every dish', () => {
     const total = MENU.reduce((sum, c) => sum + c.dishes.length, 0);
-    expect(el.querySelectorAll('[data-testid="menu-dish"]').length).toBe(total);
+    const cards = el.querySelectorAll('[data-testid="menu-dish"]').length;
+    const rows = el.querySelectorAll('[data-testid="menu-row"]').length;
+    expect(cards + rows).toBe(total);
+    expect(rows).toBe(MENU.filter(isListCategory).flatMap((c) => c.dishes).length);
   });
 
-  // Stickers appear only on picked dishes, as readable text
-  it('shows a pick sticker on each picked dish only', () => {
-    const picks = MENU.flatMap((c) => c.dishes).filter((d) => d.pick).length;
+  // Stickers appear only on picked dishes shown as cards (drink rows have no sticker)
+  it('shows a pick sticker on each picked card only', () => {
+    const picks = MENU.filter((c) => !isListCategory(c))
+      .flatMap((c) => c.dishes)
+      .filter((d) => d.pick).length;
     const stickers = el.querySelectorAll('[data-testid="menu-pick"]');
     expect(stickers.length).toBe(picks);
     stickers.forEach((s) => expect(s.textContent).toContain("Ahjoomah's pick"));
@@ -75,8 +81,8 @@ describe('Menu', () => {
     cards.forEach((card) => expect(card.querySelector('[data-testid="dish-art"]')).toBeTruthy());
   });
 
-  // Nav chips jump to every category section and stay on /menu (a bare #id would hit <base href="/">)
-  it('links a nav chip to every category id on the menu page', () => {
+  // Nav chips list the visible categories and stay on /menu (a bare #id would hit <base href="/">)
+  it('links a nav chip to every visible category id on the menu page', () => {
     const nav = el.querySelector('[data-testid="menu-nav"]');
     const hrefs = Array.from(nav?.querySelectorAll('a') ?? []).map((a) => a.getAttribute('href'));
     expect(hrefs).toEqual(MENU.map((c) => `/menu#${c.id}`));
@@ -96,9 +102,9 @@ describe('Menu', () => {
     expect(MENU.flatMap((c) => c.dishes).every((d) => d.kr.length > 0)).toBe(true);
   });
 
-  // The page renders exactly the tags and NEW markers the data declares
+  // The page renders exactly the card tags and NEW markers the data declares (drink rows have no NEW marker)
   it('renders the tag badges and NEW markers from the data', () => {
-    const dishes = MENU.flatMap((c) => c.dishes);
+    const dishes = MENU.filter((c) => !isListCategory(c)).flatMap((c) => c.dishes);
     const tagCount = dishes.reduce((sum, d) => sum + (d.tags?.length ?? 0), 0);
     expect(el.querySelectorAll('[data-testid="menu-tag"]').length).toBe(tagCount);
     expect(el.querySelectorAll('[data-testid="menu-new"]').length).toBe(
@@ -329,5 +335,249 @@ describe('Menu ordering', () => {
     q(el, 'item-dialog-add')?.click();
     await fixture.whenStable();
     expect(main.className).toContain('pb-44');
+  });
+});
+
+// Tagged dishes across a food category, a second food category and a drink category
+const tagged = (id: string, tags: MenuDish['tags'], art: MenuDish['dish'] = 'rice'): MenuDish =>
+  dish(id, { tags, dish: art });
+const FILTERABLE: MenuCategory[] = [
+  {
+    id: 'food',
+    title: 'Food',
+    kr: '',
+    blurb: '',
+    dishes: [
+      tagged('veg', ['vegetarian', 'mild']),
+      tagged('hot-veg', ['spicy', 'vegetarian']),
+      tagged('meat', ['mild']),
+    ],
+  },
+  { id: 'fire', title: 'Fire', kr: '', blurb: '', dishes: [tagged('inferno', ['extra-hot'])] },
+  {
+    id: 'sips',
+    title: 'Sips',
+    kr: '',
+    blurb: '',
+    dishes: [tagged('tea', ['vegan'], 'drink'), tagged('soju', undefined, 'drink')],
+  },
+];
+const loadFilterable = () => of<MenuResult>({ categories: FILTERABLE, source: 'api' });
+const chip = (el: HTMLElement, label: string) =>
+  Array.from(el.querySelectorAll<HTMLButtonElement>('[data-testid="menu-filter"]')).find(
+    (b) => b.textContent?.trim() === label,
+  )!;
+const dishNames = (el: HTMLElement) =>
+  Array.from(
+    el.querySelectorAll('[data-testid="menu-dish"] h3, [data-testid="menu-row"] h3'),
+  ).map((h) => h.textContent?.trim().split(/\s+/).slice(0, 2).join(' '));
+
+describe('Menu filters', () => {
+  beforeEach(() => {
+    // The cart reads and writes localStorage, so give each test a private one
+    const data: Record<string, string> = {};
+    vi.stubGlobal('localStorage', {
+      getItem: (k: string) => data[k] ?? null,
+      setItem: (k: string, v: string) => {
+        data[k] = v;
+      },
+    });
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  // Chips start off, with no count or reset showing
+  it('starts with every chip off and no count', async () => {
+    const { el } = await setup(loadFilterable);
+    const chips = Array.from(el.querySelectorAll('[data-testid="menu-filter"]'));
+    expect(chips.map((c) => c.textContent?.trim())).toEqual([
+      'Vegetarian',
+      'Vegan',
+      'Gluten free',
+      'Mild',
+    ]);
+    chips.forEach((c) => expect(c.getAttribute('aria-pressed')).toBe('false'));
+    // The live region is always in the page, but empty while no filter is on
+    expect(q(el, 'menu-filter-count')?.getAttribute('role')).toBe('status');
+    expect(q(el, 'menu-filter-count')?.textContent?.trim()).toBe('');
+    expect(q(el, 'menu-filter-clear')).toBeNull();
+  });
+
+  // Toggling a chip presses it, hides non-matching dishes and categories, and shows the count
+  it('filters dishes and categories and shows a count when a chip is toggled', async () => {
+    const { fixture, el } = await setup(loadFilterable);
+    chip(el, 'Vegetarian').click();
+    await fixture.whenStable();
+
+    expect(chip(el, 'Vegetarian').getAttribute('aria-pressed')).toBe('true');
+    expect(chip(el, 'Vegan').getAttribute('aria-pressed')).toBe('false');
+    // Vegan tea counts as vegetarian; the meat dish, inferno and soju are gone
+    expect(dishNames(el)).toEqual(['Dish veg', 'Dish hot-veg', 'Dish tea']);
+    const sections = Array.from(el.querySelectorAll('[data-testid="menu-category"]'));
+    expect(sections.map((s) => s.id)).toEqual(['food', 'sips']);
+    const navIds = Array.from(el.querySelectorAll('[data-testid="menu-nav"] a')).map((a) =>
+      a.getAttribute('data-nav-id'),
+    );
+    expect(navIds).toEqual(['food', 'sips']);
+    expect(q(el, 'menu-filter-count')?.textContent?.replace(/\s+/g, ' ').trim()).toBe(
+      '3 of 6 dishes',
+    );
+  });
+
+  // Toggling the same chip again turns it off and restores everything
+  it('restores the menu when the chip is toggled off again', async () => {
+    const { fixture, el } = await setup(loadFilterable);
+    chip(el, 'Vegetarian').click();
+    await fixture.whenStable();
+    chip(el, 'Vegetarian').click();
+    await fixture.whenStable();
+    expect(chip(el, 'Vegetarian').getAttribute('aria-pressed')).toBe('false');
+    expect(dishNames(el).length).toBe(6);
+    expect(q(el, 'menu-filter-count')?.textContent?.trim()).toBe('');
+  });
+
+  // Several chips must all match
+  it('combines chips with AND', async () => {
+    const { fixture, el } = await setup(loadFilterable);
+    chip(el, 'Vegetarian').click();
+    chip(el, 'Mild').click();
+    await fixture.whenStable();
+    // Only the vegetarian dish that is also tagged mild survives
+    expect(dishNames(el)).toEqual(['Dish veg']);
+    expect(q(el, 'menu-filter-count')?.textContent).toContain('1 of 6');
+  });
+
+  // Clear switches every chip off and brings the full menu back
+  it('resets all filters with Clear', async () => {
+    const { fixture, el } = await setup(loadFilterable);
+    chip(el, 'Vegetarian').click();
+    chip(el, 'Mild').click();
+    await fixture.whenStable();
+    q(el, 'menu-filter-clear')?.click();
+    await fixture.whenStable();
+    el.querySelectorAll('[data-testid="menu-filter"]').forEach((c) =>
+      expect(c.getAttribute('aria-pressed')).toBe('false'),
+    );
+    expect(dishNames(el).length).toBe(6);
+    expect(el.querySelectorAll('[data-testid="menu-category"]').length).toBe(3);
+    expect(q(el, 'menu-filter-count')?.textContent?.trim()).toBe('');
+  });
+
+  // A filter set that matches nothing shows the empty panel instead of sections
+  it('shows the empty panel when no dish matches, and Clear filters recovers', async () => {
+    const { fixture, el } = await setup(loadFilterable);
+    chip(el, 'Vegan').click();
+    chip(el, 'Gluten free').click();
+    await fixture.whenStable();
+    expect(q(el, 'menu-filter-empty')?.textContent).toContain('No dishes match');
+    expect(el.querySelectorAll('[data-testid="menu-category"]').length).toBe(0);
+    expect(q(el, 'menu-filter-count')?.textContent).toContain('0 of 6');
+    // With nothing to jump to, the category nav is removed too
+    expect(q(el, 'menu-nav')).toBeNull();
+
+    q(el, 'menu-filter-empty')?.querySelector('button')?.click();
+    await fixture.whenStable();
+    expect(q(el, 'menu-filter-empty')).toBeNull();
+    expect(q(el, 'menu-nav')).toBeTruthy();
+    expect(el.querySelectorAll('[data-testid="menu-category"]').length).toBe(3);
+  });
+
+  // The empty panel never shows while the menu is unfiltered
+  it('shows no empty panel without filters', async () => {
+    const { el } = await setup(loadFilterable);
+    expect(q(el, 'menu-filter-empty')).toBeNull();
+  });
+});
+
+// A pointer event with the fields the nav drag handlers read (jsdom has no PointerEvent)
+function pointer(type: string, x: number, pointerType = 'mouse'): Event {
+  const e = new Event(type, { bubbles: true, cancelable: true });
+  Object.defineProperties(e, {
+    pointerType: { value: pointerType },
+    button: { value: 0 },
+    clientX: { value: x },
+    pointerId: { value: 1 },
+  });
+  return e;
+}
+
+describe('Menu category nav', () => {
+  // The nav scrolls by drag and swipe, so it has no arrow buttons
+  it('renders no scroll arrow buttons', async () => {
+    const { el } = await setup(loadFilterable);
+    expect(q(el, 'menu-nav')).toBeTruthy();
+    expect(q(el, 'menu-nav-left')).toBeNull();
+    expect(q(el, 'menu-nav-right')).toBeNull();
+  });
+
+  // A real mouse drag swallows the click that ends it, so the pill does not navigate
+  it('does not follow a pill after a mouse drag, but follows a plain click', async () => {
+    const { el } = await setup(loadFilterable);
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+    const list = el.querySelector<HTMLElement>('[data-testid="menu-nav"] ul')!;
+    const pill = list.querySelector<HTMLAnchorElement>('[data-nav-id="food"]')!;
+
+    // Press, move well past the 5px threshold, release, then the click the browser fires
+    pill.dispatchEvent(pointer('pointerdown', 100));
+    list.dispatchEvent(pointer('pointermove', 60));
+    list.dispatchEvent(pointer('pointerup', 60));
+    pill.click();
+    expect(navigate).not.toHaveBeenCalled();
+
+    // A plain click afterwards navigates to the category fragment
+    pill.click();
+    expect(navigate).toHaveBeenCalledTimes(1);
+    expect(String(navigate.mock.calls[0][0])).toBe('/menu#food');
+  });
+
+  // Movement under the threshold is a click, not a drag
+  it('still follows a pill when the mouse moves less than the drag threshold', async () => {
+    const { el } = await setup(loadFilterable);
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+    const list = el.querySelector<HTMLElement>('[data-testid="menu-nav"] ul')!;
+    const pill = list.querySelector<HTMLAnchorElement>('[data-nav-id="food"]')!;
+    pill.dispatchEvent(pointer('pointerdown', 100));
+    list.dispatchEvent(pointer('pointermove', 98));
+    list.dispatchEvent(pointer('pointerup', 98));
+    pill.click();
+    expect(navigate).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('Menu drink categories', () => {
+  // Drink categories render priced rows inside a list, not dish cards; food keeps its cards
+  it('renders drink rows in a list instead of dish cards', async () => {
+    const { el } = await setup(loadFilterable);
+    const sips = el.querySelector('#sips')!;
+    expect(sips.querySelectorAll('[data-testid="menu-dish"]').length).toBe(0);
+    const rows = sips.querySelectorAll('ul [data-testid="menu-row"]');
+    expect(rows.length).toBe(2);
+    rows.forEach((row) => expect(row.closest('li')).toBeTruthy());
+
+    const food = el.querySelector('#food')!;
+    expect(food.querySelectorAll('[data-testid="menu-dish"]').length).toBe(3);
+    expect(food.querySelectorAll('[data-testid="menu-row"]').length).toBe(0);
+  });
+
+  // The off-menu category is a list too, although its dishes are food art
+  it('renders an off-menu category as list rows instead of dish cards', async () => {
+    const offMenu: MenuCategory = {
+      id: 'off-menu',
+      title: 'Off Menu',
+      kr: '',
+      blurb: '',
+      dishes: [dish('o1'), dish('o2')],
+    };
+    const { el } = await setup(() => of<MenuResult>({ categories: [offMenu], source: 'api' }));
+    const section = el.querySelector('#off-menu')!;
+    expect(section.querySelectorAll('ul [data-testid="menu-row"]').length).toBe(2);
+    expect(section.querySelectorAll('[data-testid="menu-dish"]').length).toBe(0);
+  });
+
+  // Choosing a drink row opens the item dialog like a card does
+  it('opens the dialog when a drink row is selected', async () => {
+    const { fixture, el } = await setup(loadFilterable);
+    el.querySelector<HTMLButtonElement>('#sips [data-testid="menu-order"]')?.click();
+    await fixture.whenStable();
+    expect(TestBed.inject(Router).url).toContain('item=tea');
   });
 });

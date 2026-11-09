@@ -1,5 +1,11 @@
 import { menuFixture } from '../../shared/api/menu.fixture';
-import { formatExtra, formatExtraLabel, formatPrice, toMenuCategories } from './menu.mapper';
+import {
+  formatExtra,
+  formatExtraLabel,
+  formatPrice,
+  tidyTitle,
+  toMenuCategories,
+} from './menu.mapper';
 
 describe('formatPrice', () => {
   it('drops the cents for whole amounts', () => {
@@ -83,8 +89,49 @@ describe('formatExtraLabel', () => {
   });
 });
 
+describe('tidyTitle', () => {
+  // A word typed in all caps becomes Title Case
+  it('title-cases an all-caps word', () => {
+    expect(tidyTitle('SOUP')).toBe('Soup');
+  });
+
+  // Minor words go lower case mid-title, and mixed-case words are left as typed
+  it('lower-cases minor words and keeps mixed-case words', () => {
+    expect(tidyTitle('Hot Pot: DINNER FOR 2')).toBe('Hot Pot: Dinner for 2');
+  });
+
+  // The curly apostrophe stays inside the word
+  it('keeps a curly apostrophe inside the word', () => {
+    expect(tidyTitle('CHEF’S SPECIAL')).toBe('Chef’s Special');
+  });
+
+  // Already mixed-case titles pass through untouched
+  it('leaves a mixed-case title unchanged', () => {
+    expect(tidyTitle('Off Menu')).toBe('Off Menu');
+  });
+
+  // Known initialisms stay upper case
+  it('keeps initialisms upper case', () => {
+    expect(tidyTitle('BBQ')).toBe('BBQ');
+  });
+
+  // A minor word as the first word is still capitalised
+  it('capitalises a minor word at the start', () => {
+    expect(tidyTitle('THE BEST')).toBe('The Best');
+  });
+});
+
 describe('toMenuCategories', () => {
   const categories = toMenuCategories(menuFixture);
+
+  // Raw admin titles are tidied when mapped
+  it('applies tidyTitle to category titles', () => {
+    const mapped = toMenuCategories({
+      ...menuFixture,
+      categories: [{ ...menuFixture.categories[0], title: 'SOUP' }],
+    });
+    expect(mapped[0].title).toBe('Soup');
+  });
 
   it('keeps the category order', () => {
     expect(categories.map((c) => c.id)).toEqual(menuFixture.categories.map((c) => c.id));
@@ -92,7 +139,7 @@ describe('toMenuCategories', () => {
 
   it('copies category copy and turns a null Korean title into empty', () => {
     const [first] = categories;
-    expect(first.title).toBe(menuFixture.categories[0].title);
+    expect(first.title).toBe(tidyTitle(menuFixture.categories[0].title));
     expect(first.blurb).toBe(menuFixture.categories[0].blurb);
     expect(first.kr).toBe(menuFixture.categories[0].titleKr ?? '');
     const blank = toMenuCategories({
