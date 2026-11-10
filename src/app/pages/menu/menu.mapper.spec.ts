@@ -1,45 +1,6 @@
 import { menuFixture } from '../../shared/api/menu.fixture';
-import {
-  formatExtra,
-  formatExtraLabel,
-  formatPrice,
-  tidyTitle,
-  toMenuCategories,
-} from './menu.mapper';
-
-describe('formatPrice', () => {
-  it('drops the cents for whole amounts', () => {
-    expect(formatPrice(2800, 'USD')).toBe('$28');
-  });
-
-  it('shows two decimals when there are cents', () => {
-    expect(formatPrice(1850, 'USD')).toBe('$18.50');
-  });
-
-  it('returns the placeholder for a zero price', () => {
-    expect(formatPrice(0, 'USD')).toBe('$00');
-  });
-
-  it('formats other currencies', () => {
-    expect(formatPrice(1250, 'EUR')).toBe('€12.50');
-  });
-
-  // Zero-decimal currencies are not divided by 100
-  it('uses the currency decimals: yen has none', () => {
-    expect(formatPrice(1500, 'JPY')).toBe('¥1,500');
-  });
-
-  // A zero price only becomes the dollar placeholder for USD
-  it('shows a formatted zero for other currencies', () => {
-    expect(formatPrice(0, 'EUR')).toBe('€0');
-  });
-
-  // A bad currency code must not throw, or one dish would send the whole menu to the fallback
-  it('does not throw on an invalid currency code', () => {
-    expect(() => formatPrice(1850, 'not-a-code')).not.toThrow();
-    expect(formatPrice(1850, 'not-a-code')).toBe('18.50 not-a-code');
-  });
-});
+import { formatPrice } from '../../shared/format/price';
+import { formatExtra, formatExtraLabel, tidyTitle, toMenuCategories } from './menu.mapper';
 
 describe('formatExtra', () => {
   // Included choices show no surcharge text

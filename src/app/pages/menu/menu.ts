@@ -28,7 +28,7 @@ import { MenuDecor } from './menu-decor';
 import { MenuHeader } from './menu-header';
 import { MenuDish } from './menu.data';
 import { MENU_FILTERS, MenuFilter, filterMenu, isListCategory } from './menu.filters';
-import { formatPrice } from './menu.mapper';
+import { formatAmount } from '../../shared/format/price';
 import { MenuService } from './menu.service';
 
 // How long the "Added to cart" confirmation stays up
@@ -141,7 +141,7 @@ export class Menu {
   private toastTimer: ReturnType<typeof setTimeout> | undefined;
 
   protected readonly cartTotalText = computed(() =>
-    formatPrice(this.cart.totalMinor(), this.cart.currency()),
+    formatAmount(this.cart.totalMinor(), this.cart.currency()),
   );
 
   constructor() {
