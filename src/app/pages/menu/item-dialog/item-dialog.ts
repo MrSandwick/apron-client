@@ -13,7 +13,8 @@ import {
 } from '@angular/core';
 import { NewCartLine } from '../../../core/cart/cart.model';
 import { DISH_TAG_LABELS, MenuDish, MenuOptionChoice, MenuOptionGroup } from '../menu.data';
-import { formatExtraLabel, formatPrice } from '../menu.mapper';
+import { formatPrice } from '../../../shared/format/price';
+import { formatExtraLabel } from '../menu.mapper';
 import {
   MAX_QUANTITY,
   MIN_QUANTITY,

@@ -1,0 +1,29 @@
+<!-- Radio group: the legend names it for screen readers -->
+<fieldset class="min-w-0">
+  <legend class="mb-3 font-sans text-[16px] font-bold text-day-ink">
+    How would you like your order?
+  </legend>
+
+  <!-- Segmented control: two equal pills in one rounded track -->
+  <div class="grid grid-cols-2 gap-1 rounded-full bg-day-ink/10 p-1">
+    @for (option of options; track option.value) {
+      <label class="relative block cursor-pointer">
+        <!-- Native radio, visually hidden but still focusable and arrow-key navigable -->
+        <input
+          type="radio"
+          name="fulfillment"
+          class="peer sr-only"
+          [value]="option.value"
+          [checked]="mode() === option.value"
+          (change)="mode.set(option.value)"
+        />
+        <!-- Pill face: filled when checked, ink ring when focused by keyboard -->
+        <span
+          class="flex min-h-11 items-center justify-center rounded-full px-5 font-display text-[17px] text-day-ink transition-colors duration-150 peer-checked:bg-day-ink peer-checked:text-dusk-card peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-day-ink motion-reduce:transition-none"
+        >
+          {{ option.label }}
+        </span>
+      </label>
+    }
+  </div>
+</fieldset>

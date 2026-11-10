@@ -90,6 +90,9 @@ export class CartService {
   readonly currency = computed(() => this._lines()[0]?.currency ?? 'USD');
   // False until the stored cart was read, so an early save cannot overwrite it
   private loaded = false;
+  // True once the stored cart was read in the browser; false on the server and before first render
+  private readonly _ready = signal(false);
+  readonly ready = this._ready.asReadonly();
 
   constructor() {
     const destroyRef = inject(DestroyRef);
@@ -158,6 +161,7 @@ export class CartService {
     const early = this._lines();
     this._lines.set(this.read());
     this.loaded = true;
+    this._ready.set(true);
     // Lines added before the read finished stay on top of the stored ones, then everything is saved
     for (const line of early) {
       this.add(line);

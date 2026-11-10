@@ -1,0 +1,31 @@
+<!-- Summary card -->
+<section
+  class="rounded-3xl bg-dusk-card p-5 text-day-ink sm:p-6"
+  aria-labelledby="cart-summary-title"
+  data-testid="cart-summary"
+>
+  <h2 id="cart-summary-title" class="font-display text-[22px] leading-tight">Order summary</h2>
+
+  <!-- Totals -->
+  <dl class="mt-4 space-y-2 font-sans text-[16px]">
+    <div class="flex items-baseline justify-between gap-4">
+      <dt class="text-day-ink-soft">Items</dt>
+      <dd class="font-bold" data-testid="cart-summary-count">{{ count() }}</dd>
+    </div>
+    <div class="flex items-baseline justify-between gap-4">
+      <dt class="text-day-ink-soft">Subtotal</dt>
+      <dd class="text-[20px] font-bold" data-testid="cart-summary-subtotal">
+        {{ subtotalText() }}
+      </dd>
+    </div>
+  </dl>
+
+  <p class="mt-3 font-sans text-[14px] text-day-ink-soft">
+    Taxes and any fees are added at checkout
+  </p>
+
+  <!-- Promo field and checkout action from the page -->
+  <div class="mt-5 space-y-4">
+    <ng-content />
+  </div>
+</section>

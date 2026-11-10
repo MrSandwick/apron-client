@@ -39,6 +39,16 @@ function make(storage = fakeStorage()) {
 describe('CartService', () => {
   afterEach(() => vi.unstubAllGlobals());
 
+  // The ready flag flips once the stored cart was read after first render
+  it('is not ready before the stored cart is read, and ready after', () => {
+    vi.stubGlobal('localStorage', fakeStorage());
+    TestBed.configureTestingModule({});
+    const cart = TestBed.inject(CartService);
+    expect(cart.ready()).toBe(false);
+    TestBed.tick();
+    expect(cart.ready()).toBe(true);
+  });
+
   // Identical dish, picks and note merge into one line with added quantities
   it('merges identical lines and adds quantities', () => {
     const { cart } = make();

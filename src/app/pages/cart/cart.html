@@ -1,0 +1,122 @@
+<!-- Page on the dusk sky -->
+<main
+  class="min-h-[70vh] bg-linear-to-b from-sky-twilight to-sky-night px-6 pt-12 pb-20 text-night-text sm:pt-16"
+  data-testid="cart-page"
+>
+  <div class="mx-auto max-w-[1152px]">
+    <!-- Heading and item count; the heading is where focus lands when the cart empties -->
+    <header class="mb-8 text-center">
+      <h1
+        #heading
+        tabindex="-1"
+        class="font-display text-[32px] text-brand-cream sm:text-[40px]"
+        data-testid="cart-title"
+      >
+        Your cart
+      </h1>
+      @if (cart.ready() && cart.count() > 0) {
+        <p class="mt-1 font-sans text-[16px] text-night-text/80" data-testid="cart-count">
+          {{ countText() }}
+        </p>
+      }
+    </header>
+
+    <!-- Polite announcements for quantity and remove changes -->
+    <p role="status" aria-live="polite" class="sr-only" data-testid="cart-announcer">
+      {{ announcement() }}
+    </p>
+
+    @if (!cart.ready()) {
+      <!-- Placeholder while the saved cart is read, so the empty state never flashes -->
+      <div
+        aria-hidden="true"
+        class="mx-auto min-h-72 max-w-xl animate-pulse rounded-3xl bg-night-text/10 motion-reduce:animate-none"
+        data-testid="cart-loading"
+      ></div>
+      <p class="sr-only">Loading cart</p>
+    } @else if (cart.lines().length === 0) {
+      <app-cart-empty />
+    } @else {
+      <!-- Receipt: one centered ticket card -->
+      <div class="mx-auto max-w-xl" data-testid="cart-layout-receipt">
+        <div class="rounded-3xl bg-dusk-card p-4 text-day-ink sm:p-6">
+          <app-fulfillment-toggle [(mode)]="mode" />
+
+          <!-- Line list; in delivery mode it is inert and marked by a dashed frame and a label, not faded text -->
+          <div class="mt-5">
+            <h2 class="sr-only">Items</h2>
+            @if (isDelivery()) {
+              <p class="mb-3 font-sans text-[16px] font-bold" data-testid="cart-delivery-note">
+                Delivery orders are placed on Uber Eats
+              </p>
+            }
+            <ul
+              class="space-y-3 rounded-2xl border-2 p-2"
+              [class]="
+                isDelivery() ? 'border-dashed border-current/60 bg-current/5' : 'border-transparent'
+              "
+              [attr.inert]="isDelivery() ? '' : null"
+              aria-label="Cart items"
+              data-testid="cart-lines"
+            >
+              @for (line of cart.lines(); track line.key) {
+                <li
+                  app-cart-line
+                  [line]="line"
+                  (quantityChange)="changeQuantity(line, $event)"
+                  (remove)="removeLine(line)"
+                ></li>
+              }
+            </ul>
+          </div>
+
+          <!-- Dashed tear line between the items and the totals -->
+          <div aria-hidden="true" class="my-5 border-t-2 border-dashed border-day-ink/30"></div>
+
+          <!-- Totals with the promo field, then checkout (takeout) or the delivery hand-off -->
+          <app-cart-summary
+            [subtotalMinor]="cart.totalMinor()"
+            [currency]="cart.currency()"
+            [count]="cart.count()"
+          >
+            <app-promo-field />
+
+            @if (isDelivery()) {
+              <app-delivery-panel />
+            } @else {
+              <!-- Checkout is not built yet, so the button is a visible, explained dead end -->
+              <div>
+                <button
+                  type="button"
+                  disabled
+                  aria-describedby="checkout-note"
+                  class="inline-flex min-h-11 w-full cursor-not-allowed items-center justify-center rounded-full bg-day-ink px-7 font-display text-[17px] text-dusk-card opacity-50"
+                  data-testid="cart-checkout"
+                >
+                  Checkout
+                </button>
+                <p
+                  id="checkout-note"
+                  class="mt-2 text-center font-sans text-[15px] text-day-ink-soft"
+                  data-testid="cart-checkout-note"
+                >
+                  Online checkout is coming soon
+                </p>
+              </div>
+            }
+          </app-cart-summary>
+        </div>
+
+        <!-- Small screens: subtotal stays in view while the lines scroll -->
+        <div
+          aria-hidden="true"
+          class="sticky bottom-3 z-30 mt-4 flex items-center justify-between rounded-2xl bg-dusk-card px-5 py-3 text-day-ink shadow-lg sm:hidden"
+          data-testid="cart-sticky-bar"
+        >
+          <span class="font-sans text-[16px] text-day-ink-soft">Subtotal</span>
+          <span class="font-sans text-[20px] font-bold">{{ subtotalText() }}</span>
+        </div>
+      </div>
+    }
+  </div>
+</main>
