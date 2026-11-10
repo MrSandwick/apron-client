@@ -258,7 +258,7 @@ describe('Menu ordering', () => {
     const bar = q(el, 'menu-cart-bar');
     expect(bar?.textContent).toContain('1 item');
     expect(bar?.textContent).toContain('$12');
-    expect(bar?.querySelector('a')?.getAttribute('href')).toBe('/order');
+    expect(bar?.querySelector('a')?.getAttribute('href')).toBe('/cart');
     expect(TestBed.inject(Router).url).not.toContain('item=');
 
     vi.advanceTimersByTime(5000);

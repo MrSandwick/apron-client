@@ -18,7 +18,13 @@ describe('Footer', () => {
     expect(el.textContent).toContain("Ahjoomah's");
     // Quick Links cover the whole page set.
     const hrefs = Array.from(el.querySelectorAll('nav a, ul a')).map((a) => a.getAttribute('href'));
-    expect(hrefs).toEqual(expect.arrayContaining(['/home', '/menu', '/reserve', '/order']));
+    expect(hrefs).toEqual(expect.arrayContaining(['/home', '/menu', '/reserve']));
+    // Order Online now leads to the menu, and nothing links to the retired /order
+    const order = Array.from(el.querySelectorAll('a')).find((a) =>
+      a.textContent?.includes('Order Online'),
+    );
+    expect(order?.getAttribute('href')).toBe('/menu');
+    expect(hrefs).not.toContain('/order');
   });
 
   it('exposes contact links and a labelled newsletter field', () => {

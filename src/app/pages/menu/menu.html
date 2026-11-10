@@ -298,8 +298,7 @@
           {{ cart.count() }} {{ cart.count() === 1 ? 'item' : 'items' }}
           <span aria-hidden="true">|</span> {{ cartTotalText() }}
         </p>
-        <!-- /order is not built yet (tracked separately); the navbar already links to it -->
-        <a routerLink="/order" class="btn-primary min-h-11 px-6 py-2 focus-visible:outline-day-ink"
+        <a routerLink="/cart" class="btn-primary min-h-11 px-6 py-2 focus-visible:outline-day-ink"
           >View cart</a
         >
       </div>

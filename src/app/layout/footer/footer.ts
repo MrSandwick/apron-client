@@ -17,7 +17,7 @@ export class Footer {
     { label: 'Home', link: '/home' },
     { label: 'Menu', link: '/menu' },
     { label: 'Reservations', link: '/reserve' },
-    { label: 'Order Online', link: '/order' },
+    { label: 'Order Online', link: '/menu' },
   ];
 
   // Placeholder until the newsletter backend is wired.
