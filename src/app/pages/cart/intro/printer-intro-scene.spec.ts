@@ -71,7 +71,7 @@ function makeThree(real = false) {
     set = vi.fn(() => this);
     copy = vi.fn(() => this);
     lerp = vi.fn(() => this);
-    multiplyScalar = vi.fn(() => this);
+    multiplyScalar = vi.fn((_scalar: number) => this);
     constructor(readonly input?: unknown) {}
   }
 

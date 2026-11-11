@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { BackdropMood } from './backdrop-scene';
+import { BackdropMood, BackdropScene } from './backdrop-scene';
 import { bokehScene } from './bokeh';
 import { CartBackdrop } from './cart-backdrop';
 
@@ -54,7 +54,8 @@ describe('CartBackdrop', () => {
     factory.mockImplementation(() => {
       const scene = fakeScene();
       scenes.push(scene);
-      return scene;
+      // The fake only has the members the host calls, so it is cast to the scene contract
+      return scene as unknown as BackdropScene;
     });
     TestBed.configureTestingModule({ imports: [CartBackdrop] });
   });
