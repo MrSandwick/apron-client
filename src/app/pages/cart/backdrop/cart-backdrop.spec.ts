@@ -93,13 +93,14 @@ describe('CartBackdrop', () => {
   it('draws one still frame and never starts the loop under reduced motion', async () => {
     const ctx = fakeContext();
     stubGetContext(ctx);
-    const raf = vi.spyOn(window, 'requestAnimationFrame');
     await mount();
     // Default test matchMedia stub reports no motion preference
     expect(scenes).toHaveLength(1);
     expect(scenes[0].draw).toHaveBeenCalledTimes(1);
     expect(ctx.setTransform).toHaveBeenCalled();
-    expect(raf).not.toHaveBeenCalled();
+    // Let real frames pass: a running loop would keep drawing, a still frame does not
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(scenes[0].draw).toHaveBeenCalledTimes(1);
   });
 
   // The preference can change while the page is open: the loop follows it
@@ -129,14 +130,14 @@ describe('CartBackdrop', () => {
     };
 
     const fixture = await mount();
-    // Reduced to begin with: one still frame, no loop, and the preference is being watched
-    expect(raf).not.toHaveBeenCalled();
+    // Reduced to begin with: one still frame, and the preference is being watched
     expect(scenes[0].draw).toHaveBeenCalledTimes(1);
     expect(listeners.size).toBe(1);
 
-    // Motion allowed: the loop starts
+    // Motion allowed: the loop starts (counted from here, so page-level frame requests do not count)
+    const requestsBefore = raf.mock.calls.length;
     flip(true);
-    expect(raf).toHaveBeenCalledTimes(1);
+    expect(raf.mock.calls.length - requestsBefore).toBe(1);
 
     // Reduced again: the loop is cancelled and one still frame is drawn
     flip(false);
@@ -183,9 +184,10 @@ describe('CartBackdrop', () => {
 
   it('maps the pointer over the whole viewport to the parallax and eases toward it', async () => {
     stubGetContext(fakeContext());
-    // Motion allowed with a fine pointer
+    // Motion allowed with a fine pointer; the phone width query stays false so the frame is not throttled
     vi.spyOn(window, 'matchMedia').mockImplementation(
-      (query: string) => ({ matches: true, media: query }) as MediaQueryList,
+      (query: string) =>
+        ({ matches: !query.includes('max-width'), media: query }) as MediaQueryList,
     );
     const loop = manualLoop();
     await mount();
