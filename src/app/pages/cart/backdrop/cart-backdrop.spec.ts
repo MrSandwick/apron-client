@@ -57,6 +57,9 @@ describe('CartBackdrop', () => {
       imports: [CartBackdrop],
       providers: [{ provide: BACKDROP_SCENE, useValue: factory }],
     });
+    // A host with 4 or fewer cores counts as low power and throttles frames, so the core count is
+    // pinned and the specs behave the same on a laptop and on a small CI runner
+    vi.spyOn(Navigator.prototype, 'hardwareConcurrency', 'get').mockReturnValue(8);
   });
 
   afterEach(() => {
