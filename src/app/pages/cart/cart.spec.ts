@@ -6,10 +6,10 @@ import { CartLine, MAX_QUANTITY, NewCartLine } from '../../core/cart/cart.model'
 import { CART_STORAGE_KEY, CartService } from '../../core/cart/cart.service';
 import { CartPage } from './cart';
 import { CartPrinterIntro } from './intro/printer-intro';
+import { WEBGL_PROBE } from './intro/webgl';
 
 // Lets a test decide whether WebGL counts as available for the printer intro
-const webgl = vi.hoisted(() => ({ available: true }));
-vi.mock('./intro/webgl', () => ({ webglAvailable: () => webgl.available }));
+const webgl = { available: true };
 
 // Stand-in for the printer intro: same selector and outputs, no scene, but a Skip button to hold focus
 @Component({ selector: 'app-cart-printer-intro', template: '<button type="button">Skip</button>' })
@@ -53,7 +53,12 @@ async function mount(lines: NewCartLine[] = LINES, extra: Provider[] = []) {
   });
   await TestBed.configureTestingModule({
     imports: [CartPage],
-    providers: [provideRouter([]), ...extra],
+    providers: [
+      provideRouter([]),
+      // The probe reads the shared flag when asked, so a test can flip it before mounting
+      { provide: WEBGL_PROBE, useValue: () => webgl.available },
+      ...extra,
+    ],
   }).compileComponents();
   const fixture = TestBed.createComponent(CartPage);
   const cart = TestBed.inject(CartService);

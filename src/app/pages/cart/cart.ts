@@ -26,7 +26,7 @@ import { CartSummary } from './cart-summary';
 import { DeliveryPanel } from './delivery-panel';
 import { FulfillmentMode, FulfillmentToggle } from './fulfillment-toggle';
 import { CartPrinterIntro } from './intro/printer-intro';
-import { webglAvailable } from './intro/webgl';
+import { WEBGL_PROBE } from './intro/webgl';
 import { PromoField } from './promo-field';
 
 // Lines past this index share the last stamp-in delay, so a long cart does not drag on
@@ -67,6 +67,7 @@ export class CartPage {
   private readonly injector = inject(Injector);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly doc = inject(DOCUMENT);
+  private readonly webglAvailable = inject(WEBGL_PROBE);
   private readonly root = this.doc.documentElement;
 
   // Not saved: the page always opens on takeout
@@ -278,7 +279,7 @@ export class CartPage {
     // The printer intro is the default entrance whenever it can run: browser only, motion allowed
     // and WebGL available (an empty cart is skipped below once the saved cart is read). Nothing
     // that differs from the server's HTML renders before cart.ready(), so hydration still matches
-    if (this.isBrowser && motionAllowed() && webglAvailable()) {
+    if (this.isBrowser && motionAllowed() && this.webglAvailable()) {
       this.introQueued.set(true);
       this.introPhase.set('pending');
       this.introTimer = setTimeout(() => this.onIntroTimeout(), INTRO_SAFETY_MS);

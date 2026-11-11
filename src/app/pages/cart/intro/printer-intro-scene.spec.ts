@@ -292,7 +292,9 @@ describe('paperPose', () => {
   it('decreases the angle monotonically along s when curled', () => {
     let prev = paperPose(0, 2.6, 0.8, 0).angle;
     expect(prev).toBeCloseTo(70 * DEG);
-    for (let s = 0.1; s <= 2.6001; s += 0.1) {
+    // Integer steps keep the last s at exactly 2.6, the fed length, instead of drifting past it
+    for (let i = 1; i <= 26; i++) {
+      const s = i / 10;
       const angle = paperPose(s, 2.6, 0.8, 0).angle;
       expect(angle).toBeLessThan(prev);
       prev = angle;

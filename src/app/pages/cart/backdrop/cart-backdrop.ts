@@ -13,7 +13,7 @@ import {
 import { MOTION_OK, motionAllowed } from '../../../shared/motion';
 import { BackdropMood, BackdropScene, Budget, Frame } from './backdrop-scene';
 import { budget, clamp, mulberry32, readPalette } from './backdrop-kit';
-import { bokehScene } from './bokeh';
+import { BACKDROP_SCENE } from './backdrop-token';
 
 // Fixed seed so the bokeh always lays out the same way
 const SEED = 20240611;
@@ -42,6 +42,7 @@ export class CartBackdrop {
 
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly createScene = inject(BACKDROP_SCENE);
   private readonly canvas = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
 
   private g?: CanvasRenderingContext2D;
@@ -116,7 +117,7 @@ export class CartBackdrop {
       palette: readPalette(),
       time: 0,
     };
-    this.scene = bokehScene(this.bud, mulberry32(SEED));
+    this.scene = this.createScene(this.bud, mulberry32(SEED));
     this.ready = true;
 
     // Sizing also draws the first frame (the only one under reduced motion)

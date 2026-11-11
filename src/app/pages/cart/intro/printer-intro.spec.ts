@@ -1,20 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { gsap } from 'gsap';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { initialIntroState } from './intro-contract';
+import { IntroPalette, PrinterIntroScene, initialIntroState } from './intro-contract';
 import { CartPrinterIntro } from './printer-intro';
-import { createPrinterIntroScene } from './printer-intro-scene';
-import { createCardTexture } from './receipt-texture';
+import { PRINTER_INTRO_DEPS, PrinterIntroDeps, RoundedBox, Three } from './printer-intro-deps';
+import { CardTexture } from './receipt-texture';
 import { resetWebglProbe } from './webgl';
-
-// The scene, the card texture and the heavy imports are mocked so the host is tested alone
-vi.mock('./printer-intro-scene', () => ({
-  createPrinterIntroScene: vi.fn(),
-  readIntroPalette: vi.fn(() => ({})),
-}));
-vi.mock('./receipt-texture', () => ({ createCardTexture: vi.fn() }));
-vi.mock('three', () => ({}));
-vi.mock('three/addons/geometries/RoundedBoxGeometry.js', () => ({ RoundedBoxGeometry: class {} }));
 
 interface FakeScene {
   state: ReturnType<typeof initialIntroState>;
@@ -39,8 +30,23 @@ function fakeScene(): FakeScene {
 }
 
 let scenes: FakeScene[];
-const factory = vi.mocked(createPrinterIntroScene);
-const texture = vi.mocked(createCardTexture);
+
+// The scene factory and the card texture are stand-ins, so the host is tested alone
+const factory = vi.fn<PrinterIntroDeps['createScene']>();
+const texture = vi.fn<PrinterIntroDeps['createCardTexture']>();
+
+// Three, the rounded box and the palette are placeholders; gsap is the real one the timeline needs
+const deps: PrinterIntroDeps = {
+  loadLibs: () =>
+    Promise.resolve({
+      three: {} as Three,
+      roundedBox: class {} as unknown as RoundedBox,
+      gsap,
+    }),
+  createScene: factory,
+  readPalette: () => ({}) as IntroPalette,
+  createCardTexture: texture,
+};
 
 // jsdom has no WebGL: the availability probe gets a fake context, or none
 function stubWebgl(available: boolean): void {
@@ -139,16 +145,20 @@ describe('CartPrinterIntro', () => {
     // The WebGL answer is cached per session, so each test probes afresh
     resetWebglProbe();
     factory.mockReset();
-    factory.mockImplementation((() => {
+    factory.mockImplementation(() => {
       const scene = fakeScene();
       scenes.push(scene);
-      return scene;
-    }) as never);
+      // The fake only has the members the host calls, so it is cast to the scene contract
+      return scene as unknown as PrinterIntroScene;
+    });
     texture.mockReset();
     texture.mockImplementation(() =>
       Promise.resolve({ canvas: document.createElement('canvas'), aspect: 2 }),
     );
-    TestBed.configureTestingModule({ imports: [CartPrinterIntro] });
+    TestBed.configureTestingModule({
+      imports: [CartPrinterIntro],
+      providers: [{ provide: PRINTER_INTRO_DEPS, useValue: deps }],
+    });
   });
 
   afterEach(() => {
@@ -416,9 +426,8 @@ describe('CartPrinterIntro', () => {
     stubWebgl(true);
     placeTarget({ width: 400, height: 500 });
     // The texture waits, so the timeline cannot be built yet
-    type Texture = { canvas: HTMLCanvasElement; aspect: number };
-    let release: (value: Texture) => void = () => undefined;
-    texture.mockImplementation(() => new Promise<Texture>((resolve) => (release = resolve)));
+    let release: (value: CardTexture) => void = () => undefined;
+    texture.mockImplementation(() => new Promise<CardTexture>((resolve) => (release = resolve)));
     const { fixture, events } = create();
     fixture.detectChanges();
     await vi.waitFor(() => expect(texture).toHaveBeenCalled(), { timeout: 5000 });
@@ -594,7 +603,7 @@ describe('CartPrinterIntro', () => {
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     placeTarget({ width: 400, height: 500 });
     // The texture never resolves, so the intro cannot start
-    texture.mockImplementation(() => new Promise(() => undefined));
+    texture.mockImplementation(() => new Promise<CardTexture>(() => undefined));
     const { fixture, events } = create();
     fixture.detectChanges();
     // Not yet at 2.4 s, gone by 2.6 s
@@ -624,7 +633,7 @@ describe('CartPrinterIntro', () => {
     stubWebgl(true);
     placeTarget({ width: 400, height: 500 });
     // The texture never resolves, so the scene is not built
-    texture.mockImplementation(() => new Promise(() => undefined));
+    texture.mockImplementation(() => new Promise<CardTexture>(() => undefined));
     const { fixture } = create();
     fixture.detectChanges();
     const host: HTMLElement = fixture.nativeElement;

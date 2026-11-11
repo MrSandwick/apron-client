@@ -1,3 +1,5 @@
+import { InjectionToken } from '@angular/core';
+
 // The answer is the same for the whole session, so the probe context is created only once
 let cached: boolean | undefined;
 
@@ -20,6 +22,12 @@ function probe(): boolean {
     return false;
   }
 }
+
+// The probe as an injectable, so a test can answer for the page without touching a canvas
+export const WEBGL_PROBE = new InjectionToken<() => boolean>('WEBGL_PROBE', {
+  providedIn: 'root',
+  factory: () => webglAvailable,
+});
 
 // Forgets the cached answer, so a test can probe again with a different stub
 export function resetWebglProbe(): void {

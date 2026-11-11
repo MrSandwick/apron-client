@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Budget, Frame, Palette } from './backdrop-scene';
-import { lerpColor, mulberry32 } from './backdrop-kit';
+import { mulberry32 } from './backdrop-kit';
 import {
   BOKEH_MAX_DRIFT,
   BOKEH_MIN_DEPTH,
@@ -8,12 +8,6 @@ import {
   BOKEH_PARALLAX_Y,
   bokehScene,
 } from './bokeh';
-
-// The real blend, wrapped so a test can count how often a frame recomputes colours
-vi.mock('./backdrop-kit', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('./backdrop-kit')>();
-  return { ...actual, lerpColor: vi.fn(actual.lerpColor) };
-});
 
 const PALETTE: Palette = {
   amber: '#f0a500',
@@ -95,7 +89,6 @@ describe('bokehScene', () => {
   beforeEach(() => {
     // Offscreen sprite canvases are faked so their gradient colors can be recorded
     stops = [];
-    vi.mocked(lerpColor).mockClear();
     const spriteCtx = {
       fillStyle: '' as unknown,
       fillRect: vi.fn(),
@@ -221,32 +214,34 @@ describe('bokehScene', () => {
     expect(cool).toBeGreaterThan(warm);
   });
 
-  it('blends colours and builds sprites only when the mood step changes', () => {
+  it('builds sprites and colours only when the mood step changes', () => {
     const scene = bokehScene(DESKTOP, mulberry32(9));
     scene.resize(1200, 800);
     const { ctx } = makeCtx();
-    const blend = vi.mocked(lerpColor);
 
-    // First frame blends the four palette colours once
+    // First frame builds the sprites, which is where the blended colours show up
     scene.draw(ctx, frameOf(0));
-    expect(blend).toHaveBeenCalledTimes(4);
     const sprites = createElement.mock.calls.length;
+    const warmStops = stops.slice();
     expect(sprites).toBeGreaterThan(0);
+    expect(warmStops.length).toBeGreaterThan(0);
 
     // Same step, even with a slightly different mood: nothing is rebuilt
     scene.draw(ctx, frameOf(0));
     scene.draw(ctx, frameOf(0.03));
-    expect(blend).toHaveBeenCalledTimes(4);
     expect(createElement).toHaveBeenCalledTimes(sprites);
+    expect(stops).toEqual(warmStops);
 
-    // A new step blends again, and returning to a seen step reuses its colours and sprites
+    // A new step builds new sprites in cooler colours, and returning to a seen step reuses them
     scene.draw(ctx, frameOf(0.5));
-    expect(blend).toHaveBeenCalledTimes(8);
     const afterCool = createElement.mock.calls.length;
+    expect(afterCool).toBeGreaterThan(sprites);
+    expect(coolness(stops.slice(warmStops.length))).toBeGreaterThan(coolness(warmStops));
+    const stopsAfterCool = stops.length;
     scene.draw(ctx, frameOf(0));
     scene.draw(ctx, frameOf(0.5));
-    expect(blend).toHaveBeenCalledTimes(8);
     expect(createElement).toHaveBeenCalledTimes(afterCool);
+    expect(stops).toHaveLength(stopsAfterCool);
   });
 
   it('lowers intensity as the mood gets cooler', () => {

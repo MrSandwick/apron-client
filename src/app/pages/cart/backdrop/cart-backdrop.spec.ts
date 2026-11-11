@@ -1,11 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { BackdropMood, BackdropScene } from './backdrop-scene';
-import { bokehScene } from './bokeh';
+import { BackdropMood, BackdropScene, SceneFactory } from './backdrop-scene';
+import { BACKDROP_SCENE } from './backdrop-token';
 import { CartBackdrop } from './cart-backdrop';
-
-// The scene is mocked so the host is tested on its own
-vi.mock('./bokeh', () => ({ bokehScene: vi.fn() }));
 
 interface FakeScene {
   resize: ReturnType<typeof vi.fn>;
@@ -49,15 +46,17 @@ function tint(fixture: ComponentFixture<CartBackdrop>): HTMLElement {
 describe('CartBackdrop', () => {
   beforeEach(() => {
     scenes = [];
-    const factory = vi.mocked(bokehScene);
-    factory.mockReset();
-    factory.mockImplementation(() => {
+    // The scene factory is replaced so the host is tested on its own
+    const factory = vi.fn<SceneFactory>(() => {
       const scene = fakeScene();
       scenes.push(scene);
       // The fake only has the members the host calls, so it is cast to the scene contract
       return scene as unknown as BackdropScene;
     });
-    TestBed.configureTestingModule({ imports: [CartBackdrop] });
+    TestBed.configureTestingModule({
+      imports: [CartBackdrop],
+      providers: [{ provide: BACKDROP_SCENE, useValue: factory }],
+    });
   });
 
   afterEach(() => {

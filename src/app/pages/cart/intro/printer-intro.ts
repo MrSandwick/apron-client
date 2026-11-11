@@ -10,23 +10,11 @@ import {
   viewChild,
 } from '@angular/core';
 import { motionAllowed } from '../../../shared/motion';
-import {
-  IntroPalette,
-  LandingRect,
-  PrinterIntroScene,
-  PrinterIntroSceneOptions,
-  ticketAspect,
-} from './intro-contract';
+import { IntroPalette, LandingRect, PrinterIntroScene, ticketAspect } from './intro-contract';
 import { unionRect } from './card-rect';
 import { IntroFade, buildIntroTimeline } from './intro-timeline';
-import { createPrinterIntroScene, readIntroPalette } from './printer-intro-scene';
-import { createCardTexture } from './receipt-texture';
-import { webglAvailable } from './webgl';
-
-type Three = typeof import('three');
-type RoundedBoxModule = typeof import('three/addons/geometries/RoundedBoxGeometry.js');
-type RoundedBox = RoundedBoxModule['RoundedBoxGeometry'];
-type Gsap = typeof import('gsap').gsap;
+import { Gsap, PRINTER_INTRO_DEPS } from './printer-intro-deps';
+import { WEBGL_PROBE } from './webgl';
 
 // If the intro has not started this long after mount, the page is shown without it
 const WATCHDOG_MS = 2500;
@@ -69,6 +57,8 @@ export class CartPrinterIntro {
   readonly done = output<void>();
 
   private readonly destroyRef = inject(DestroyRef);
+  private readonly deps = inject(PRINTER_INTRO_DEPS);
+  private readonly webglAvailable = inject(WEBGL_PROBE);
   private readonly canvas = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
   private readonly skipButton = viewChild.required<ElementRef<HTMLButtonElement>>('skipBtn');
 
@@ -154,20 +144,10 @@ export class CartPrinterIntro {
     this.skip();
   }
 
-  // Seam for tests: builds the three.js scene
-  protected createScene(
-    three: Three,
-    roundedBox: RoundedBox,
-    canvas: HTMLCanvasElement,
-    options: PrinterIntroSceneOptions,
-  ): PrinterIntroScene {
-    return createPrinterIntroScene(three, roundedBox, canvas, options);
-  }
-
   private init(): void {
     if (this.destroyed) return;
     // Reduced motion or no WebGL: skip everything and show the page at once
-    if (!motionAllowed() || !webglAvailable()) {
+    if (!motionAllowed() || !this.webglAvailable()) {
       this.finish();
       return;
     }
@@ -191,15 +171,11 @@ export class CartPrinterIntro {
   }
 
   private async load(): Promise<void> {
-    const [three, rounded, gsapModule] = await Promise.all([
-      import('three'),
-      import('three/addons/geometries/RoundedBoxGeometry.js'),
-      import('gsap'),
-    ]);
+    const { three, roundedBox, gsap } = await this.deps.loadLibs();
     // The page may have been left while the chunks were loading
     if (this.stopped()) return;
 
-    const palette: IntroPalette = readIntroPalette();
+    const palette: IntroPalette = this.deps.readPalette();
     // Without a card there is nothing to copy or to land on, so the page is shown as it is
     const card = document.querySelector<HTMLElement>('[data-intro-target]');
     if (!card) {
@@ -207,7 +183,7 @@ export class CartPrinterIntro {
       return;
     }
     // The ticket is a picture of the card joined with its torn edge, modelled at the same proportions
-    const texture = await createCardTexture(
+    const texture = await this.deps.createCardTexture(
       card,
       document.querySelector<HTMLElement>('[data-intro-edge]'),
     );
@@ -217,7 +193,7 @@ export class CartPrinterIntro {
 
     const canvas = this.canvas().nativeElement;
     const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
-    const scene = this.createScene(three, rounded.RoundedBoxGeometry, canvas, {
+    const scene = this.deps.createScene(three, roundedBox, canvas, {
       dpr,
       palette,
       receipt,
@@ -233,7 +209,7 @@ export class CartPrinterIntro {
     this.started.emit();
 
     this.timeline = buildIntroTimeline(
-      gsapModule.gsap,
+      gsap,
       scene.state,
       {
         onFrame: () => this.paint(),
@@ -244,7 +220,7 @@ export class CartPrinterIntro {
       this.fadeState,
     );
     // Presses made while loading start the timeline already sped up
-    this.gsap = gsapModule.gsap;
+    this.gsap = gsap;
     this.timeline.timeScale(this.speed);
   }
 
