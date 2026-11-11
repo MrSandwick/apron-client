@@ -106,6 +106,14 @@ describe('CartLineItem', () => {
     expect(host.className).not.toContain('bg-dusk-card');
   });
 
+  // The host is a one-row grid so the leave animation can collapse it, with the content in a clipping wrapper
+  it('is a one-row grid host with its content in a clipping wrapper', () => {
+    const host = render(base).nativeElement as HTMLElement;
+    expect(host.classList.contains('grid')).toBe(true);
+    expect(host.classList.contains('grid-rows-[1fr]')).toBe(true);
+    expect(host.firstElementChild?.className).toContain('overflow-hidden');
+  });
+
   // Each control is named after the dish
   it('labels the buttons with the dish name', () => {
     const fixture = render(base);

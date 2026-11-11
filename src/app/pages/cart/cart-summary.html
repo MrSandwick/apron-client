@@ -6,16 +6,28 @@
 >
   <h2 id="cart-summary-title" class="font-display text-[22px] leading-tight">Order summary</h2>
 
-  <!-- Totals -->
+  <!-- Totals; the two values are dynamic, so the intro leaves them blank on the 3D ticket -->
   <dl class="mt-4 space-y-2 font-sans text-[16px]">
     <div class="flex items-baseline justify-between gap-4">
       <dt class="text-day-ink-soft">Items</dt>
-      <dd class="font-bold" data-testid="cart-summary-count">{{ count() }}</dd>
+      <dd
+        class="font-bold"
+        [class]="dynamicClass()"
+        data-intro-dynamic
+        data-testid="cart-summary-count"
+      >
+        {{ count() }}
+      </dd>
     </div>
     <div class="flex items-baseline justify-between gap-4">
       <dt class="text-day-ink-soft">Subtotal</dt>
-      <dd class="text-[20px] font-bold" data-testid="cart-summary-subtotal">
-        {{ subtotalText() }}
+      <dd
+        class="text-[20px] font-bold"
+        [class]="dynamicClass()"
+        data-intro-dynamic
+        data-testid="cart-summary-subtotal"
+      >
+        <app-tweened-amount [amountMinor]="subtotalMinor()" [currency]="currency()" />
       </dd>
     </div>
   </dl>

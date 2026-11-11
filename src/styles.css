@@ -72,6 +72,134 @@
   --font-display: 'Fredoka One', cursive;
   --font-sans: 'Nunito', sans-serif;
   --font-kr: 'Noto Sans KR', sans-serif;
+
+  /* Easing curves: spring overshoots slightly, print decelerates like a receipt feeding out */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-print: cubic-bezier(0.2, 0.7, 0.3, 1);
+
+  /* Motion utilities (animate-<name>). Delays are set per element in templates */
+  /* Receipt feeds out from the top; clip-path and translate never shift layout */
+  --animate-receipt-print: receipt-print 650ms var(--ease-print) both;
+  /* Stamp lands with a tiny settle; templates set --stamp-delay per element */
+  --animate-stamp-in: stamp-in 280ms ease-out var(--stamp-delay, 0ms) both;
+  /* Cart line fades left, then collapses; the host must be grid grid-rows-[1fr] */
+  --animate-line-out: line-out 360ms ease-in-out forwards;
+  --animate-fade-up: fade-up 220ms ease-out both;
+  --animate-badge-pop: badge-pop 300ms var(--ease-spring) none;
+  /* Mascot: sleepy idle loop, a hop, and a wave (the template sets the wrist transform-origin) */
+  --animate-mascot-doze: mascot-doze 3s ease-in-out 3;
+  --animate-mascot-hop: mascot-hop 450ms var(--ease-spring) 1;
+  --animate-mascot-wave: mascot-wave 700ms ease-in-out 3;
+  /* Cart backdrop eases in from transparent when it mounts after the intro */
+  --animate-backdrop-in: backdrop-in 1800ms ease-out both;
+
+  @keyframes receipt-print {
+    from {
+      clip-path: inset(0 0 100% 0);
+      translate: 0 -16px;
+    }
+    to {
+      clip-path: inset(0);
+      translate: 0 0;
+    }
+  }
+
+  @keyframes stamp-in {
+    from {
+      opacity: 0;
+      scale: 1.04;
+    }
+    to {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+
+  @keyframes line-out {
+    /* Fade and slide first, then collapse the row */
+    0% {
+      opacity: 1;
+      translate: 0 0;
+      grid-template-rows: 1fr;
+    }
+    40% {
+      opacity: 0;
+      translate: -12px 0;
+      grid-template-rows: 1fr;
+    }
+    100% {
+      opacity: 0;
+      translate: -12px 0;
+      grid-template-rows: 0fr;
+      margin-block: 0;
+      border-color: transparent;
+    }
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes badge-pop {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.35);
+    }
+  }
+
+  @keyframes mascot-doze {
+    /* Slow tilt with a gentle breathe */
+    0%,
+    100% {
+      transform: rotate(-2deg) scale(1);
+    }
+    50% {
+      transform: rotate(2deg) scale(1.02);
+    }
+  }
+
+  @keyframes mascot-hop {
+    /* Rise, land with a small squash, settle */
+    0%,
+    100% {
+      transform: translateY(0) scale(1, 1);
+    }
+    45% {
+      transform: translateY(-10px) scale(0.98, 1.03);
+    }
+    85% {
+      transform: translateY(0) scale(1.04, 0.95);
+    }
+  }
+
+  @keyframes mascot-wave {
+    0%,
+    100% {
+      transform: rotate(-15deg);
+    }
+    50% {
+      transform: rotate(20deg);
+    }
+  }
+
+  @keyframes backdrop-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 }
 
 @layer base {

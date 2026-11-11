@@ -23,6 +23,13 @@ describe('CartEmpty', () => {
     expect(el.querySelector('h2')?.textContent?.trim()).toBe('Your cart is empty');
   });
 
+  // The empty state shows the sleepy mascot, hidden from assistive tech
+  it('shows the sleepy mascot face as decorative', async () => {
+    const face = (await render()).querySelector('app-ahjoomah-face');
+    expect(face?.getAttribute('data-mood')).toBe('sleepy');
+    expect(face?.getAttribute('aria-hidden')).toBe('true');
+  });
+
   // The primary link leads to the menu
   it('links Browse the menu to /menu', async () => {
     const link = (await render()).querySelector<HTMLAnchorElement>('a');

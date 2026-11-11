@@ -70,6 +70,14 @@ describe('Footer', () => {
     expect(el.querySelector('a[href*="creativecommons.org/licenses/by/4.0"]')).toBeTruthy();
   });
 
+  // The cart intro covers the footer, so its links must not be reachable by keyboard meanwhile
+  it('hides its content while the cart intro plays', () => {
+    const fixture = TestBed.createComponent(Footer);
+    fixture.detectChanges();
+    const content = (fixture.nativeElement as HTMLElement).querySelector('footer > div')!;
+    expect(content.classList).toContain('in-data-[intro=playing]:invisible');
+  });
+
   // The restaurant is in Chicago only, so the footer names no other city
   it('names Chicago and no other city', () => {
     const fixture = TestBed.createComponent(Footer);

@@ -1,71 +1,77 @@
-<!-- Dish details: name, picks and note -->
-<div class="min-w-0 flex-1">
-  <h3 class="font-display text-[20px] leading-tight break-words" data-testid="cart-line-name">
-    @if (line().code) {
-      <span class="mr-2 text-day-accent">{{ line().code }}</span>
-    }
-    {{ line().name }}
-  </h3>
-  @if (picksText()) {
-    <p
-      class="mt-1 font-sans text-[15px] break-words text-day-ink-soft"
-      data-testid="cart-line-picks"
-    >
-      {{ picksText() }}
-    </p>
-  }
-  @if (line().note) {
-    <p
-      class="mt-1 font-sans text-[15px] break-words text-day-ink-soft"
-      data-testid="cart-line-note"
-    >
-      Note: {{ line().note }}
-    </p>
-  }
-  <p class="mt-1 font-sans text-[14px] text-day-ink-soft" data-testid="cart-line-unit">
-    {{ unitText() }} each
-  </p>
-</div>
+<!-- Clipping wrapper so the row can shrink to nothing when it leaves -->
+<div class="min-h-0 overflow-hidden">
+  <!-- Row layout: details beside the controls on wide screens -->
+  <div class="flex flex-col gap-4 px-2 py-4 sm:flex-row sm:items-start sm:justify-between">
+    <!-- Dish details: name, picks and note -->
+    <div class="min-w-0 flex-1">
+      <h3 class="font-display text-[20px] leading-tight break-words" data-testid="cart-line-name">
+        @if (line().code) {
+          <span class="mr-2 text-day-accent">{{ line().code }}</span>
+        }
+        {{ line().name }}
+      </h3>
+      @if (picksText()) {
+        <p
+          class="mt-1 font-sans text-[15px] break-words text-day-ink-soft"
+          data-testid="cart-line-picks"
+        >
+          {{ picksText() }}
+        </p>
+      }
+      @if (line().note) {
+        <p
+          class="mt-1 font-sans text-[15px] break-words text-day-ink-soft"
+          data-testid="cart-line-note"
+        >
+          Note: {{ line().note }}
+        </p>
+      }
+      <p class="mt-1 font-sans text-[14px] text-day-ink-soft" data-testid="cart-line-unit">
+        {{ unitText() }} each
+      </p>
+    </div>
 
-<!-- Controls: stepper, line total and remove -->
-<div class="flex flex-wrap items-center justify-between gap-3 sm:flex-col sm:items-end">
-  <div class="flex items-center gap-2">
-    <button
-      type="button"
-      class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-day-ink font-sans text-[22px] leading-none text-brand-cream focus-visible:outline-day-ink disabled:cursor-not-allowed disabled:opacity-40"
-      [attr.aria-label]="'Decrease ' + line().name"
-      [disabled]="line().quantity <= minQuantity"
-      data-testid="cart-line-decrease"
-      (click)="step(-1)"
-    >
-      -
-    </button>
-    <span class="min-w-8 text-center font-sans text-[18px] font-bold" data-testid="cart-line-qty">{{
-      line().quantity
-    }}</span>
-    <button
-      type="button"
-      class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-day-ink font-sans text-[22px] leading-none text-brand-cream focus-visible:outline-day-ink disabled:cursor-not-allowed disabled:opacity-40"
-      [attr.aria-label]="'Increase ' + line().name"
-      [disabled]="line().quantity >= maxQuantity"
-      data-testid="cart-line-increase"
-      (click)="step(1)"
-    >
-      +
-    </button>
+    <!-- Controls: stepper, line total and remove -->
+    <div class="flex flex-wrap items-center justify-between gap-3 sm:flex-col sm:items-end">
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-day-ink font-sans text-[22px] leading-none text-brand-cream transition enabled:motion-safe:active:scale-95 focus-visible:outline-day-ink disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:transition-none"
+          [attr.aria-label]="'Decrease ' + line().name"
+          [disabled]="line().quantity <= minQuantity"
+          data-testid="cart-line-decrease"
+          (click)="step(-1)"
+        >
+          -
+        </button>
+        <span class="min-w-8 text-center font-sans text-[18px] font-bold" data-testid="cart-line-qty">{{
+          line().quantity
+        }}</span>
+        <button
+          type="button"
+          class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-day-ink font-sans text-[22px] leading-none text-brand-cream transition enabled:motion-safe:active:scale-95 focus-visible:outline-day-ink disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:transition-none"
+          [attr.aria-label]="'Increase ' + line().name"
+          [disabled]="line().quantity >= maxQuantity"
+          data-testid="cart-line-increase"
+          (click)="step(1)"
+        >
+          +
+        </button>
+      </div>
+
+      <p class="font-sans text-[18px] font-bold" data-testid="cart-line-total">{{ totalText() }}</p>
+
+      <!-- Remove; data-remove lets the page move focus here after a change -->
+      <button
+        type="button"
+        class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-4 font-sans text-[15px] font-bold text-day-accent underline transition enabled:motion-safe:active:scale-95 hover:bg-day-ink/10 focus-visible:outline-day-ink motion-reduce:transition-none"
+        [attr.aria-label]="'Remove ' + line().name"
+        [attr.data-remove]="line().key"
+        data-testid="cart-line-remove"
+        (click)="remove.emit()"
+      >
+        Remove
+      </button>
+    </div>
   </div>
-
-  <p class="font-sans text-[18px] font-bold" data-testid="cart-line-total">{{ totalText() }}</p>
-
-  <!-- Remove; data-remove lets the page move focus here after a change -->
-  <button
-    type="button"
-    class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-4 font-sans text-[15px] font-bold text-day-accent underline hover:bg-day-ink/10 focus-visible:outline-day-ink"
-    [attr.aria-label]="'Remove ' + line().name"
-    [attr.data-remove]="line().key"
-    data-testid="cart-line-remove"
-    (click)="remove.emit()"
-  >
-    Remove
-  </button>
 </div>

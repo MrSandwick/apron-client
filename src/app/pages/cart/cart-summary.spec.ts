@@ -49,6 +49,19 @@ describe('CartSummary', () => {
     );
   });
 
+  // The test-setup matchMedia stub reports no motion preference, so the tween jumps at once
+  it('shows a changed subtotal immediately when motion is unavailable', async () => {
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    fixture.componentInstance.subtotal = 1800;
+    fixture.changeDetectorRef.markForCheck();
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('[data-testid="cart-summary-subtotal"]')?.textContent?.trim()).toBe(
+      '$18',
+    );
+  });
+
   // The fees note is always present
   it('shows the taxes and fees note', async () => {
     expect((await render()).textContent).toContain('Taxes and any fees are added at checkout');

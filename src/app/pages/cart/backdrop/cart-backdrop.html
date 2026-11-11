@@ -1,0 +1,14 @@
+<!-- Viewport-tall layer that stays pinned while the page scrolls -->
+<div class="relative size-full">
+  <!-- Scene canvas, masked so the title band stays clear -->
+  <canvas
+    #canvas
+    class="size-full [mask-image:linear-gradient(to_bottom,transparent_0,transparent_100px,black_300px)]"
+  ></canvas>
+
+  <!-- Cool-mood tint, faded in over the scene -->
+  <div
+    class="absolute inset-0 bg-linear-to-b from-transparent to-sky-dawn/15 transition-opacity duration-1000 motion-reduce:transition-none"
+    [class]="mood() === 'cool' ? 'opacity-100' : 'opacity-0'"
+  ></div>
+</div>

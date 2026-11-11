@@ -76,6 +76,20 @@ describe('FulfillmentToggle', () => {
     expect(seen).toEqual(['delivery']);
   });
 
+  // The sliding indicator is decorative and sits on the second pill only for delivery
+  it('moves the aria-hidden indicator with the mode', async () => {
+    const { fixture, el } = await mount();
+    const indicator = el.querySelector('[data-testid="fulfillment-indicator"]')!;
+    expect(indicator.getAttribute('aria-hidden')).toBe('true');
+    expect(indicator.className).not.toContain('translate-x-[calc(100%+0.25rem)]');
+    fixture.componentRef.setInput('mode', 'delivery');
+    await fixture.whenStable();
+    expect(indicator.classList.contains('translate-x-[calc(100%+0.25rem)]')).toBe(true);
+    fixture.componentRef.setInput('mode', 'takeout');
+    await fixture.whenStable();
+    expect(indicator.className).not.toContain('translate-x-[calc(100%+0.25rem)]');
+  });
+
   // Each target is at least 44px tall
   it('gives each option a min-h-11 target', async () => {
     const { el } = await mount();

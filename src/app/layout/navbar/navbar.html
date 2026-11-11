@@ -1,6 +1,6 @@
-<!-- Sticky top bar, translucent over the page background -->
+<!-- Sticky top bar, translucent over the page background; slides in from the top once the cart intro (data-intro on the root) has played, and is invisible (so out of the tab order) while it waits -->
 <header
-  class="sticky top-0 z-50 border-b border-white/10 bg-sky-night/90 backdrop-blur"
+  class="sticky top-0 z-50 border-b border-white/10 bg-sky-night/90 backdrop-blur transition-[translate,visibility] duration-500 ease-spring in-data-[intro=playing]:invisible in-data-[intro=playing]:-translate-y-full motion-reduce:transition-none"
 >
   <div class="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-6">
     <!-- Brand: logo mark links home -->
@@ -57,12 +57,16 @@
         </svg>
         <!-- Count badge, only when the cart has items; the link label already says the count -->
         @if (count() > 0) {
-          <span
-            aria-hidden="true"
-            class="absolute -right-1 -top-1 flex min-w-5 items-center justify-center rounded-full bg-brand-amber px-1 font-sans text-[11px] font-bold leading-5 text-brand-bg"
-          >
-            {{ count() }}
-          </span>
+          <!-- Re-keyed on each increase so the pop animation restarts -->
+          @for (k of [popKey()]; track k) {
+            <span
+              aria-hidden="true"
+              [class]="popActive() ? 'motion-safe:animate-badge-pop' : ''"
+              class="absolute -right-1 -top-1 flex min-w-5 items-center justify-center rounded-full bg-brand-amber px-1 font-sans text-[11px] font-bold leading-5 text-brand-bg"
+            >
+              {{ count() }}
+            </span>
+          }
         }
       </a>
 

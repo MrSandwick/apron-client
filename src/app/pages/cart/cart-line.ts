@@ -10,9 +10,10 @@ import { formatAmount } from '../../shared/format/price';
   templateUrl: './cart-line.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    // Borderless row inside the receipt card, with a divider except on the last one
+    // Borderless row inside the receipt card, with a divider except on the last one.
+    // The grid row lets the leave animation collapse the height (see animate-line-out)
     class:
-      'flex flex-col gap-4 bg-transparent px-1 py-4 text-day-ink not-last:border-b not-last:border-day-ink/15 sm:flex-row sm:items-start sm:justify-between',
+      'grid grid-rows-[1fr] bg-transparent text-day-ink not-last:border-b not-last:border-day-ink/15',
     'data-testid': 'cart-line',
   },
 })

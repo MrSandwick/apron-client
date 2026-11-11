@@ -1,0 +1,27 @@
+<!-- Canvas layer on the page's own sky, so the navbar and page stay hidden until the fade-out -->
+<div
+  aria-hidden="true"
+  class="absolute inset-0 bg-linear-to-b from-sky-twilight to-sky-night"
+  [style.opacity]="fade()"
+>
+  <canvas #canvas class="size-full"></canvas>
+</div>
+
+<!-- Speed-up hint, bottom left to mirror Skip; fades out after the first press -->
+<p
+  aria-hidden="true"
+  class="pointer-events-none absolute bottom-[max(1.5rem,env(safe-area-inset-bottom))] left-[max(1.5rem,env(safe-area-inset-left))] flex min-h-11 items-center text-sm text-night-text/70 transition-opacity duration-300 motion-reduce:transition-none"
+  [class.opacity-0]="pressed()"
+>
+  Tap to speed up
+</p>
+
+<!-- Skip control, kept clear of notches; takes focus when the overlay opens and ends the intro at once -->
+<button
+  #skipBtn
+  type="button"
+  (click)="skip()"
+  class="absolute bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-[max(1.5rem,env(safe-area-inset-right))] min-h-11 rounded-full bg-dusk-card px-5 font-display text-day-ink shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-amber motion-safe:active:scale-95"
+>
+  Skip intro
+</button>

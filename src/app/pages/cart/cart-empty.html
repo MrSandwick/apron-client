@@ -3,11 +3,16 @@
   class="flex flex-col items-center gap-4 rounded-3xl bg-dusk-card px-6 py-12 text-center text-day-ink"
   data-testid="cart-empty"
 >
+  <!-- Dozing mascot; decorative, the text says it all -->
+  <app-ahjoomah-face mood="sleepy" class="mx-auto block size-28" />
   <h2 class="font-display text-[26px] leading-tight">Your cart is empty</h2>
   <p class="max-w-md font-sans text-[16px] text-day-ink-soft">
     Add a dish from the menu and it will show up here.
   </p>
-  <a routerLink="/menu" class="btn-primary mt-2 min-h-11 focus-visible:outline-day-ink">
+  <a
+    routerLink="/menu"
+    class="btn-primary mt-2 min-h-11 transition motion-safe:active:scale-95 focus-visible:outline-day-ink motion-reduce:transition-none"
+  >
     Browse the menu
   </a>
 </section>
