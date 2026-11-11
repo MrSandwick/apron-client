@@ -1,6 +1,7 @@
 <!-- Night: the end of the page's day, continuing the reserve section's navy -->
 <footer class="bg-sky-night px-6 pt-16 pb-8" data-testid="footer">
-  <div class="mx-auto max-w-[1152px]">
+  <!-- Above the cart page backdrop, which is drawn over the footer's background; invisible, so out of the tab order, while the cart intro plays -->
+  <div class="relative z-10 mx-auto max-w-[1152px] in-data-[intro=playing]:invisible">
     <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
       <!-- Brand: logo, tagline, and socials -->
       <div>
@@ -68,7 +69,7 @@
           Quick Links
         </h2>
         <ul class="mt-5 flex flex-col gap-2">
-          @for (item of quickLinks; track item.link) {
+          @for (item of quickLinks; track item.label) {
             <li>
               <a
                 [routerLink]="item.link"
