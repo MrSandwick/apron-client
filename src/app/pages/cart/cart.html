@@ -1,21 +1,55 @@
 <!-- Page on the dusk sky -->
 <main
-  class="min-h-[70vh] bg-linear-to-b from-sky-twilight to-sky-night px-6 pt-12 pb-20 text-night-text sm:pt-16"
+  class="relative min-h-[70vh] bg-linear-to-b from-sky-twilight to-sky-night px-6 pt-12 pb-20 text-night-text sm:pt-16"
   data-testid="cart-page"
 >
-  <div class="mx-auto max-w-[1152px]">
-    <!-- Heading and item count; the heading is where focus lands when the cart empties -->
-    <header class="mb-8 text-center">
+  <!-- Animated bokeh behind everything; absent while the 3D intro plays, then loads when the browser is idle and fades in. Waits for the saved cart, so the first client render matches the server's -->
+  @if (cart.ready() && backdropReady()) {
+    @defer (on idle) {
+      <app-cart-backdrop [mood]="backdropMood()" />
+    }
+  }
+
+  <!-- Printer intro overlay: a direct child of main, so no stacking context or scaled ancestor
+       keeps its z-[60] below the navbar. If its chunk fails to load, the empty error block shows
+       nothing and the page's safety timer reveals the receipt -->
+  @if (
+    cart.ready() &&
+    cart.lines().length > 0 &&
+    (introPhase() === 'pending' || introPhase() === 'playing' || introPhase() === 'revealing')
+  ) {
+    @defer (on immediate) {
+      <app-cart-printer-intro
+        (started)="onIntroStarted()"
+        (reveal)="onIntroReveal()"
+        (done)="onIntroDone()"
+      />
+    } @error {
+      <!-- Nothing to show; see the note above -->
+    }
+  }
+
+  <div class="relative z-10 mx-auto max-w-[1152px]">
+    <!-- Heading and item count; the heading is where focus lands when the cart empties. Both wait for the printer scene -->
+    <header
+      class="mb-8 text-center transition-opacity duration-300 motion-reduce:transition-none"
+      [class]="headerHidden() ? 'opacity-0' : ''"
+    >
       <h1
         #heading
         tabindex="-1"
-        class="font-display text-[32px] text-brand-cream sm:text-[40px]"
+        class="font-display text-[32px] text-brand-cream outline-none sm:text-[40px]"
         data-testid="cart-title"
       >
         Your cart
       </h1>
       @if (cart.ready() && cart.count() > 0) {
-        <p class="mt-1 font-sans text-[16px] text-night-text/80" data-testid="cart-count">
+        <p
+          class="mt-1 font-sans text-[16px] text-night-text/80"
+          [class]="stampClass()"
+          [style.--stamp-delay]="summaryDelay() + 'ms'"
+          data-testid="cart-count"
+        >
           {{ countText() }}
         </p>
       }
@@ -37,84 +71,144 @@
     } @else if (cart.lines().length === 0) {
       <app-cart-empty />
     } @else {
-      <!-- Receipt: one centered ticket card -->
-      <div class="mx-auto max-w-xl" data-testid="cart-layout-receipt">
-        <div class="rounded-3xl bg-dusk-card p-4 text-day-ink sm:p-6">
-          <app-fulfillment-toggle [(mode)]="mode" />
-
-          <!-- Line list; in delivery mode it is inert and marked by a dashed frame and a label, not faded text -->
-          <div class="mt-5">
-            <h2 class="sr-only">Items</h2>
-            @if (isDelivery()) {
-              <p class="mb-3 font-sans text-[16px] font-bold" data-testid="cart-delivery-note">
-                Delivery orders are placed on Uber Eats
-              </p>
-            }
-            <ul
-              class="space-y-3 rounded-2xl border-2 p-2"
-              [class]="
-                isDelivery() ? 'border-dashed border-current/60 bg-current/5' : 'border-transparent'
-              "
-              [attr.inert]="isDelivery() ? '' : null"
-              aria-label="Cart items"
-              data-testid="cart-lines"
-            >
-              @for (line of cart.lines(); track line.key) {
-                <li
-                  app-cart-line
-                  [line]="line"
-                  (quantityChange)="changeQuantity(line, $event)"
-                  (remove)="removeLine(line)"
-                ></li>
+      <!-- Receipt: one centered ticket card; laid out in place and inert while the intro plays (the 3D ticket is drawn from it); transparent only until the overlay is up, so its static parts show from the first frame of the hand-off -->
+      <div
+        class="mx-auto max-w-xl"
+        [class]="receiptPending() ? 'opacity-0' : ''"
+        [attr.inert]="contentHidden() ? '' : null"
+        data-testid="cart-layout-receipt"
+      >
+        <!-- Printing wrapper: the ticket and its torn edge feed out together -->
+        <div
+          class="relative -mt-6 pt-10"
+          [animate.enter]="enterFx('motion-safe:animate-receipt-print')"
+          data-testid="cart-receipt-print"
+        >
+          <!-- Mascot stamped on the ticket corner; re-created on a quantity increase so it hops -->
+          <div
+            class="pointer-events-none absolute top-0 right-4 z-10 size-14 rotate-6 sm:right-6"
+            [class]="stampClass()"
+            [style.--stamp-delay]="introMascotDelay() + 'ms'"
+            data-testid="cart-mascot"
+          >
+            <!-- Created only at reveal during the intro, so the hop plays as the mascot stamps in -->
+            @if (!contentHidden()) {
+              @for (k of [hopKey()]; track k) {
+                <app-ahjoomah-face
+                  [mood]="faceMood()"
+                  [style.animation-delay]="introStamp() ? introMascotDelay() + 'ms' : null"
+                  class="block size-full"
+                />
               }
-            </ul>
+            }
           </div>
 
-          <!-- Dashed tear line between the items and the totals -->
-          <div aria-hidden="true" class="my-5 border-t-2 border-dashed border-day-ink/30"></div>
+          <!-- Ticket card; its flat bottom continues into the torn edge below. The printer intro copies it, minus the data-intro-dynamic parts, and lands the 3D ticket on it -->
+          <div class="rounded-t-3xl bg-dusk-card p-4 text-day-ink sm:p-6" data-intro-target>
+            <app-fulfillment-toggle [(mode)]="mode" />
 
-          <!-- Totals with the promo field, then checkout (takeout) or the delivery hand-off -->
-          <app-cart-summary
-            [subtotalMinor]="cart.totalMinor()"
-            [currency]="cart.currency()"
-            [count]="cart.count()"
-          >
-            <app-promo-field />
-
-            @if (isDelivery()) {
-              <app-delivery-panel />
-            } @else {
-              <!-- Checkout is not built yet, so the button is a visible, explained dead end -->
-              <div>
-                <button
-                  type="button"
-                  disabled
-                  aria-describedby="checkout-note"
-                  class="inline-flex min-h-11 w-full cursor-not-allowed items-center justify-center rounded-full bg-day-ink px-7 font-display text-[17px] text-dusk-card opacity-50"
-                  data-testid="cart-checkout"
-                >
-                  Checkout
-                </button>
+            <!-- Line list (dynamic: left blank on the 3D ticket); in delivery mode it is inert and marked by a dashed frame and a label, not faded text -->
+            <div class="mt-5">
+              <h2 class="sr-only">Items</h2>
+              @if (isDelivery()) {
                 <p
-                  id="checkout-note"
-                  class="mt-2 text-center font-sans text-[15px] text-day-ink-soft"
-                  data-testid="cart-checkout-note"
+                  class="mb-3 font-sans text-[16px] font-bold"
+                  animate.enter="motion-safe:animate-fade-up"
+                  data-testid="cart-delivery-note"
                 >
-                  Online checkout is coming soon
+                  Delivery orders are placed on Uber Eats
                 </p>
-              </div>
-            }
-          </app-cart-summary>
+              }
+              <ul
+                class="space-y-3 rounded-2xl border-2 p-2"
+                [class]="
+                  isDelivery()
+                    ? 'border-dashed border-current/60 bg-current/5'
+                    : 'border-transparent'
+                "
+                [attr.inert]="isDelivery() ? '' : null"
+                aria-label="Cart items"
+                data-intro-dynamic
+                data-testid="cart-lines"
+              >
+                @for (line of cart.lines(); track line.key; let i = $index) {
+                  <!-- Lines stamp in one after another; leaving collapses the row -->
+                  <li
+                    app-cart-line
+                    [animate.enter]="enterFx('motion-safe:animate-stamp-in')"
+                    animate.leave="pointer-events-none motion-safe:animate-line-out"
+                    [class]="stampClass()"
+                    [style.--stamp-delay]="lineDelay(i) + 'ms'"
+                    [line]="line"
+                    (quantityChange)="changeQuantity(line, $event)"
+                    (remove)="removeLine(line)"
+                  ></li>
+                }
+              </ul>
+            </div>
+
+            <!-- Dashed tear line between the items and the totals -->
+            <div aria-hidden="true" class="my-5 border-t-2 border-dashed border-day-ink/30"></div>
+
+            <!-- Totals with the promo field, then checkout (takeout) or the delivery hand-off; the values stamp in after the last line -->
+            <app-cart-summary
+              [animate.enter]="enterFx('motion-safe:animate-stamp-in')"
+              [style.--stamp-delay]="summaryDelay() + 'ms'"
+              [dynamicClass]="stampClass()"
+              [subtotalMinor]="subtotalMinor()"
+              [currency]="cart.currency()"
+              [count]="cart.count()"
+            >
+              <app-promo-field />
+
+              @if (isDelivery()) {
+                <app-delivery-panel animate.enter="motion-safe:animate-fade-up" />
+              } @else {
+                <!-- Checkout is not built yet, so the button is a visible, explained dead end -->
+                <div animate.enter="motion-safe:animate-fade-up">
+                  <button
+                    type="button"
+                    disabled
+                    aria-describedby="checkout-note"
+                    class="inline-flex min-h-11 w-full cursor-not-allowed items-center justify-center rounded-full bg-day-ink px-7 font-display text-[17px] text-dusk-card opacity-50"
+                    data-testid="cart-checkout"
+                  >
+                    Checkout
+                  </button>
+                  <p
+                    id="checkout-note"
+                    class="mt-2 text-center font-sans text-[15px] text-day-ink-soft"
+                    data-testid="cart-checkout-note"
+                  >
+                    Online checkout is coming soon
+                  </p>
+                </div>
+              }
+            </app-cart-summary>
+          </div>
+
+          <!-- Torn bottom edge: the ticket colour masked into a row of 12px triangles (a data URI, so no document-relative reference breaks under base href) -->
+          <div
+            aria-hidden="true"
+            class="-mt-px block h-3 w-full bg-current text-dusk-card [mask-image:url(data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%2712%27%20height=%2712%27%3E%3Cpath%20d=%27M0%200H12L6%2012Z%27/%3E%3C/svg%3E)] [mask-repeat:repeat-x] [mask-size:12px_12px]"
+            data-testid="cart-tear-edge"
+            data-intro-edge
+          ></div>
         </div>
 
-        <!-- Small screens: subtotal stays in view while the lines scroll -->
+        <!-- Small screens: subtotal stays in view while the lines scroll; fades in at the reveal and counts up with the summary -->
         <div
           aria-hidden="true"
-          class="sticky bottom-3 z-30 mt-4 flex items-center justify-between rounded-2xl bg-dusk-card px-5 py-3 text-day-ink shadow-lg sm:hidden"
+          class="sticky bottom-3 z-30 mt-4 flex items-center justify-between rounded-2xl bg-dusk-card px-5 py-3 text-day-ink shadow-lg transition-opacity duration-200 motion-reduce:transition-none sm:hidden"
+          [class]="contentHidden() ? 'opacity-0' : ''"
           data-testid="cart-sticky-bar"
         >
           <span class="font-sans text-[16px] text-day-ink-soft">Subtotal</span>
-          <span class="font-sans text-[20px] font-bold">{{ subtotalText() }}</span>
+          <app-tweened-amount
+            class="font-sans text-[20px] font-bold"
+            [amountMinor]="subtotalMinor()"
+            [currency]="cart.currency()"
+          />
         </div>
       </div>
     }
