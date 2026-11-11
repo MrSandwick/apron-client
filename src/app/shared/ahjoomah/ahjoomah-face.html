@@ -1,0 +1,160 @@
+<!-- The one-shot hop replays only when the parent re-creates this component (for example via @if) -->
+<svg
+  viewBox="0 0 64 64"
+  class="block h-full w-full overflow-visible"
+  [class]="motionClass()"
+  focusable="false"
+  data-testid="ahjoomah-face"
+>
+  <!-- Amber badge behind the head -->
+  <circle cx="32" cy="32" r="31" class="fill-brand-amber" />
+
+  <!-- Extras that sit above the head: sleepy z marks -->
+  @if (mood() === 'sleepy') {
+    <g
+      class="fill-none stroke-mascot-hair"
+      stroke-width="1.6"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      data-part="zzz"
+    >
+      <path d="M45 7h5l-5 5h5" />
+      <path d="M53 15h3.4l-3.4 3.4h3.4" />
+    </g>
+  }
+
+  <!-- Hair: rounded dome that drops into a short bob -->
+  <path d="M13 29a19 19 0 0 1 38 0v10q0 3-3 3H16q-3 0-3-3z" class="fill-mascot-hair" />
+
+  <!-- Face, with the pointed parting cut into the hairline -->
+  <path d="M15.5 33Q17 24 32 17q15 7 16.5 16a16.5 16.5 0 0 1-33 0z" class="fill-mascot-skin" />
+
+  @switch (mood()) {
+    @case ('sleepy') {
+      <!-- Flat, slightly drooping closed-eye lines -->
+      <g
+        class="fill-none stroke-mascot-hair"
+        stroke-width="2.6"
+        stroke-linecap="round"
+        data-part="eyes"
+      >
+        <path d="M21.5 36q3.5 1.8 7 0M35.5 36q3.5 1.8 7 0" />
+      </g>
+
+      <!-- Soft blush -->
+      <g class="fill-mascot-blush" data-part="blush">
+        <circle cx="22" cy="41.5" r="2.2" />
+        <circle cx="42" cy="41.5" r="2.2" />
+      </g>
+
+      <!-- Small round 'o' mouth -->
+      <g data-part="mouth">
+        <ellipse cx="32" cy="42" rx="1.6" ry="2" class="fill-mascot-hair" data-part="mouth-o" />
+      </g>
+    }
+    @case ('waving') {
+      <!-- Wink: left eye open, right eye a closed arc -->
+      <g data-part="eyes">
+        <g data-part="wink">
+          <circle cx="25" cy="35.5" r="2.6" class="fill-mascot-hair" />
+          <circle cx="25.9" cy="34.6" r="0.8" class="fill-white" />
+        </g>
+        <path
+          d="M35.5 36.5q3.5-4 7 0"
+          class="fill-none stroke-mascot-hair"
+          stroke-width="3"
+          stroke-linecap="round"
+        />
+      </g>
+
+      <!-- Regular blush -->
+      <g class="fill-mascot-blush" data-part="blush">
+        <circle cx="22" cy="41.5" r="2.2" />
+        <circle cx="42" cy="41.5" r="2.2" />
+      </g>
+
+      <!-- Small closed smile -->
+      <g data-part="mouth">
+        <path
+          d="M29 40.2q3 2.6 6 0"
+          class="fill-none stroke-mascot-hair"
+          stroke-width="1.6"
+          stroke-linecap="round"
+        />
+      </g>
+
+      <!-- Waving hand beside the head; the group pivots at its bottom-left, the wrist -->
+      <g
+        class="[transform-box:fill-box] origin-bottom-left motion-safe:animate-mascot-wave"
+        data-part="hand"
+      >
+        <path
+          d="M52.5 41L55.5 34"
+          class="fill-none stroke-mascot-skin"
+          stroke-width="3.4"
+          stroke-linecap="round"
+        />
+        <circle
+          cx="56"
+          cy="30.5"
+          r="4.4"
+          class="fill-mascot-skin stroke-mascot-hair"
+          stroke-width="1.4"
+        />
+      </g>
+    }
+    @default {
+      <!-- Delighted: the logo's closed happy arcs -->
+      <g
+        class="fill-none stroke-mascot-hair"
+        stroke-width="3"
+        stroke-linecap="round"
+        data-part="eyes"
+      >
+        <path d="M21.5 36.5q3.5-4 7 0M35.5 36.5q3.5-4 7 0" />
+      </g>
+
+      <!-- Stronger blush -->
+      <g class="fill-mascot-blush" data-part="blush">
+        <circle cx="21.5" cy="41.5" r="3.2" />
+        <circle cx="42.5" cy="41.5" r="3.2" />
+      </g>
+
+      <!-- Open smile -->
+      <g data-part="mouth">
+        <path d="M28 39.8q4 6 8 0z" class="fill-mascot-hair" data-part="smile" />
+      </g>
+    }
+  }
+
+  <!-- Rolling pin across the chin: handles, then the barrel -->
+  <g data-part="pin">
+    <rect
+      x="6"
+      y="46.5"
+      width="9"
+      height="3.4"
+      rx="1.7"
+      class="fill-kitchen-wood-dark stroke-mascot-hair"
+      stroke-width="1.4"
+    />
+    <rect
+      x="49"
+      y="46.5"
+      width="9"
+      height="3.4"
+      rx="1.7"
+      class="fill-kitchen-wood-dark stroke-mascot-hair"
+      stroke-width="1.4"
+    />
+    <rect
+      x="14"
+      y="45"
+      width="36"
+      height="6.4"
+      rx="3.2"
+      class="fill-mascot-pin stroke-mascot-hair"
+      stroke-width="1.6"
+    />
+  </g>
+</svg>

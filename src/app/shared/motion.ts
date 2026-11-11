@@ -2,7 +2,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 // Query every motion build is gated on
-const MOTION_OK = '(prefers-reduced-motion: no-preference)';
+export const MOTION_OK ='(prefers-reduced-motion: no-preference)';
 
 // Shared entry point for scroll-driven motion. Registers ScrollTrigger and runs `build`
 // only when the visitor allows motion (prefers-reduced-motion: no-preference), so
@@ -17,8 +17,12 @@ export function whenMotionAllowed(build: () => void | (() => void), alsoWhen?: s
   return media;
 }
 
-// Whether motion is allowed right now (browser only). For one-off checks outside a build,
-// such as the 3D render loop deciding whether to spin.
+// Whether motion is allowed right now. For one-off checks outside a build, such as the 3D
+// render loop deciding whether to spin or a tween deciding whether to count. False on the
+// server, where matchMedia is missing, and when the visitor asks for reduced motion.
 export function motionAllowed(): boolean {
-  return typeof window !== 'undefined' && window.matchMedia(MOTION_OK).matches;
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+    return false;
+  }
+  return window.matchMedia(MOTION_OK).matches;
 }
