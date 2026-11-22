@@ -7,6 +7,11 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Server,
     headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' },
   },
+  // Reservations depend on the guest's clock and live availability, so the browser renders it
+  {
+    path: 'reservations',
+    renderMode: RenderMode.Client,
+  },
   {
     path: '**',
     renderMode: RenderMode.Prerender,

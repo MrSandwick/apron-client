@@ -1,0 +1,76 @@
+<!-- Native modal: focus is trapped, Escape closes it, and the backdrop sits behind the card -->
+<dialog
+  #dlg
+  aria-labelledby="cancel-dialog-title"
+  aria-describedby="cancel-dialog-text"
+  class="m-auto w-[calc(100%-2rem)] max-w-md bg-transparent p-0 text-brand-cream backdrop:bg-black/70"
+  data-testid="cancel-dialog"
+  (close)="onNativeClose()"
+  (click)="onDialogClick($event)"
+>
+  <!-- Card -->
+  <form
+    class="rounded-3xl border border-brand-amber/25 bg-brand-surface p-5 sm:p-7"
+    novalidate
+    (submit)="submit($event)"
+  >
+    <h2 id="cancel-dialog-title" class="font-display text-[24px] leading-tight text-brand-cream">
+      Cancel your reservation?
+    </h2>
+    <p id="cancel-dialog-text" class="mt-2 font-sans text-[15px] text-brand-muted">
+      To verify it is you, enter the phone number used for this reservation.
+    </p>
+
+    <!-- Phone check -->
+    <label for="cancel-phone" class="mt-5 mb-1.5 block font-sans text-[14px] font-bold">
+      Phone number
+    </label>
+    <input
+      id="cancel-phone"
+      type="tel"
+      autocomplete="tel"
+      inputmode="tel"
+      required
+      class="min-h-11 w-full rounded-xl border border-brand-cream/25 bg-brand-raised px-3 font-sans text-[16px] text-brand-cream"
+      [value]="phone()"
+      [attr.aria-invalid]="phoneError() ? 'true' : null"
+      [attr.aria-describedby]="phoneError() ? 'cancel-phone-error' : null"
+      data-testid="cancel-phone"
+      (input)="onInput($event)"
+    />
+    <p
+      id="cancel-phone-error"
+      aria-live="polite"
+      class="mt-1 min-h-5 font-sans text-[14px] text-brand-chili"
+    >
+      {{ phoneError() }}
+    </p>
+
+    <!-- Cancel failure other than the phone, announced when it appears -->
+    <div role="alert" class="empty:hidden" data-testid="cancel-error">
+      @if (error()) {
+        <p class="mt-2 font-sans text-[15px] text-brand-chili">{{ error() }}</p>
+      }
+    </div>
+
+    <!-- Keep the booking or go through with the cancel -->
+    <div class="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+      <button
+        type="button"
+        class="btn-ghost min-h-11"
+        data-testid="cancel-keep"
+        (click)="keep.emit()"
+      >
+        Keep
+      </button>
+      <button
+        type="submit"
+        class="btn-primary min-h-11 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:hover:translate-y-0 disabled:hover:bg-brand-amber"
+        [disabled]="pending()"
+        data-testid="cancel-confirm"
+      >
+        {{ pending() ? 'Canceling' : 'Yes, Cancel' }}
+      </button>
+    </div>
+  </form>
+</dialog>

@@ -16,6 +16,11 @@ export const routes: Routes = [
     title: "Your cart | Ahjoomah's",
     loadComponent: () => import('./pages/cart/cart').then((m) => m.CartPage),
   },
+  {
+    path: 'reservations',
+    title: "Reservations | Ahjoomah's",
+    loadComponent: () => import('./reservations/reservations').then((m) => m.ReservationsPage),
+  },
   // The old order link lands on the cart
   { path: 'order', redirectTo: 'cart', pathMatch: 'full' },
 ];

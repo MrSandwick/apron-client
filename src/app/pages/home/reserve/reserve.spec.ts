@@ -32,7 +32,7 @@ describe('HomeReserve', () => {
     expect(el.querySelector('img')).toBeNull();
   });
 
-  it('links "Reserve a Table" to /reserve and keeps the call CTA as a placeholder', () => {
+  it('links "Reserve a Table" to /reservations and keeps the call CTA as a placeholder', () => {
     const fixture = TestBed.createComponent(HomeReserve);
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
@@ -41,7 +41,7 @@ describe('HomeReserve', () => {
     const reserve = Array.from(el.querySelectorAll('a')).find((a) =>
       a.textContent?.includes('Reserve a Table'),
     );
-    expect(reserve?.getAttribute('href')).toBe('/reserve');
+    expect(reserve?.getAttribute('href')).toBe('/reservations');
 
     // No phone wired yet, so the call CTA stays a button.
     const call = Array.from(el.querySelectorAll('button')).find((b) =>

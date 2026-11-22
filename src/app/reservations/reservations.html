@@ -1,0 +1,79 @@
+<!-- Page on the dusk sky, like the cart -->
+<main
+  class="relative min-h-[70vh] bg-linear-to-b from-sky-twilight to-sky-night px-4 pt-10 pb-20 text-night-text sm:px-6 sm:pt-14"
+  data-testid="reservations-page"
+>
+  <div class="mx-auto max-w-[640px]">
+    <!-- Page heading -->
+    <header class="mb-8 text-center">
+      <p class="eyebrow">Reservations</p>
+      <h1 class="mt-2 font-display text-[32px] text-brand-cream sm:text-[40px]">Reserve a table</h1>
+      <p class="mt-2 font-sans text-[16px] text-night-text/80">
+        Pick a party size, a date and a time. We hold your table while you finish.
+      </p>
+    </header>
+
+    <!-- Current step, in a card -->
+    <div
+      class="rounded-3xl border border-brand-amber/15 bg-brand-surface p-5 shadow-xl shadow-black/30 sm:p-8"
+    >
+      @switch (step()) {
+        @case ('details') {
+          <app-details-step
+            [partySize]="partySize()"
+            [date]="date()"
+            [minDate]="minDate"
+            [slots]="slots()"
+            [slotsState]="slotsState()"
+            [slotsError]="slotsError()"
+            [selectedTime]="selectedTime()"
+            [holding]="holding()"
+            [error]="holdError()"
+            [notice]="notice()"
+            (partySizeChange)="setPartySize($event)"
+            (dateChange)="setDate($event)"
+            (slotSelect)="selectSlot($event)"
+            (reserveNow)="reserveNow()"
+            (retrySlots)="loadSlots()"
+          />
+        }
+        @case ('guest') {
+          @if (hold(); as h) {
+            <app-guest-step
+              [date]="heldDate()"
+              [time]="heldTime()"
+              [partySize]="h.partySize"
+              [expiresAt]="h.expiresAt"
+              [pending]="submitting()"
+              [error]="submitError()"
+              [fieldErrors]="submitFieldErrors()"
+              (submitted)="submitGuest($event)"
+              (changeSelection)="changeSelection()"
+              (expired)="expiredNotice()"
+            />
+          }
+        }
+        @case ('confirmation') {
+          <app-confirmation-step
+            [reservation]="reservation()"
+            [state]="reservationState()"
+            [error]="reservationError()"
+            (cancelRequested)="openCancel()"
+            (newReservation)="startOver()"
+            (retry)="retryReservation()"
+          />
+        }
+      }
+    </div>
+  </div>
+
+  <!-- Phone check before a cancel; native dialog, so it lives outside the card -->
+  <app-cancel-dialog
+    [open]="cancelOpen()"
+    [pending]="canceling()"
+    [error]="cancelError()"
+    [fieldErrors]="cancelFieldErrors()"
+    (keep)="keepReservation()"
+    (confirmCancel)="cancelReservation($event)"
+  />
+</main>
