@@ -1,0 +1,179 @@
+<!-- Step two: guest details and the hold summary -->
+<section aria-labelledby="guest-heading" data-testid="guest-step">
+  <h2
+    id="guest-heading"
+    tabindex="-1"
+    data-step-heading
+    class="font-display text-[26px] leading-tight text-brand-cream outline-none"
+  >
+    Complete your reservation
+  </h2>
+
+  <!-- Summary card: what is being held, and for how long -->
+  <div
+    class="mt-5 rounded-2xl border border-brand-amber/25 bg-brand-raised p-4"
+    data-testid="hold-summary"
+  >
+    <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 font-sans text-[16px]">
+      <dt class="text-brand-muted">Date</dt>
+      <dd class="font-bold text-brand-cream" data-testid="summary-date">{{ dateText() }}</dd>
+      <dt class="text-brand-muted">Time</dt>
+      <dd class="font-bold text-brand-cream" data-testid="summary-time">{{ timeText() }}</dd>
+      <dt class="text-brand-muted">Party size</dt>
+      <dd class="font-bold text-brand-cream" data-testid="summary-party">
+        {{ guestsLabel(partySize()) }}
+      </dd>
+    </dl>
+
+    <!-- Countdown: the clock is read on demand; the status line below speaks only about once a minute -->
+    @if (remaining() !== null) {
+      <p class="mt-3 border-t border-brand-cream/10 pt-3 font-sans text-[15px] text-brand-cream">
+        Table held for
+        <span
+          role="timer"
+          class="font-display text-[20px] tabular-nums"
+          [class]="urgent() ? 'text-brand-chili' : 'text-brand-amber'"
+          data-testid="countdown"
+          >{{ countdownText() }}</span
+        >
+      </p>
+    }
+    <p role="status" aria-live="polite" class="sr-only" data-testid="countdown-status">
+      {{ announcement() }}
+    </p>
+
+    <!-- Go back and pick another time -->
+    <button
+      type="button"
+      class="mt-3 inline-flex min-h-11 cursor-pointer items-center font-sans text-[15px] font-bold text-brand-amber underline underline-offset-4 hover:text-brand-cream"
+      data-testid="change-selection"
+      (click)="changeSelection.emit()"
+    >
+      Change selection
+    </button>
+  </div>
+
+  <!-- Guest details form -->
+  <form class="mt-6 grid gap-4" [formGroup]="form" (ngSubmit)="submit($event)" novalidate>
+    <!-- First and last name side by side from sm up -->
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div>
+        <label for="guest-first-name" class="mb-1.5 block font-sans text-[14px] font-bold">
+          First name <span class="text-brand-muted" aria-hidden="true">(required)</span>
+        </label>
+        <input
+          id="guest-first-name"
+          type="text"
+          formControlName="firstName"
+          autocomplete="given-name"
+          required
+          data-field="firstName"
+          class="min-h-11 w-full rounded-xl border border-brand-cream/25 bg-brand-raised px-3 font-sans text-[16px] text-brand-cream"
+          [attr.aria-invalid]="errorText('firstName') ? 'true' : null"
+          [attr.aria-describedby]="errorText('firstName') ? 'guest-first-name-error' : null"
+        />
+        <p
+          id="guest-first-name-error"
+          aria-live="polite"
+          class="mt-1 min-h-5 font-sans text-[14px] text-brand-chili"
+        >
+          {{ errorText('firstName') }}
+        </p>
+      </div>
+
+      <div>
+        <label for="guest-last-name" class="mb-1.5 block font-sans text-[14px] font-bold">
+          Last name <span class="text-brand-muted" aria-hidden="true">(optional)</span>
+        </label>
+        <input
+          id="guest-last-name"
+          type="text"
+          formControlName="lastName"
+          autocomplete="family-name"
+          data-field="lastName"
+          class="min-h-11 w-full rounded-xl border border-brand-cream/25 bg-brand-raised px-3 font-sans text-[16px] text-brand-cream"
+          [attr.aria-invalid]="errorText('lastName') ? 'true' : null"
+          [attr.aria-describedby]="errorText('lastName') ? 'guest-last-name-error' : null"
+        />
+        <p
+          id="guest-last-name-error"
+          aria-live="polite"
+          class="mt-1 min-h-5 font-sans text-[14px] text-brand-chili"
+        >
+          {{ errorText('lastName') }}
+        </p>
+      </div>
+    </div>
+
+    <div>
+      <label for="guest-phone" class="mb-1.5 block font-sans text-[14px] font-bold">
+        Phone <span class="text-brand-muted" aria-hidden="true">(required)</span>
+      </label>
+      <input
+        id="guest-phone"
+        type="tel"
+        formControlName="phone"
+        autocomplete="tel"
+        inputmode="tel"
+        required
+        data-field="phone"
+        class="min-h-11 w-full rounded-xl border border-brand-cream/25 bg-brand-raised px-3 font-sans text-[16px] text-brand-cream"
+        [attr.aria-invalid]="errorText('phone') ? 'true' : null"
+        [attr.aria-describedby]="errorText('phone') ? 'guest-phone-error' : null"
+      />
+      <p
+        id="guest-phone-error"
+        aria-live="polite"
+        class="mt-1 min-h-5 font-sans text-[14px] text-brand-chili"
+      >
+        {{ errorText('phone') }}
+      </p>
+    </div>
+
+    <div>
+      <label for="guest-email" class="mb-1.5 block font-sans text-[14px] font-bold">
+        Email <span class="text-brand-muted" aria-hidden="true">(required)</span>
+      </label>
+      <input
+        id="guest-email"
+        type="email"
+        formControlName="email"
+        autocomplete="email"
+        required
+        data-field="email"
+        class="min-h-11 w-full rounded-xl border border-brand-cream/25 bg-brand-raised px-3 font-sans text-[16px] text-brand-cream"
+        [attr.aria-invalid]="errorText('email') ? 'true' : null"
+        [attr.aria-describedby]="errorText('email') ? 'guest-email-error' : null"
+      />
+      <p
+        id="guest-email-error"
+        aria-live="polite"
+        class="mt-1 min-h-5 font-sans text-[14px] text-brand-chili"
+      >
+        {{ errorText('email') }}
+      </p>
+    </div>
+
+    <!-- Hold policy -->
+    <p class="font-sans text-[14px] text-brand-muted">
+      We hold your table for {{ holdMinutes }} min. Please call us if you are running late.
+    </p>
+
+    <!-- Confirm failure, announced when it appears -->
+    <div role="alert" class="empty:hidden" data-testid="confirm-error">
+      @if (error()) {
+        <p class="font-sans text-[15px] text-brand-chili">{{ error() }}</p>
+      }
+    </div>
+
+    <!-- Submit; disabled while the request is in flight -->
+    <button
+      type="submit"
+      class="btn-primary min-h-11 w-full disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:hover:translate-y-0 disabled:hover:bg-brand-amber sm:w-auto"
+      [disabled]="pending()"
+      data-testid="complete-reservation"
+    >
+      {{ pending() ? 'Completing' : 'Complete Reservation' }}
+    </button>
+  </form>
+</section>

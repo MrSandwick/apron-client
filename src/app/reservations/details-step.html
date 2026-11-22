@@ -1,0 +1,162 @@
+<!-- Step one: pick party size, date and time -->
+<section aria-labelledby="details-heading" data-testid="details-step">
+  <h2
+    id="details-heading"
+    tabindex="-1"
+    data-step-heading
+    class="font-display text-[26px] leading-tight text-brand-cream outline-none"
+  >
+    Find a table
+  </h2>
+
+  <!-- Notice after being sent back (for example an expired hold); announced when it appears -->
+  <div role="alert" class="empty:hidden" data-testid="details-notice">
+    @if (notice()) {
+      <p
+        class="mt-4 rounded-2xl border border-brand-amber/40 bg-brand-amber/10 px-4 py-3 font-sans text-[15px] text-brand-cream"
+      >
+        {{ notice() }}
+      </p>
+    }
+  </div>
+
+  <!-- Party size and date side by side from sm up -->
+  <div class="mt-5 grid gap-4 sm:grid-cols-2">
+    <div>
+      <label for="party-size" class="mb-1.5 block font-sans text-[14px] font-bold text-brand-cream">
+        Party size
+      </label>
+      <select
+        id="party-size"
+        class="min-h-11 w-full cursor-pointer rounded-xl border border-brand-cream/25 bg-brand-raised px-3 font-sans text-[16px] text-brand-cream"
+        (change)="onParty($event)"
+        data-testid="party-size"
+      >
+        @for (n of partyOptions; track n) {
+          <option [value]="n" [selected]="n === partySize()">{{ guestsLabel(n) }}</option>
+        }
+      </select>
+    </div>
+
+    <div>
+      <label for="visit-date" class="mb-1.5 block font-sans text-[14px] font-bold text-brand-cream">
+        Date
+      </label>
+      <input
+        id="visit-date"
+        type="date"
+        class="min-h-11 w-full rounded-xl border border-brand-cream/25 bg-brand-raised px-3 font-sans text-[16px] text-brand-cream scheme-dark"
+        [min]="minDate()"
+        [value]="date()"
+        [attr.aria-describedby]="datePast() ? 'visit-date-error' : null"
+        [attr.aria-invalid]="datePast() ? 'true' : null"
+        (change)="onDate($event)"
+        data-testid="visit-date"
+      />
+      <p
+        id="visit-date-error"
+        aria-live="polite"
+        class="mt-1 min-h-5 font-sans text-[14px] text-brand-chili"
+      >
+        @if (datePast()) {
+          Choose today or a later date
+        }
+      </p>
+    </div>
+  </div>
+
+  <!-- Time slots for the chosen date and party -->
+  <fieldset class="mt-4 min-w-0" [attr.aria-busy]="slotsState() === 'loading'">
+    <legend class="mb-2 p-0 font-sans text-[14px] font-bold text-brand-cream">
+      Available times
+    </legend>
+
+    @switch (slotsState()) {
+      @case ('loading') {
+        <!-- Skeleton grid keeps the layout steady while times load -->
+        <p role="status" class="sr-only">Loading available times</p>
+        <ul class="grid grid-cols-3 gap-2 sm:grid-cols-4" aria-hidden="true">
+          @for (n of skeletonCells; track n) {
+            <li class="h-11 rounded-xl bg-brand-raised motion-safe:animate-pulse"></li>
+          }
+        </ul>
+      }
+      @case ('error') {
+        <!-- The times could not be loaded; offer a retry -->
+        <div role="alert" class="rounded-2xl border border-brand-chili/50 px-4 py-3">
+          <p class="font-sans text-[15px] text-brand-cream" data-testid="slots-error">
+            {{ slotsError() }}
+          </p>
+          <button type="button" class="btn-ghost mt-3 min-h-11 px-6" (click)="retrySlots.emit()">
+            Try again
+          </button>
+        </div>
+      }
+      @case ('ready') {
+        @if (slots().length === 0) {
+          <p class="font-sans text-[15px] text-brand-muted" data-testid="slots-empty">
+            There are no times listed for this date. Try another day.
+          </p>
+        } @else {
+          <ul class="grid grid-cols-3 gap-2 sm:grid-cols-4" data-testid="slot-grid">
+            @for (slot of slots(); track slot.time) {
+              <li>
+                <button
+                  type="button"
+                  class="min-h-11 w-full rounded-xl border px-1 py-1.5 font-sans text-[15px] font-bold transition-colors motion-reduce:transition-none"
+                  [class]="slotClass(slot)"
+                  [disabled]="!slot.available"
+                  [attr.aria-pressed]="slot.available ? slot.time === selectedTime() : null"
+                  data-testid="slot"
+                  (click)="pick(slot)"
+                >
+                  {{ timeLabel(slot.time) }}
+                  @if (!slot.available) {
+                    <span class="sr-only">, unavailable</span>
+                  }
+                  @if (slot.available && slot.manualApproval) {
+                    <span class="block text-[11px] leading-none font-semibold">By request</span>
+                  }
+                </button>
+              </li>
+            }
+          </ul>
+          @if (anyManual()) {
+            <p class="mt-2 font-sans text-[13px] text-brand-muted">
+              Times marked By request are confirmed by the restaurant, by email.
+            </p>
+          }
+        }
+      }
+      @default {
+        <p class="font-sans text-[15px] text-brand-muted">Choose a date to see the times.</p>
+      }
+    }
+  </fieldset>
+
+  <!-- Hold failure, announced when it appears -->
+  <div role="alert" class="empty:hidden" data-testid="hold-error">
+    @if (error()) {
+      <p class="mt-4 font-sans text-[15px] text-brand-chili">{{ error() }}</p>
+    }
+  </div>
+
+  <!-- Primary action; stays disabled until a free slot is chosen -->
+  <div class="mt-6">
+    <button
+      type="button"
+      class="btn-primary min-h-11 w-full disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:hover:translate-y-0 disabled:hover:bg-brand-amber sm:w-auto"
+      [disabled]="!selectedTime() || holding()"
+      [attr.aria-describedby]="selectedTime() ? null : 'reserve-hint'"
+      data-testid="reserve-now"
+      (click)="reserveNow.emit()"
+    >
+      {{ holding() ? 'Holding your table' : 'Reserve Now' }}
+    </button>
+    @if (!selectedTime()) {
+      <p id="reserve-hint" class="mt-2 font-sans text-[14px] text-brand-muted">
+        Pick a time to continue.
+      </p>
+    }
+  </div>
+</section>
