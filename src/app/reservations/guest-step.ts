@@ -28,6 +28,8 @@ import {
 import { GuestDetails } from './reservation.models';
 
 const HOLD_MINUTES = 10;
+// Slack on top of the hold length before a browser-versus-server clock gap is treated as skew
+const SKEW_ALLOWANCE_MINUTES = 2;
 
 type GuestField = 'firstName' | 'lastName' | 'phone' | 'email';
 
@@ -96,13 +98,23 @@ export class GuestStep {
   // The API's field messages, each dropped as soon as the guest edits that field
   private readonly serverErrors = signal<Record<string, string>>({});
 
-  // Current time, ticked once a second in the browser
-  private readonly now = signal(Date.now());
-  private readonly expiryMs = computed(() => Date.parse(this.expiresAt()));
+  // Monotonic clock reading, ticked once a second in the browser
+  private readonly now = signal(performance.now());
+  // When the hold ends on the monotonic clock, or null when expiresAt is unusable. Worked out once
+  // per hold: the browser's wall clock may be skewed, so only trust the gap if it is plausible
+  private readonly deadline = computed(() => {
+    const end = Date.parse(this.expiresAt());
+    if (!Number.isFinite(end)) {
+      return null;
+    }
+    const gap = end - Date.now();
+    const sane = gap >= 0 && gap <= (HOLD_MINUTES + SKEW_ALLOWANCE_MINUTES) * 60_000;
+    return performance.now() + (sane ? gap : HOLD_MINUTES * 60_000);
+  });
   // Whole seconds left on the hold, or null when expiresAt is unusable
   protected readonly remaining = computed(() => {
-    const end = this.expiryMs();
-    return Number.isFinite(end) ? Math.max(0, Math.ceil((end - this.now()) / 1000)) : null;
+    const deadline = this.deadline();
+    return deadline === null ? null : Math.max(0, Math.ceil((deadline - this.now()) / 1000));
   });
   protected readonly countdownText = computed(() => {
     const left = this.remaining();
@@ -136,8 +148,8 @@ export class GuestStep {
 
     // Tick the clock in the browser only; the server never starts a timer
     afterNextRender(() => {
-      this.now.set(Date.now());
-      const timer = setInterval(() => this.now.set(Date.now()), 1000);
+      this.now.set(performance.now());
+      const timer = setInterval(() => this.now.set(performance.now()), 1000);
       destroyRef.onDestroy(() => clearInterval(timer));
     });
 

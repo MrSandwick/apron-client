@@ -41,12 +41,13 @@ export class ReservationsPage {
   private readonly route = inject(ActivatedRoute);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
-  protected readonly minDate = todayIso();
+  // Today in the restaurant's zone; refreshed on demand so a tab left open past midnight catches up
+  protected readonly minDate = signal(todayIso());
   protected readonly step = signal<Step>('details');
 
   // Step one
   protected readonly partySize = signal(DEFAULT_PARTY_SIZE);
-  protected readonly date = signal(this.minDate);
+  protected readonly date = signal(this.minDate());
   protected readonly slots = signal<Slot[]>([]);
   protected readonly slotsState = signal<SlotsState>('idle');
   protected readonly slotsError = signal('');
@@ -109,6 +110,8 @@ export class ReservationsPage {
   }
 
   protected setDate(date: string): void {
+    // Catch up with midnight first, so the typed date is judged against the new today
+    this.refreshMinDate();
     this.date.set(date);
     this.holdError.set('');
     this.loadSlots();
@@ -119,12 +122,22 @@ export class ReservationsPage {
     this.holdError.set('');
   }
 
+  // Focusing the date input re-reads today; if the date moved, its times are stale
+  protected onDateFocus(): void {
+    const before = this.date();
+    this.refreshMinDate();
+    if (this.date() !== before) {
+      this.loadSlots();
+    }
+  }
+
   // Fetches the times for the chosen date and party; a newer request replaces an older one
   protected loadSlots(): void {
     this.slotsSub?.unsubscribe();
     this.selectedTime.set(null);
+    this.refreshMinDate();
     const date = this.date();
-    if (!date || date < this.minDate) {
+    if (!date || date < this.minDate()) {
       this.slots.set([]);
       this.slotsState.set('idle');
       return;
@@ -148,6 +161,13 @@ export class ReservationsPage {
   protected reserveNow(): void {
     const time = this.selectedTime();
     if (!time || this.holding()) {
+      return;
+    }
+    // Midnight passed since the times were loaded: show the new day's times instead of holding
+    const pickedDate = this.date();
+    this.refreshMinDate();
+    if (this.date() !== pickedDate || pickedDate < this.minDate()) {
+      this.loadSlots();
       return;
     }
     const date = this.date();
@@ -329,6 +349,21 @@ export class ReservationsPage {
     this.submitError.set('');
     this.step.set('details');
     this.loadSlots();
+  }
+
+  // Re-reads today; a signal ignores an unchanged value, so this costs nothing until midnight
+  private refreshMinDate(): void {
+    const today = todayIso();
+    const previous = this.minDate();
+    if (today === previous) {
+      return;
+    }
+    this.minDate.set(today);
+    // A date left on the old minimum moves to the new one; a date typed before it stays flagged
+    const date = this.date();
+    if (date >= previous && date < today) {
+      this.date.set(today);
+    }
   }
 
   // Puts the booking id in the address (or takes it out) without losing other parameters

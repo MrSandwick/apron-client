@@ -22,7 +22,7 @@
           <app-details-step
             [partySize]="partySize()"
             [date]="date()"
-            [minDate]="minDate"
+            [minDate]="minDate()"
             [slots]="slots()"
             [slotsState]="slotsState()"
             [slotsError]="slotsError()"
@@ -32,6 +32,7 @@
             [notice]="notice()"
             (partySizeChange)="setPartySize($event)"
             (dateChange)="setDate($event)"
+            (dateFocus)="onDateFocus()"
             (slotSelect)="selectSlot($event)"
             (reserveNow)="reserveNow()"
             (retrySlots)="loadSlots()"

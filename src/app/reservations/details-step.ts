@@ -31,6 +31,8 @@ export class DetailsStep {
 
   readonly partySizeChange = output<number>();
   readonly dateChange = output<string>();
+  // The date input got focus, so the page can refresh what "today" is
+  readonly dateFocus = output<void>();
   readonly slotSelect = output<string>();
   readonly reserveNow = output<void>();
   readonly retrySlots = output<void>();
@@ -50,6 +52,11 @@ export class DetailsStep {
 
   protected onDate(event: Event): void {
     this.dateChange.emit((event.target as HTMLInputElement).value);
+  }
+
+  // Unique per slot: the daylight-saving fall-back hour lists 01:30 twice, so time alone repeats
+  protected slotKey(slot: Slot): string {
+    return `${slot.startDate ?? ''}|${slot.time}`;
   }
 
   protected pick(slot: Slot): void {

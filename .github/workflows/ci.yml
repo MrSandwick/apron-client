@@ -22,9 +22,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -32,7 +32,7 @@ jobs:
       - run: npm ci --prefer-offline --no-audit --no-fund
 
       # Angular's incremental build cache, keyed on dependencies and config
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: .angular/cache
           key: ng-${{ runner.os }}-${{ hashFiles('package-lock.json', 'angular.json') }}-${{ github.sha }}
