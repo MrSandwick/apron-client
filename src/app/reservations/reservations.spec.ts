@@ -304,8 +304,8 @@ describe('ReservationsPage', () => {
   // The countdown reaching zero sends the guest back with a clear message
   it('returns to step one with a notice when the hold expires', async () => {
     const { el, http, fixture } = await setupWithSlots();
-    // Fake only the clock and the countdown's interval, so Angular's own scheduling is untouched
-    vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] });
+    // Fake only the clocks and the countdown's interval, so Angular's own scheduling is untouched
+    vi.useFakeTimers({ toFake: ['Date', 'performance', 'setInterval', 'clearInterval'] });
     reserve(fixture, el);
     http.expectOne(HOLDS_URL).flush(holdBody(5000));
     fixture.detectChanges();
@@ -368,6 +368,88 @@ describe('ReservationsPage', () => {
     http.expectOne((r) => r.url === SLOTS_URL).flush(slotsBody(todayIso()));
     fixture.detectChanges();
     expect(byId(el, 'details-step')).toBeTruthy();
+  });
+});
+
+describe('ReservationsPage left open past midnight', () => {
+  // 23:30 and 00:30 in Chicago on either side of midnight (winter, so the offset is -06:00)
+  const BEFORE = { at: '2026-01-15T05:30:00Z', day: '2026-01-14' };
+  const AFTER = { at: '2026-01-15T06:30:00Z', day: '2026-01-15' };
+
+  // Opens the page just before midnight and answers the first slots request
+  async function openBeforeMidnight() {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(BEFORE.at));
+    const ctx = await setup();
+    ctx.http
+      .expectOne((r) => r.url === SLOTS_URL && r.params.get('date') === BEFORE.day)
+      .flush(slotsBody(BEFORE.day));
+    ctx.fixture.detectChanges();
+    return ctx;
+  }
+
+  afterEach(() => {
+    // Put the real clock back so later specs are unaffected
+    vi.useRealTimers();
+    TestBed.inject(HttpTestingController).verify();
+  });
+
+  // Focusing the date input after midnight moves the default date and the minimum to the new day
+  it('refreshes the minimum and the default date when the date input gets focus', async () => {
+    const { el, http, fixture } = await openBeforeMidnight();
+    const input = byId(el, 'visit-date') as HTMLInputElement;
+    expect(input.min).toBe(BEFORE.day);
+
+    vi.setSystemTime(new Date(AFTER.at));
+    input.dispatchEvent(new Event('focus'));
+    http
+      .expectOne((r) => r.url === SLOTS_URL && r.params.get('date') === AFTER.day)
+      .flush(slotsBody(AFTER.day));
+    fixture.detectChanges();
+    expect(input.min).toBe(AFTER.day);
+    expect(input.value).toBe(AFTER.day);
+  });
+
+  // A slot request never carries yesterday's date once midnight has passed
+  it('requests slots for the new day when the party size changes after midnight', async () => {
+    const { el, http, fixture } = await openBeforeMidnight();
+    vi.setSystemTime(new Date(AFTER.at));
+    const select = byId(el, 'party-size') as HTMLSelectElement;
+    select.value = '3';
+    select.dispatchEvent(new Event('change'));
+    const req = http.expectOne((r) => r.url === SLOTS_URL);
+    expect(req.request.params.get('date')).toBe(AFTER.day);
+    req.flush(slotsBody(AFTER.day, 3));
+    fixture.detectChanges();
+    expect((byId(el, 'visit-date') as HTMLInputElement).min).toBe(AFTER.day);
+  });
+
+  // A date typed after midnight that is now in the past is flagged and never requested
+  it('does not request slots for a date that became past', async () => {
+    const { el, http, fixture } = await openBeforeMidnight();
+    vi.setSystemTime(new Date(AFTER.at));
+    const input = byId(el, 'visit-date') as HTMLInputElement;
+    input.value = BEFORE.day;
+    input.dispatchEvent(new Event('change'));
+    http.expectNone((r) => r.url === SLOTS_URL);
+    fixture.detectChanges();
+    expect(el.textContent).toContain('Choose today or a later date');
+    expect(input.min).toBe(AFTER.day);
+  });
+
+  // A pick made before midnight is not held for the old day; the new day's times load instead
+  it('reloads slots instead of holding when Reserve Now is pressed after midnight', async () => {
+    const { el, http, fixture } = await openBeforeMidnight();
+    el.querySelectorAll<HTMLButtonElement>('[data-testid="slot"]')[0].click();
+    fixture.detectChanges();
+    vi.setSystemTime(new Date(AFTER.at));
+    byId(el, 'reserve-now')!.click();
+    http.expectNone(HOLDS_URL);
+    http
+      .expectOne((r) => r.url === SLOTS_URL && r.params.get('date') === AFTER.day)
+      .flush(slotsBody(AFTER.day));
+    fixture.detectChanges();
+    expect((byId(el, 'reserve-now') as HTMLButtonElement).disabled).toBe(true);
   });
 });
 

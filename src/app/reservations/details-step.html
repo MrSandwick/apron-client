@@ -51,6 +51,7 @@
         [attr.aria-describedby]="datePast() ? 'visit-date-error' : null"
         [attr.aria-invalid]="datePast() ? 'true' : null"
         (change)="onDate($event)"
+        (focus)="dateFocus.emit()"
         data-testid="visit-date"
       />
       <p
@@ -99,7 +100,7 @@
           </p>
         } @else {
           <ul class="grid grid-cols-3 gap-2 sm:grid-cols-4" data-testid="slot-grid">
-            @for (slot of slots(); track slot.time) {
+            @for (slot of slots(); track slotKey(slot)) {
               <li>
                 <button
                   type="button"
