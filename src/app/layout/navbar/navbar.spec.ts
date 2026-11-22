@@ -31,7 +31,7 @@ describe('Navbar', () => {
     const hrefs = Array.from(el.querySelectorAll('a')).map((a) => a.getAttribute('href'));
     expect(hrefs).toContain('/home');
     expect(hrefs).toContain('/menu');
-    expect(hrefs).toContain('/reserve');
+    expect(hrefs).toContain('/reservations');
     expect(hrefs).toContain('/cart');
     expect(hrefs).not.toContain('/order');
   });
@@ -215,7 +215,7 @@ describe('Navbar', () => {
     const hrefs = Array.from(panel!.querySelectorAll('a')).map((a) => a.getAttribute('href'));
     expect(hrefs).toContain('/home');
     expect(hrefs).toContain('/menu');
-    expect(hrefs).toContain('/reserve');
+    expect(hrefs).toContain('/reservations');
   });
 
   it('collapses the mobile menu again when the toggle is pressed twice', () => {

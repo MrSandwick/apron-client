@@ -46,13 +46,13 @@ describe('HomeHero', () => {
     expect(toggle?.getAttribute('aria-pressed')).toBe('false');
   });
 
-  it('links the CTAs to /reserve and /menu', () => {
+  it('links the CTAs to /reservations and /menu', () => {
     const fixture = TestBed.createComponent(HomeHero);
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
     // Both CTAs are anchors; assert their resolved routes.
     const hrefs = Array.from(el.querySelectorAll('a')).map((a) => a.getAttribute('href'));
-    expect(hrefs).toContain('/reserve');
+    expect(hrefs).toContain('/reservations');
     expect(hrefs).toContain('/menu');
   });
 
@@ -70,7 +70,7 @@ describe('HomeHero', () => {
     const fixture = TestBed.createComponent(HomeHero);
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
-    const reserve = el.querySelector<HTMLAnchorElement>('a[href="/reserve"]');
+    const reserve = el.querySelector<HTMLAnchorElement>('a[href="/reservations"]');
     expect(el.querySelector('[data-testid="eyes-open"]')).toBeTruthy();
 
     reserve?.dispatchEvent(new Event('mouseenter'));

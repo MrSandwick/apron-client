@@ -16,7 +16,7 @@ export class Footer {
   readonly quickLinks = [
     { label: 'Home', link: '/home' },
     { label: 'Menu', link: '/menu' },
-    { label: 'Reservations', link: '/reserve' },
+    { label: 'Reservations', link: '/reservations' },
     { label: 'Order Online', link: '/menu' },
   ];
 
