@@ -3,27 +3,15 @@ name: CI
 # Runs the unit suite and a production build, so a pass or fail is one short check to read
 # instead of someone re-running the tests by hand
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    paths:
-      - 'src/**'
-      - 'public/**'
-      - 'package*.json'
-      - 'angular.json'
-      - 'tsconfig*.json'
-      - '.github/workflows/ci.yml'
+  # Every push to any branch
   push:
-    branches: [main]
-    paths:
-      - 'src/**'
-      - 'public/**'
-      - 'package*.json'
-      - 'angular.json'
-      - 'tsconfig*.json'
+    branches: ['**']
+  # Manual run from the Actions tab
+  workflow_dispatch:
 
-# A newer push to the same branch cancels the older run
+# A newer push to the same ref cancels the older run so runs do not queue
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -31,8 +19,6 @@ permissions:
 
 jobs:
   test-and-build:
-    # Draft PRs wait until they are ready for review
-    if: github.event.pull_request.draft != true
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
