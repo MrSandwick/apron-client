@@ -92,6 +92,29 @@
   --animate-mascot-wave: mascot-wave 700ms ease-in-out 3;
   /* Cart backdrop eases in from transparent when it mounts after the intro */
   --animate-backdrop-in: backdrop-in 1800ms ease-out both;
+  /* Visit: amber ring spreading from the map pin (starts after the pin lands), and the open-now dot */
+  --animate-ripple: ripple 2.4s ease-out 1.2s infinite;
+  --animate-live-pulse: live-pulse 2s ease-out infinite;
+
+  @keyframes ripple {
+    from {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    to {
+      transform: scale(6);
+      opacity: 0;
+    }
+  }
+
+  @keyframes live-pulse {
+    from {
+      box-shadow: 0 0 0 0 rgb(74 222 128 / 0.6);
+    }
+    to {
+      box-shadow: 0 0 0 10px rgb(74 222 128 / 0);
+    }
+  }
 
   @keyframes receipt-print {
     from {
@@ -201,6 +224,11 @@
     }
   }
 }
+
+/* Scroll-reveal states set by the appInView directive: `armed` hides an element (and its
+   descendants' reveal classes) until it scrolls in; `in` is the shown state. With no state
+   attribute (SSR, no JS, reduced motion) everything stays visible. */
+@custom-variant armed (&:where([data-state='armed'], [data-state='armed'] *));
 
 @layer base {
   /* Freeze the page behind an open modal dialog */

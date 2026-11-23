@@ -63,6 +63,18 @@ describe('SectionCanvas', () => {
     expect(() => fixture.destroy()).not.toThrow();
   });
 
+  // The three-bottle variant takes the model and tears down safely when WebGL never starts
+  it('accepts the bottles variant with a model and destroys cleanly', async () => {
+    const fixture = TestBed.createComponent(SectionCanvas);
+    fixture.componentRef.setInput('variant', 'bottles');
+    fixture.componentRef.setInput('model', 'modelAssets/soju/scene.gltf');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.variant()).toBe('bottles');
+    expect(() => fixture.destroy()).not.toThrow();
+  });
+
   // The model input is optional and tears down safely even if its async load never runs
   it('accepts an optional bottle model and destroys cleanly', async () => {
     const fixture = TestBed.createComponent(SectionCanvas);
