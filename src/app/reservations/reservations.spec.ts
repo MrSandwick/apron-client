@@ -630,3 +630,48 @@ describe('ReservationsPage on a reservation link', () => {
     expect(byId(el, 'confirm-party')?.textContent).toContain('4 guests');
   });
 });
+
+describe('ReservationsPage companion scene', () => {
+  async function setupScene() {
+    await TestBed.configureTestingModule({
+      imports: [ReservationsPage],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
+    }).compileComponents();
+    const fixture = TestBed.createComponent(ReservationsPage);
+    fixture.detectChanges();
+    return { fixture, el: fixture.nativeElement as HTMLElement };
+  }
+
+  // The flat scene is a full-page backdrop directly inside main, hidden from assistive tech, with no 3D canvas
+  it('shows the flat scene as a backdrop covering the page and no 3D canvas', async () => {
+    const { el } = await setupScene();
+    const scene = byId(el, 'reservation-scene')!;
+    expect(scene.tagName.toLowerCase()).toBe('app-reservation-scene');
+    expect(scene.parentElement).toBe(byId(el, 'reservations-page'));
+    expect(scene.getAttribute('aria-hidden')).toBe('true');
+    expect(scene.classList.contains('absolute')).toBe(true);
+    expect(scene.classList.contains('inset-0')).toBe(true);
+    expect(scene.classList.contains('z-0')).toBe(true);
+    expect(el.querySelector('app-section-canvas')).toBeNull();
+  });
+
+  // The backdrop is decorative: it ignores the pointer and holds no controls, so it cannot block the form
+  it('does not take pointer events or hold any control', async () => {
+    const { el } = await setupScene();
+    const scene = byId(el, 'reservation-scene')!;
+    expect(scene.classList.contains('pointer-events-none')).toBe(true);
+    expect(scene.querySelector('button, input, select, a, [tabindex]')).toBeNull();
+  });
+
+  // The heading and card sit in a wrapper above the backdrop, so the form is the main object of the page
+  it('keeps the form card outside the backdrop and above it', async () => {
+    const { el } = await setupScene();
+    const scene = byId(el, 'reservation-scene')!;
+    const card = el.querySelector('app-details-step')!;
+    expect(scene.contains(card)).toBe(false);
+    const content = card.closest('.z-10');
+    expect(content).toBeTruthy();
+    expect(content?.classList.contains('relative')).toBe(true);
+    expect(content?.contains(el.querySelector('h1'))).toBe(true);
+  });
+});

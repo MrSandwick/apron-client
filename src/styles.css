@@ -65,6 +65,16 @@
   /* Solid card surface for dusk pages (/menu) so text never sits on a mid-tone */
   --color-dusk-card: #f6ede2;
 
+  /* Soju-house dining room for the reservation backdrop: wall, shadow, walnut table, brass
+     trim, paper card shade and the warm lantern light */
+  --color-dine-wall: #2b1d18;
+  --color-dine-shadow: #120c0a;
+  --color-dine-walnut: #6b3f22;
+  --color-dine-walnut-dark: #3a2213;
+  --color-dine-brass: #9c7a45;
+  --color-dine-paper-shade: #dcc59c;
+  --color-dine-flame: #ffe2a3;
+
   /* Wood tones for the engraved logo, rolling pin and dish art */
   --color-kitchen-wood: #b5763d;
   --color-kitchen-wood-dark: #7a4a22;
