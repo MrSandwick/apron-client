@@ -128,13 +128,10 @@
         ></div>
       </div>
 
-      <!-- Left setting: the RESERVED card is the hero in front, a steel water cup stands behind its right
-           shoulder, kimchi sits further back, and steel chopsticks with a spoon lie in front at an angle. The inner end of the cluster holds the
-           least important pieces, so the booking card never covers the card -->
-      <svg
-        viewBox="0 0 520 320"
-        class="absolute bottom-[calc(14px+24px)] lg:bottom-[calc(14px+40px)] left-[calc(3%+60px)] w-[50vw] max-w-[520px] overflow-visible sm:w-[52vw] lg:left-[calc(1%+68px)] lg:w-[min(36vw,680px)] lg:max-w-none"
-      >
+      <!-- Left setting: a wrapper the same size as the SVG pieces, so the CSS card and the SVG items
+           share one coordinate box. The RESERVED card is a real 3D tent in CSS (see below) -->
+      <div class="absolute bottom-[calc(14px+24px)] lg:bottom-[calc(14px+40px)] left-[calc(3%+60px)] w-[50vw] max-w-[520px] sm:w-[52vw] lg:left-[calc(1%+68px)] lg:w-[min(36vw,680px)] lg:max-w-none aspect-[520/320]">
+        <svg viewBox="0 0 520 320" class="absolute inset-0 size-full overflow-visible">
         <!-- Kimchi on a small plate, at the back -->
         <g transform="translate(424 232) scale(0.75)">
           <g data-prop data-order="3" class="opacity-90">
@@ -159,54 +156,53 @@
             <ellipse cx="0" cy="-96" rx="20" ry="3.4" class="fill-dine-shadow/75" />
           </g>
         </g>
-        <!-- RESERVED tent card, the hero, drawn in the reference's perspective on a 1208 by 864 canvas:
-             the front face turned away to the right so its far edge is taller, the back face showing as a
-             shaded wedge on the left, a lit top ridge, a thin base edge, an inset border, and the text
-             turned with the face. Scaled down into the setting by the outer group -->
-        <g transform="translate(150 302) scale(0.3) translate(-600 -785)">
-          <g data-prop>
-            <ellipse data-shadow cx="620" cy="760" rx="520" ry="34" transform="rotate(-12 620 760)" class="fill-black/50 blur-[8px]" />
-            <path d="M262 235L333 578L148 628Z" class="fill-brand-muted" />
-            <path d="M262 235L276 241L162 628L148 628Z" class="fill-dine-paper-shade" />
-            <path d="M378 784L1055 577L1058 589L384 797Z" class="fill-dine-paper-shade" />
-            <path d="M938 117L950 127L1058 589L1055 577Z" class="fill-brand-muted/70" />
-            <path d="M265 235L938 117L1055 577L378 784Z" fill="url(#rs-card-face)" />
-            <path d="M265 235L938 117" class="stroke-white/85" stroke-width="9" stroke-linecap="round" />
-            <path d="M343 296L912 188L996 520L425 688Z" class="fill-none stroke-sky-evening/35" stroke-width="4" />
-            <text
-              transform="translate(665 385) rotate(-10) skewX(11)"
-              y="36"
-              text-anchor="middle"
-              font-size="100"
-              textLength="540"
-              lengthAdjust="spacing"
-              class="fill-sky-evening font-sans font-bold"
-            >RESERVED</text>
-            <path d="M570 518L825 455" class="stroke-brand-amber" stroke-width="7" stroke-linecap="round" />
-            <path d="M558 518l12-12 12 12-12 12zM813 455l12-12 12 12-12 12z" class="fill-brand-amber" />
-            <text
-              transform="translate(712 570) rotate(-13) skewX(11)"
-              y="22"
-              text-anchor="middle"
-              font-size="66"
-              letter-spacing="14"
-              class="fill-sky-evening/80 font-kr font-bold"
-            >예약석</text>
-          </g>
-        </g>
         <!-- Steel chopsticks and a long spoon lying at an angle in front, with their shadows -->
         <g data-prop data-order="7" data-slide>
           <g transform="translate(40 -4)">
-            <path d="M334 310L454 276M344 316L464 282" class="stroke-black/30" stroke-width="5" stroke-linecap="round" transform="translate(4 5)" />
             <path d="M332 306L452 272M342 312L462 278" class="stroke-sky-dawn" stroke-width="4.5" stroke-linecap="round" />
             <path d="M334 304L448 271" class="stroke-white/50" stroke-width="1.5" stroke-linecap="round" />
-            <path d="M330 338L470 306" class="stroke-black/30" stroke-width="5" stroke-linecap="round" transform="translate(4 5)" />
             <path d="M330 338L470 306" class="stroke-sky-dawn" stroke-width="4" stroke-linecap="round" />
             <ellipse cx="318" cy="340" rx="13" ry="7" transform="rotate(-18 318 340)" class="fill-sky-dawn" />
             <ellipse cx="318" cy="340" rx="8" ry="4" transform="rotate(-18 318 340)" class="fill-white/45" />
           </g>
         </g>
       </svg>
+        <!-- RESERVED tent card, a CSS 3D tent: two panels meet at a top ridge and lean apart like an
+             open book. The whole tent is turned so its right side recedes and the back panel shows as a
+             dark wedge on the left. The front panel carries the text and follows the perspective -->
+        <div
+          data-prop
+          data-order="5"
+          class="absolute [perspective:1000px]"
+          style="left: 9%; bottom: 4%; width: 46%; height: 50%"
+        >
+          <div data-shadow class="absolute -bottom-[4%] left-[-2%] h-[16%] w-[104%] bg-[radial-gradient(ellipse_at_46%_30%,rgb(0_0_0/0.42),transparent_68%)]"></div>
+          <div class="absolute inset-0 transform-3d" style="transform: rotateX(-6deg) rotateY(36deg)">
+            <!-- Back panel, leaning away from the viewer: only its edge and shadow side show -->
+            <div
+              class="absolute inset-x-0 top-0 h-full origin-top rounded-[3px] bg-dine-paper-shade"
+              style="transform: rotateX(-22deg)"
+            ></div>
+            <!-- Front panel, leaning toward the viewer from the same ridge -->
+            <div
+              class="absolute inset-x-0 top-0 h-full origin-top overflow-hidden rounded-[3px] bg-[linear-gradient(to_bottom,var(--color-brand-cream),var(--color-dine-paper-shade))] shadow-lg"
+              style="transform: rotateX(22deg)"
+            >
+              <div class="absolute inset-x-0 top-0 h-[3px] bg-white/80"></div>
+              <div class="absolute inset-[9%] border border-sky-evening/35"></div>
+              <div class="absolute inset-0 flex flex-col items-center justify-center gap-[4%] text-sky-evening">
+                <p class="font-sans text-[clamp(10px,2.9vw,21px)] font-bold tracking-[0.14em]">RESERVED</p>
+                <div class="flex items-center gap-[3%]">
+                  <span class="h-[2px] w-[18%] bg-brand-amber"></span>
+                  <span class="size-[0.6em] rotate-45 bg-brand-amber"></span>
+                  <span class="h-[2px] w-[18%] bg-brand-amber"></span>
+                </div>
+                <p class="font-kr text-[clamp(8px,2.3vw,16px)] font-bold tracking-[0.25em] text-sky-evening/80">예약석</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Right setting: a tall soju bottle at the back, the stew pot in the middle, a side dish
            and two glasses in front. The essentials sit at the outer end, clear of the booking card -->
