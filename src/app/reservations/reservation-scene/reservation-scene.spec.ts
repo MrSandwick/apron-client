@@ -22,7 +22,8 @@ describe('ReservationScene', () => {
   it('holds no controls and only the RESERVED card lettering', async () => {
     const { el } = await setup();
     expect(el.querySelector('button, input, select, a, [tabindex]')).toBeNull();
-    expect(el.textContent?.replace(/\s+/g, ' ').trim()).toBe('RESERVED 예약석');
+    // The two lines are separate paragraphs with no space between them, so compare without whitespace
+    expect(el.textContent?.replace(/\s+/g, '')).toBe('RESERVED예약석');
   });
 
   // Four depth layers, far to near, each with one intro child that pops in on entry
@@ -40,7 +41,8 @@ describe('ReservationScene', () => {
     const { el } = await setup();
     const table = el.querySelector('[data-layer="table"]')!;
     expect(table.querySelectorAll('[data-prop]').length).toBe(9);
-    expect(table.querySelector('text')?.textContent).toBe('RESERVED');
+    // The card lettering is HTML on the CSS 3D tent, not an SVG text node
+    expect(table.querySelector('p')?.textContent?.trim()).toBe('RESERVED');
     expect(table.querySelectorAll('[data-steam]').length).toBe(3);
   });
 
@@ -79,7 +81,9 @@ describe('ReservationScene', () => {
   // The table slides sideways with the cursor but is marked x-only, so the room never shows under it
   it('keeps the table from moving vertically with the cursor', async () => {
     const { el } = await setup();
-    expect(el.querySelector('[data-layer="table"]')?.hasAttribute('data-pointer-x-only')).toBe(true);
+    expect(el.querySelector('[data-layer="table"]')?.hasAttribute('data-pointer-x-only')).toBe(
+      true,
+    );
   });
 
   // The utensils are solid steel: no semi-transparent fills to see the table through
