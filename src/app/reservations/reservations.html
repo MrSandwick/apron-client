@@ -1,10 +1,20 @@
 <!-- Page on the dusk sky, like the cart -->
 <main
-  class="relative min-h-[70vh] bg-linear-to-b from-sky-twilight to-sky-night px-4 pt-10 pb-20 text-night-text sm:px-6 sm:pt-14"
+  class="relative min-h-[70vh] bg-linear-to-b from-sky-twilight to-sky-night px-4 pt-10 pb-72 text-night-text sm:px-6 sm:pt-14 lg:pb-24"
   data-testid="reservations-page"
 >
-  <div class="mx-auto max-w-[640px]">
-    <!-- Page heading -->
+  <!-- Decorative dusk terrace covering the whole page, behind the form. pointer-events-none so
+       it can never block a control. Its bottom fades into the footer colour -->
+  <app-reservation-scene
+    data-testid="reservation-scene"
+    aria-hidden="true"
+    class="pointer-events-none absolute inset-0 z-0"
+  />
+
+  <!-- Heading and card, above the backdrop. The extra bottom padding on phones and tablets
+       leaves the lower-right table clear of the card -->
+  <div class="relative z-10 mx-auto max-w-[640px]">
+    <!-- Page heading, over the card -->
     <header class="mb-8 text-center">
       <p class="eyebrow">Reservations</p>
       <h1 class="mt-2 font-display text-[32px] text-brand-cream sm:text-[40px]">Reserve a table</h1>
@@ -15,7 +25,7 @@
 
     <!-- Current step, in a card -->
     <div
-      class="rounded-3xl border border-brand-amber/15 bg-brand-surface p-5 shadow-xl shadow-black/30 sm:p-8"
+      class="min-w-0 rounded-3xl border border-brand-amber/15 bg-brand-surface p-5 shadow-xl shadow-black/30 sm:p-8"
     >
       @switch (step()) {
         @case ('details') {

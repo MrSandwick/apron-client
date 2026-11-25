@@ -18,6 +18,7 @@ import { GuestStep } from './guest-step';
 import { fieldErrors, problemMessage } from './reservation.errors';
 import { todayIso } from './reservation.format';
 import { GuestDetails, Hold, Reservation, Slot } from './reservation.models';
+import { ReservationScene } from './reservation-scene/reservation-scene';
 import { ReservationService } from './reservation.service';
 
 type Step = 'details' | 'guest' | 'confirmation';
@@ -31,7 +32,7 @@ const HOLD_EXPIRED = 'Your table hold expired. Please choose a time again.';
 // (details, guest, confirmation). The step components only display and report what the guest did.
 @Component({
   selector: 'app-reservations-page',
-  imports: [DetailsStep, GuestStep, ConfirmationStep, CancelDialog],
+  imports: [DetailsStep, GuestStep, ConfirmationStep, CancelDialog, ReservationScene],
   templateUrl: './reservations.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
