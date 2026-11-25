@@ -27,6 +27,11 @@
         <stop offset="0%" class="[stop-color:var(--color-brand-cream)]" />
         <stop offset="100%" class="[stop-color:var(--color-dine-paper-shade)]" />
       </linearGradient>
+      <linearGradient id="rs-steel" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" class="[stop-color:color-mix(in_srgb,var(--color-sky-dawn),white_55%)]" />
+        <stop offset="45%" class="[stop-color:var(--color-sky-dawn)]" />
+        <stop offset="100%" class="[stop-color:color-mix(in_srgb,var(--color-sky-dawn),black_35%)]" />
+      </linearGradient>
     </defs>
   </svg>
 
@@ -158,12 +163,26 @@
         </g>
         <!-- Steel chopsticks and a long spoon lying at an angle in front, with their shadows -->
         <g data-prop data-order="7" data-slide>
-          <g transform="translate(40 -4)">
-            <path d="M332 306L452 272M342 312L462 278" class="stroke-sky-dawn" stroke-width="4.5" stroke-linecap="round" />
-            <path d="M334 304L448 271" class="stroke-white/50" stroke-width="1.5" stroke-linecap="round" />
-            <path d="M330 338L470 306" class="stroke-sky-dawn" stroke-width="4" stroke-linecap="round" />
-            <ellipse cx="318" cy="340" rx="13" ry="7" transform="rotate(-18 318 340)" class="fill-sky-dawn" />
-            <ellipse cx="318" cy="340" rx="8" ry="4" transform="rotate(-18 318 340)" class="fill-white/45" />
+          <!-- Steel sujeo lying on the table: drawn along +x, then turned so the steel gradient runs
+               across each piece's width -->
+          <g transform="translate(322 312) rotate(-10) scale(1.08)">
+            <!-- Two flat chopsticks, wider at the top end, with engraved bands there -->
+            @for (dy of [0, 7]; track dy) {
+              <g [attr.transform]="'translate(' + dy / 2 + ' ' + dy + ')'">
+                <path d="M0 -1.3L128 -2.6L128 2.6L0 1.3Z" fill="url(#rs-steel)" />
+                <path d="M110 -2.4V2.4M114 -2.5V2.5M118 -2.5V2.5" class="stroke-dine-shadow/40" stroke-width="0.8" />
+                <path d="M2 -0.6L126 -1.4" class="stroke-white/60" stroke-width="0.7" stroke-linecap="round" />
+              </g>
+            }
+            <!-- Long flat spoon: oval bowl at the front, a thin handle widening to its end -->
+            <g transform="translate(-4 20)">
+              <path d="M25 -1.3L132 -2.4Q136 0 132 2.4L25 1.3Z" fill="url(#rs-steel)" />
+              <path d="M118 -2.2V2.2M122 -2.3V2.3" class="stroke-dine-shadow/40" stroke-width="0.8" />
+              <ellipse cx="13" cy="0" rx="14" ry="8.5" fill="url(#rs-steel)" />
+              <ellipse cx="12" cy="0.7" rx="10.5" ry="5.8" class="fill-[color-mix(in_srgb,var(--color-sky-dawn),black_22%)]" />
+              <ellipse cx="8" cy="-2.4" rx="4" ry="1.4" class="fill-white/70" />
+              <path d="M28 -0.5L130 -1.2" class="stroke-white/55" stroke-width="0.6" stroke-linecap="round" />
+            </g>
           </g>
         </g>
       </svg>
