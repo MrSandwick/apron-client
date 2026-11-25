@@ -40,8 +40,8 @@ describe('HomeVisit', () => {
     expect(text).toContain('Sunday');
   });
 
-  // Heading is two masked lines with the second in amber, plus the lead paragraph
-  it('renders the two-line heading and the lead paragraph', () => {
+  // Heading is two masked lines with the second in amber
+  it('renders the two-line heading', () => {
     const fixture = TestBed.createComponent(HomeVisit);
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
@@ -49,7 +49,7 @@ describe('HomeVisit', () => {
     expect(h2?.textContent).toContain('Come find');
     expect(h2?.textContent).toContain('us tonight');
     expect(h2?.querySelector('.text-brand-amber')?.textContent).toContain('us tonight');
-    expect(el.textContent).toContain('The lanterns are lit');
+    expect(el.textContent).not.toContain('The lanterns are lit');
   });
 
   // No map or phone links yet, so both actions stay buttons sized as 44px tap targets
@@ -72,12 +72,13 @@ describe('HomeVisit', () => {
     expect(call[0].classList.contains('btn-ghost')).toBe(true);
   });
 
-  // The map is an illustrated frame with a pin, and the giant word behind the section is decorative
-  it('renders the map with its pin and a hidden drifting word', () => {
+  // No map or phone number in the panel, and the giant word behind the section is decorative
+  it('has no map or phone and keeps a hidden drifting word', () => {
     const fixture = TestBed.createComponent(HomeVisit);
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.querySelector('[role="img"] svg')).toBeTruthy();
+    expect(el.querySelector('[role="img"]')).toBeNull();
+    expect(el.textContent).not.toContain('(000)');
     const drift = el.querySelector('[data-testid="visit-drift"]');
     expect(drift?.getAttribute('aria-hidden')).toBe('true');
     expect(drift?.textContent).toContain('찾아오세요');
@@ -92,33 +93,25 @@ describe('HomeVisit', () => {
     expect(rows[0].textContent).not.toContain('Today');
   });
 
-  // Inside opening hours the pill says when the kitchen closes (Sunday 3 PM in Chicago)
-  it('shows "Open now" with the closing time while open', async () => {
+  // The open-now pill and the walk-ins line are gone
+  it('shows no open-now pill or walk-ins line', async () => {
     setNow('2026-11-22T21:00:00Z');
     const { el } = await render();
-    expect(el.querySelector('[data-testid="open-status"]')?.textContent).toContain(
-      'Open now · until 9 PM',
-    );
+    expect(el.querySelector('[data-testid="open-status"]')).toBeNull();
+    expect(el.textContent).not.toContain('Open now');
+    expect(el.textContent).not.toContain('Walk-ins');
   });
 
-  // After closing time the pill switches to the closed state (Sunday 10 PM in Chicago)
-  it('shows "Closed now" outside opening hours', async () => {
-    setNow('2026-11-23T04:00:00Z');
-    const { el } = await render();
-    expect(el.querySelector('[data-testid="open-status"]')?.textContent).toContain('Closed now');
-  });
-
-  // Prerendered markup has no clock yet, so no pill and no Today tag. The browser clock is cleared
-  // by hand, which avoids depending on when afterNextRender fires
-  it('shows neither status nor Today while the browser clock is unknown', async () => {
+  // Prerendered markup has no clock yet, so no Today tag. The browser clock is cleared by hand,
+  // which avoids depending on when afterNextRender fires
+  it('shows no Today tag while the browser clock is unknown', async () => {
     setNow('2026-11-22T21:00:00Z');
     const { fixture, el } = await render();
-    expect(el.querySelector('[data-testid="open-status"]')).toBeTruthy();
+    expect(el.textContent).toContain('Today');
 
     // Back to the prerendered state
     fixture.componentInstance['now'].set(null);
     fixture.detectChanges();
-    expect(el.querySelector('[data-testid="open-status"]')).toBeNull();
     expect(el.textContent).not.toContain('Today');
   });
 
@@ -128,7 +121,7 @@ describe('HomeVisit', () => {
     const { el } = await render();
     const rows = Array.from(el.querySelectorAll('[data-testid="hours-list"] > div'));
     for (const row of rows) {
-      for (const cls of ['-mx-3', 'my-1.5', 'px-4', 'py-[18px]', 'border-b']) {
+      for (const cls of ['border-t-2', 'pt-5']) {
         expect(row.classList.contains(cls)).toBe(true);
       }
     }
